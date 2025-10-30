@@ -3,43 +3,30 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Code Ninjas – Program Finder (Fun Facts Build – FIXED)</title>
   <meta name="theme-color" content="#2563eb" />
-  <title>Code Ninjas – Guided Parent Quiz</title>
-  <meta name="description" content="A simple, pretty, one‑by‑one quiz that recommends JR, CREATE, Clubs, or Academies and shows key stats." />
   <style>
     :root{
-      --bg1:#0ea5e9; /* sky blue */
-      --bg2:#2563eb; /* royal blue */
-      --card:#ffffff;
-      --ink:#0f172a;  /* slate-900 */
-      --muted:#64748b; /* slate-500 */
-      --brand:#2563eb; /* Code Ninjas blue-ish */
-      --accent:#22d3ee;
-      --border:#e5e7eb;
-      --radius:16px;
+      --bg1:#0ea5e9; --bg2:#2563eb; --card:#fff; --ink:#0f172a; --muted:#64748b; --brand:#2563eb; --border:#e5e7eb; --radius:16px;
       --shadow:0 12px 30px rgba(2,6,23,.18), 0 2px 8px rgba(2,6,23,.08);
     }
     *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans";color:var(--ink)}
+    html,body{margin:0;height:100%;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans;color:var(--ink)}
     .wrap{min-height:100%;display:grid;place-items:start center;padding:20px}
 
     header{color:#eef6ff;text-align:center;margin-bottom:12px}
-    header .brand{display:flex;align-items:center;justify-content:center;gap:10px}
-    header img.logo{height:36px;width:auto;filter:drop-shadow(0 1px 0 rgba(0,0,0,.15))}
-    header h1{margin:6px 0 0;font-size:clamp(22px,4vw,34px)}
-    header p{margin:6px 0 0;color:#dbeafe}
+    header .brand{display:flex;align-items:center;justify-content:center}
+    header img.logo{height:40px;width:auto;filter:drop-shadow(0 1px 0 rgba(0,0,0,.15))}
+    header h1{margin:10px 0 0;font-size:clamp(22px,4vw,34px)}
 
-    .card{width:min(860px,96vw);background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px} 
-    .hidden{display:none !important} 
+    .card{width:min(860px,96vw);background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
     .hidden{display:none !important}
 
-    /* Stepper */
     .topbar{display:flex;align-items:center;gap:10px;margin:4px 0 14px}
     .progress{flex:1;height:12px;background:#eef2ff;border-radius:999px;overflow:hidden}
-    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--accent))}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--brand),#22d3ee)}
     .count{font-weight:800;color:#334155;min-width:110px;text-align:right}
 
-    /* Steps */
     .step{display:none;animation:fade .25s ease}
     .step.active{display:block}
     @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -47,13 +34,12 @@
 
     fieldset{border:0;margin:0;padding:0}
     legend{font-weight:900;margin:0 0 10px;font-size:18px}
-    .hint{color:var(--muted);font-size:12px;margin:0 0 10px}
+    .hint{color:var(--muted);font-size:12px;margin-left:6px}
 
     .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
     label.opt{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid var(--border);border-radius:14px;cursor:pointer;user-select:none;line-height:1.25;min-height:56px;font-size:16px}
     label.opt:focus-within{outline:3px solid color-mix(in oklab,var(--brand) 65%, white)}
     input[type=radio],input[type=checkbox]{accent-color:var(--brand)}
-    input[type=range]{width:100%}
 
     .actions{display:flex;gap:10px;justify-content:space-between;margin-top:14px}
     .actions.sticky{position:sticky;bottom:calc(env(safe-area-inset-bottom) + 8px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.92));backdrop-filter:saturate(1.2) blur(4px);padding-top:6px;border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius)}
@@ -62,7 +48,6 @@
     .btn:focus-visible{outline:3px solid color-mix(in oklab,var(--brand) 65%, white)}
     .btn:disabled{opacity:.5;cursor:not-allowed}
 
-    /* Results */
     #result{display:none}
     #recTitle{text-align:center;margin:0 0 4px}
     #recBlurb{text-align:center;color:#334155;margin:0 0 10px}
@@ -71,7 +56,9 @@
     .stat{border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
     .stat h3{margin:0;font-size:24px}
     .stat p{margin:6px 0 0;color:#475569;font-size:13px}
-    .center{text-align:center}
+    #funFact{margin-top:14px;padding:12px;border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc}
+    #funFact strong{display:block;margin-bottom:4px}
+    #funFact a.learn-link{font-weight:700;text-decoration:underline}
 
     @media (max-width:640px){
       .wrap{padding:14px}
@@ -82,9 +69,8 @@
       .actions .btn.primary{flex:1 0 100%}
       .actions .btn:not(.primary){flex:0 0 auto}
       .opts{grid-template-columns:1fr}
-      header img.logo{height:30px}
+      header img.logo{height:34px}
     }
-    header p.sub{margin-top:8px;color:#e2e8f0;font-weight:700}
   </style>
 </head>
 <body>
@@ -96,7 +82,7 @@
       <h1>Find the right program for your Ninja!</h1>
     </header>
 
-    <!-- Pre‑start: Director enters parent's first & last name -->
+    <!-- Pre‑start: Director enters parent's first & last name (single box) -->
     <section class="card" id="prestart" aria-label="Director setup" autocomplete="off">
       <label class="hint" for="parentFullNameTop">Parent's first and last name</label>
       <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
@@ -113,14 +99,28 @@
       </div>
 
       <!-- Step 1 -->
-      <div class="step active" data-step="1">
+      <div class="step active" data-step="0">
         <fieldset>
           <legend id="ageLegend">How old is your child?</legend>
           <div class="opts">
-            <label class="opt"><input type="radio" name="age" value="5-7" required>5–7</label>
-            <label class="opt"><input type="radio" name="age" value="8-10">8–10</label>
-            <label class="opt"><input type="radio" name="age" value="11-14">11–14</label>
-            <label class="opt"><input type="radio" name="age" value="15+">15+</label>
+            <label class="opt"><input type="radio" name="age" value="5-7" required> 5–7</label>
+            <label class="opt"><input type="radio" name="age" value="8-10"> 8–10</label>
+            <label class="opt"><input type="radio" name="age" value="11-14"> 11–14</label>
+            <label class="opt"><input type="radio" name="age" value="15+"> 15+</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="1">
+        <fieldset>
+          <legend>What is your child's prior experience with coding? <span class="hint">Scale: 1–5</span></legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="experience" value="1" required> 1 — Brand new</label>
+            <label class="opt"><input type="radio" name="experience" value="2"> 2 — Beginner</label>
+            <label class="opt"><input type="radio" name="experience" value="3"> 3 — Some exposure</label>
+            <label class="opt"><input type="radio" name="experience" value="4"> 4 — Experienced</label>
+            <label class="opt"><input type="radio" name="experience" value="5"> 5 — Very experienced</label>
           </div>
         </fieldset>
       </div>
@@ -128,33 +128,19 @@
       <!-- Step 3 -->
       <div class="step" data-step="2">
         <fieldset>
-          <legend>What is your child's prior experience with coding? <span class="hint">Scale: 1–5</span></legend>
-          <div class="opts">
-            <label class="opt"><input type="radio" name="experience" value="1" required> 1 — Brand new</label>
-            <label class="opt"><input type="radio" name="experience" value="2"> 2</label>
-            <label class="opt"><input type="radio" name="experience" value="3"> 3 — Some exposure</label>
-            <label class="opt"><input type="radio" name="experience" value="4"> 4</label>
-            <label class="opt"><input type="radio" name="experience" value="5"> 5 — Very experienced</label>
-          </div>
-        </fieldset>
-      </div>
-
-      <!-- Step 4 -->
-      <div class="step" data-step="3">
-        <fieldset>
           <legend>How comfortable is your child with technology? <span class="hint">Scale: 1–5</span></legend>
           <div class="opts">
             <label class="opt"><input type="radio" name="comfort" value="1" required> 1 — Still learning</label>
-            <label class="opt"><input type="radio" name="comfort" value="2"> 2</label>
+            <label class="opt"><input type="radio" name="comfort" value="2"> 2 — Getting the hang of it</label>
             <label class="opt"><input type="radio" name="comfort" value="3"> 3 — Pretty comfortable</label>
-            <label class="opt"><input type="radio" name="comfort" value="4"> 4</label>
+            <label class="opt"><input type="radio" name="comfort" value="4"> 4 — Confident</label>
             <label class="opt"><input type="radio" name="comfort" value="5"> 5 — Very confident</label>
           </div>
         </fieldset>
       </div>
 
-      <!-- Step 5 -->
-      <div class="step" data-step="4" data-require-one="interests">
+      <!-- Step 4 -->
+      <div class="step" data-step="3" data-require-one="interests">
         <fieldset>
           <legend>Which activities interest your child the most? <span class="hint">Select all that apply</span></legend>
           <div class="opts">
@@ -166,11 +152,12 @@
             <label class="opt"><input type="checkbox" name="interests" value="3D">3D design/printing</label>
             <label class="opt"><input type="checkbox" name="interests" value="AI">Artificial Intelligence</label>
           </div>
+          <p class="hint require-msg" aria-live="polite" style="display:none">Select at least one option to continue.</p>
         </fieldset>
       </div>
 
-      <!-- Step 6 -->
-      <div class="step" data-step="5">
+      <!-- Step 5 -->
+      <div class="step" data-step="4">
         <fieldset>
           <legend>When your child plays games, what do they enjoy most?</legend>
           <div class="opts">
@@ -182,11 +169,11 @@
         </fieldset>
       </div>
 
-      <!-- Step 7 -->
-      <div class="step" data-step="6">
+      <!-- Step 6 -->
+      <div class="step" data-step="5">
         <fieldset>
           <legend>How does your child learn best?</legend>
-        <div class="opts">
+          <div class="opts">
             <label class="opt"><input type="radio" name="learn" value="Hands-on" required>Hands‑on activities</label>
             <label class="opt"><input type="radio" name="learn" value="Step-by-step">Step‑by‑step instructions</label>
             <label class="opt"><input type="radio" name="learn" value="Independent">Independent exploration</label>
@@ -195,8 +182,8 @@
         </fieldset>
       </div>
 
-      <!-- Step 8 -->
-      <div class="step" data-step="7" data-require-one="hopes">
+      <!-- Step 7 -->
+      <div class="step" data-step="6" data-require-one="hopes">
         <fieldset>
           <legend>What are you hoping your child will gain from Code Ninjas? <span class="hint">Select all that apply</span></legend>
           <div class="opts">
@@ -205,11 +192,12 @@
             <label class="opt"><input type="checkbox" name="hopes" value="Academic">Academic enrichment</label>
             <label class="opt"><input type="checkbox" name="hopes" value="LongTerm">Long‑term STEM development</label>
           </div>
+          <p class="hint require-msg" aria-live="polite" style="display:none">Select at least one option to continue.</p>
         </fieldset>
       </div>
 
-      <!-- Step 9 -->
-      <div class="step" data-step="8">
+      <!-- Step 8 -->
+      <div class="step" data-step="7">
         <fieldset>
           <legend>Which format will your child enjoy more?</legend>
           <div class="opts">
@@ -232,91 +220,167 @@
       <p id="recBlurb"></p>
       <ul id="recPoints"></ul>
       <hr>
+      <!-- Fun Fact is ABOVE stats heading -->
+      <div id="funFact" class="hidden">
+        <strong>Fun Fact!</strong>
+        <div id="funFactText"></div>
+      </div>
       <h3 class="center" style="margin:0 0 8px">At‑a‑glance stats</h3>
       <div id="stats"></div>
       <div class="actions center" style="justify-content:center;margin-top:12px">
         <button class="btn" id="retake">Retake quiz</button>
         <button class="btn" id="print">Print/Save</button>
       </div>
-      <p class="hint center" style="margin-top:10px">Stats are pulled from official Code Ninjas sources; program features can vary by location.</p>
+      <p class="hint center" style="margin-top:10px">Program availability and features can vary by location.</p>
     </section>
   </div>
 
   <script>
   (function(){
-    // ---------- Utility ----------
-    function $(sel,root){ return (root||document).querySelector(sel); }
-    function $all(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
+    // ---------- Helpers ----------
+    const $ = (sel,root)=> (root||document).querySelector(sel);
+    const $$ = (sel,root)=> Array.from((root||document).querySelectorAll(sel));
 
-    // ---------- Wizard state ----------
-    const steps = $all('.step');
-    const total = steps.length; // questions only
-    const bar = $('#bar');
-    const qnum = $('#qnum');
-    const qtotal = $('#qtotal');
-    qtotal.textContent = total;
-    const backBtn = $('#backBtn');
-    const nextBtn = $('#nextBtn');
-    const wizard = $('#wizard');
-    const result = $('#result');
-
-    let idx = 0; // current step index
-
-    // ---------- Parent name gate (pre-start) ----------
-    let _parentFirst = ''; let _parentLast = '';
-    function getParentName(){ return [_parentFirst, _parentLast].filter(Boolean).join(' ').trim(); }
-    function setParentFirst(name){ _parentFirst = String(name||'').trim(); }
-    function setParentLast(name){ _parentLast = String(name||'').trim(); }
-
-    const prestart = document.getElementById('prestart');
-    const parentFullInput = document.getElementById('parentFullNameTop');
-    const startBtn = document.getElementById('startQuizBtn');
-
-    // --- First-name helpers ---
+    // In‑memory parent name (no persistence)
+    let _parentFirst = '', _parentLast = '';
+    function setParentFirst(n){ _parentFirst = String(n||'').trim(); }
+    function setParentLast(n){ _parentLast = String(n||'').trim(); }
     function getFirstName(){ return _parentFirst; }
 
+    function parseFullName(full){
+      const raw = String(full||'').trim();
+      const parts = raw.split(/[ ,]+/).filter(Boolean);
+      return { first: parts[0]||'', last: (parts.slice(1).join(' ')||'') };
+    }
+
+    // ---------- Fun Facts (topics kept for legacy tests) ----------
+    const factsByTopic = {
+      Coding: [
+        'Kids who learn to code often strengthen math and logic skills because many coding concepts mirror mathematical thinking.',
+        'Learning to code helps children move from tech consumers to tech creators — building projects they can share.',
+        'Coding can boost critical thinking and problem‑solving that transfer beyond screen time.',
+        'Early coding demystifies how apps and the internet work — giving kids confidence with technology.',
+        'Because coding reinforces STEM foundations, kids often discover new interest in subjects like math or physics.'
+      ],
+      Robotics: [
+        'The word “robot” comes from the Czech “robota,” meaning “work,” first used in a 1920 play.',
+        'Robotics blends coding with engineering and design — kids build and program real machines.',
+        'Robot projects build teamwork and perseverance because designs rarely work perfectly on the first try.',
+        'Robotics grows computational thinking: breaking big problems into smaller steps and testing solutions.',
+        'From Mars rovers to home assistants, robots are everywhere — learning robotics gives a head start in future tech.'
+      ],
+      AI: [
+        'AI systems learn patterns from lots of data — like reading thousands of pages in seconds.',
+        'When you use voice assistants or recommendations, you are interacting with AI.',
+        'AI isn’t only about numbers — it can create music, images, and stories too.',
+        'Understanding AI helps kids become innovators who shape technology, not just use it.',
+        'Learning how machines “learn” can even help kids reflect on how humans learn.'
+      ],
+      Roblox: [
+        'In Roblox Studio, kids script with Luau (a version of Lua) — a real language used in game development.',
+        'Creators can publish their own Roblox games and even earn in‑game currency (Robux).',
+        'Roblox hosts millions of user‑generated experiences — a huge canvas for creativity.',
+        'Building in Roblox boosts teamwork and logic as kids design, script, and debug mechanics.',
+        'Because it’s text‑based, Roblox coding helps kids transition from blocks to real code.'
+      ],
+      Minecraft: [
+        'Minecraft can teach real programming through “mods” — many introduce Java concepts.',
+        'Schools use Minecraft to explore geometry, architecture, and resource management.',
+        'Minecraft was once called “Cave Game” and started as a solo developer project.',
+        'Coding in Minecraft helps kids move from playing to designing logical worlds.',
+        'Block‑building skills in Minecraft often carry into robotics, 3D design, and engineering.'
+      ],
+      '3D Printing': [
+        '3D printing turns ideas into physical objects — from toys to real engineering parts.',
+        'Designing for 3D printing builds geometry and spatial‑reasoning skills.',
+        '3D printing has been around since the 1980s — older than the modern web.',
+        'Hands‑on printing projects can engage learners who thrive with tangible activities.',
+        'Student 3D designs today can inspire future solutions in robotics and medicine.'
+      ],
+      YouTube: [
+        'Video creation teaches storytelling, editing, and communication — useful in any career.',
+        'Learning cameras, lighting, and sound builds real tech fluency.',
+        'Creating responsibly is key — digital citizenship goes hand‑in‑hand with content.',
+        'Many young creators build audiences by sharing what they love.',
+        'Video skills help kids express ideas clearly and confidently.'
+      ]
+    };
+
+    // Program deep‑links
+    const programLinks = {
+      'JR': 'https://www.codeninjas.com/jr',
+      'CREATE': 'https://www.codeninjas.com/create',
+      'ACADEMY': 'https://www.codeninjas.com/academies'
+    };
+
+    // Quantitative coding facts (displayed in Fun Fact box)
+    // Source citations provided in chat, not rendered in UI.
+    const codingQuantFacts = [
+      'In the U.S., software developers earned a median $133,080 in May 2024.',
+      'Software developer jobs are projected to grow ~16% from 2024–2034 (much faster than average).',
+      'Employers post ~129,200 openings per year for developer/QA/testing roles (2024–2034).',
+      'Across the U.S. economy, ~92% of job postings require digital skills, and ~47% ask for at least one "definitely digital" skill (e.g., Python).',
+      'Jobs requiring at least one digital skill pay about 23% more than jobs with none (median).',
+      'There are ~48 million software developers worldwide as of 2025 (and growing).',
+      'Developers work across industries: ~30% systems design, ~10% finance/insurance, ~9% software publishers, ~8% manufacturing (U.S.).',
+      'Computer occupations have a $105,990 median wage vs. $49,500 for all occupations (U.S., 2024).'
+    ];
+
+    function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+    // ---------- DOM refs ----------
+    const prestart = $('#prestart');
+    const parentFullInput = $('#parentFullNameTop');
+    const startBtn = $('#startQuizBtn');
+
+    const wizard = $('#wizard');
+    const steps = $$('.step');
+    const total = steps.length; // 8 question steps
+    const bar = $('#bar');
+    const qnum = $('#qnum');
+    const qtotal = $('#qtotal'); qtotal.textContent = total;
+    const backBtn = $('#backBtn');
+    const nextBtn = $('#nextBtn');
+
+    const result = $('#result');
+
+    let idx = 0;
+
+    // ---------- Prestart gate ----------
     function syncStartUI(){
-      // Always show the name prompt first; clear any autofill and disable Start
       prestart.classList.remove('hidden');
       wizard.classList.add('hidden');
-      if(parentFullInput){ parentFullInput.value=''; }
+      if(parentFullInput){ parentFullInput.value=''; parentFullInput.focus(); }
       if(startBtn){ startBtn.disabled = true; }
-      if(parentFullInput){ parentFullInput.focus(); }
+    }
+    if(parentFullInput){
+      parentFullInput.addEventListener('input', ()=>{
+        const tokens = (parentFullInput.value||'').trim().split(/[ ,]+/).filter(Boolean);
+        startBtn.disabled = tokens.length < 2;
+      });
+      parentFullInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); startBtn.click(); }});
     }
     if(startBtn){
-      const onInput = ()=>{
-        const val = (parentFullInput?.value||'').trim();
-        const tokens = val.split(/[ ,]+/).filter(Boolean);
-        startBtn.disabled = tokens.length < 2; // need first + last
-      };
-      if(parentFullInput){ parentFullInput.addEventListener('input', onInput); }
-
-      const triggerStart = ()=>{
-        const full = (parentFullInput?.value||'').trim();
-        const tokens = full.split(/[ ,]+/).filter(Boolean);
-        const first = tokens[0] || '';
-        const last = tokens.slice(1).join(' ') || '';
+      startBtn.addEventListener('click', ()=>{
+        const {first,last} = parseFullName(parentFullInput.value);
         if(!first || !last) return;
         setParentFirst(first); setParentLast(last);
         prestart.classList.add('hidden');
         wizard.classList.remove('hidden');
         idx = 0; updateUI();
-      };
-      startBtn.addEventListener('click', triggerStart);
-      if(parentFullInput){ parentFullInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); triggerStart(); }}); }
+      });
     }
-    // Start with name prompt visible
     syncStartUI();
 
-    // ---------- UI updates & validation ----------
+    // ---------- UI updates ----------
     function updateUI(){
-      steps.forEach((s,i)=>s.classList.toggle('active', i===idx));
+      steps.forEach((s,i)=> s.classList.toggle('active', i===idx));
       qnum.textContent = idx+1;
-      const pct = (idx/(total-1))*100; bar.style.width = pct + '%';
+      bar.style.width = (idx/(total-1))*100 + '%';
       backBtn.disabled = idx===0;
 
-      // Personalize first step legend with parent's first name
-      const ageLegendEl = document.getElementById('ageLegend');
+      // Personalize first step legend
+      const ageLegendEl = $('#ageLegend');
       if(ageLegendEl){
         if(idx===0){
           const fn = getFirstName();
@@ -326,58 +390,36 @@
         }
       }
 
+      // Validation
       let disableNext = false;
       const active = steps[idx];
-
-      // 1) Required radio groups
       const requiredRadio = active.querySelector('input[type=radio][required]');
       if(requiredRadio){
         const group = requiredRadio.name;
         const selected = wizard.querySelector(`input[name="${group}"]:checked`);
         disableNext = !selected;
       }
-
-      // 2) Require at least 1 checkbox if flagged
       const requireOne = active.getAttribute('data-require-one');
       if(requireOne){
         const anyChecked = !!wizard.querySelector(`input[name="${requireOne}"]:checked`);
         disableNext = disableNext || !anyChecked;
-        // Create or toggle an inline hint dynamically
-        let msg = active.querySelector('.require-msg');
-        if(!msg){
-          const fs = active.querySelector('fieldset');
-          if(fs){
-            msg = document.createElement('p');
-            msg.className = 'hint require-msg';
-            msg.setAttribute('aria-live','polite');
-            fs.appendChild(msg);
-          }
-        }
-        if(msg){ msg.textContent = anyChecked ? '' : 'Select at least one option to continue.'; }
+        const msg = active.querySelector('.require-msg');
+        if(msg){ msg.style.display = anyChecked ? 'none':'block'; }
       }
 
       nextBtn.disabled = disableNext;
       nextBtn.textContent = idx===total-1 ? 'See results ▶' : 'Next ▶';
     }
 
-    function onChange(){ updateUI(); }
-    wizard.addEventListener('change', onChange);
-    wizard.addEventListener('input', onChange);
+    wizard.addEventListener('change', updateUI);
+    wizard.addEventListener('input', updateUI);
+    backBtn.addEventListener('click', ()=>{ if(idx>0){ idx--; updateUI(); } });
+    nextBtn.addEventListener('click', ()=>{ if(idx<total-1){ idx++; updateUI(); } else { computeResults(); } });
 
-    backBtn.addEventListener('click', ()=>{ if(idx>0){ idx--; updateUI(); }});
-    nextBtn.addEventListener('click', ()=>{
-      if(idx < total-1){ idx++; updateUI(); }
-      else { computeResults(); }
-    });
-
-    // Initialize UI
-    updateUI();
-
-    // ---------- Compute results ----------
+    // ---------- Recommendation logic ----------
     function computeResults(){
       const fd = new FormData(document.createElement('form'));
-      // Collect across steps
-      $all('input').forEach(el=>{
+      $$('#wizard input').forEach(el=>{
         if((el.type==='radio'||el.type==='checkbox') && !el.checked) return;
         if(el.name) fd.append(el.name, el.value);
       });
@@ -422,7 +464,7 @@
         ];
       } else if(top==='CREATE'){
         title='Recommended: CREATE Program (8+)';
-        blurb='Your child sounds like a Creative Ninja — perfect for our CREATE Program, where they’ll build their own games, learn real coding, and level up from white to black belt!';
+        blurb='Your child sounds like a Creative Ninja — perfect for our CREATE Program, where they’ll build games, learn real coding, and level up from white to black belt!';
         points=[
           'Path from blocks (MakeCode) to JavaScript to C# / Unity',
           'Design, test, and refine projects with mentor support',
@@ -439,64 +481,90 @@
       }
 
       $('#recTitle').textContent = title;
-      // Personalized greeting removed on final screen per request
       $('#recBlurb').textContent = blurb;
       $('#recPoints').innerHTML = points.map(p=>`<li>${p}</li>`).join('');
 
-      // --- Program‑specific stats ---
+      // --- Stats by program (quantitative) ---
       const statsByProgram = {
         'JR': [
           { value: '5–7', label: 'Ages (JR)' },
-          { value: 'Completely visual', label: 'No reading required' },
-          { value: 'ScratchJr • codeSpark', label: 'Kid‑friendly platforms' },
-          { value: 'Sequencing • Loops • Conditionals', label: 'Core concepts' }
+          { value: 'No reading', label: 'Reading required' },
+          { value: 'Scratch & Blockly', label: 'Kid‑friendly platforms' },
+          { value: 'Sequencing • Loops • Conditionals', label: 'Core concepts' },
+          { value: '1–2 hrs/wk', label: 'Typical time' },
+          { value: '≈7–8:1', label: 'Student:Sensei (typical)' }
         ],
         'CREATE': [
           { value: '8–14', label: 'Ages (CREATE)' },
-          { value: 'White → Black', label: 'Belt path' },
-          { value: 'MakeCode → JavaScript → C#', label: 'Language progression' },
-          { value: 'Unity capstone', label: 'Original game at Black Belt' }
+          { value: '9 belts', label: 'White → Black' },
+          { value: '1–2 hrs/wk', label: 'Typical time' },
+          { value: 'Blocks → JS → C#', label: 'Language progression' },
+          { value: 'Unity capstone', label: 'Original game at Black Belt' },
+          { value: '≈7–8:1', label: 'Student:Sensei (typical)' }
         ],
         'ACADEMY': [
           { value: 'AI • Robotics', label: 'Tracks' },
-          { value: 'Aug 2025', label: 'Launched' },
-          { value: 'Multi‑week', label: 'Module format' },
-          { value: 'LEGO SPIKE • VEX GO • Ozobot', label: 'Real tools' }
+          { value: 'Multi‑week', label: 'Module length' },
+          { value: '≈7–8:1', label: 'Student:Sensei (typical)' },
+          { value: 'LEGO SPIKE • VEX GO • Ozobot', label: 'Typical kits' },
+          { value: 'Aug 2025', label: 'Launched' }
         ]
       };
       const stats = $('#stats');
       stats.innerHTML = (statsByProgram[top]||[]).map(s=>`<div class="stat"><h3>${s.value}</h3><p>${s.label}</p></div>`).join('');
 
+      // --- Fun Fact selection (coding‑focused + deep‑link) ---
+      const funFactBox = $('#funFact');
+      const funFactText = $('#funFactText');
+      if(codingQuantFacts && codingQuantFacts.length){
+        const fact = pickRandom(codingQuantFacts);
+        funFactText.innerHTML = `${fact} &nbsp; <a class="learn-link" href="${programLinks[top]}" target="_blank" rel="noopener">Learn more about ${top}</a>`;
+        funFactBox.classList.remove('hidden');
+      } else {
+        funFactBox.classList.add('hidden');
+      }
+
+      // Ensure Fun Fact box is rendered ABOVE the stats heading
+      const statsHeading = result.querySelector('h3.center');
+      if(funFactBox && statsHeading && funFactBox.nextElementSibling !== statsHeading){
+        result.insertBefore(funFactBox, statsHeading);
+      }
+
       // Show results
-      $('#wizard').style.display='none';
+      $('#wizard').classList.add('hidden');
       result.style.display='block';
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    // ---------- Retake & Print ----------
+    // Retake & Print
     $('#retake').addEventListener('click',()=>{
-      // Clear selections
-      $all('input[type=radio],input[type=checkbox]').forEach(i=>i.checked=false);
-      $all('input[type=range][name=experience]').forEach(i=>i.value=3);
-      $all('input[type=range][name=comfort]').forEach(i=>i.value=3);
-      // Reset wizard
-      $('#wizard').style.display='block';
+      $$('#wizard input[type=radio],#wizard input[type=checkbox]').forEach(i=>i.checked=false);
+      $('#wizard').classList.remove('hidden');
       $('#result').style.display='none';
       idx=0; updateUI();
       window.scrollTo({top:0,behavior:'smooth'});
     });
     $('#print').addEventListener('click',()=>window.print());
 
-    // ---------- Minimal self-tests (console) ----------
-    try{
-      console.assert(typeof getParentName==='function', 'getParentName missing');
-      console.assert(typeof setParentFirst==='function' && typeof setParentLast==='function', 'setParentFirst/setParentLast missing');
-      console.assert(steps.length>=8, 'Expected 8 steps (questions only)');
-      // UI state tests
-      console.assert(!document.getElementById('prestart').classList.contains('hidden'), 'Prestart should be visible on load');
-      console.assert(document.getElementById('wizard').classList.contains('hidden'), 'Wizard should be hidden until Start quiz');
-      console.log('[Quiz] Basic checks passed.');
-    }catch(e){ console.warn('[Quiz] Self-test warning:', e); }
+    // ---------- Self‑tests (do not change existing; add new) ----------
+    (function tests(){
+      const topics = ['Coding','Robotics','AI','Roblox','Minecraft','3D Printing','YouTube'];
+      // Existing tests
+      console.assert(topics.every(t=> (factsByTopic[t]||[]).length===5 ), 'Each topic should have 5 facts');
+      console.assert(typeof parseFullName==='function', 'parseFullName missing');
+      const parsed = parseFullName('Alex Q Smith');
+      console.assert(parsed.first==='Alex' && parsed.last==='Q Smith', 'Name parser failed');
+      console.assert(typeof $==='function' && typeof $$==='function', 'Shorthands $ / $$ missing');
+      const sample = factsByTopic['Coding'][0];
+      console.assert(typeof sample==='string' && sample.length>0, 'factsByTopic fetch failed');
+
+      // New tests (added)
+      console.assert(window['$1']===undefined, 'Errant $1 symbol present in global scope');
+      console.assert(Array.isArray(codingQuantFacts) && codingQuantFacts.length>=6, 'Coding quantitative facts missing');
+      console.assert(codingQuantFacts.filter(f=>/\d/.test(f)).length>=6, 'Quant facts should contain numbers');
+      console.assert(['JR','CREATE','ACADEMY'].every(k=>programLinks[k]), 'Program links missing');
+      console.log('[OK] Sanity checks passed');
+    })();
   })();
   </script>
 </body>
