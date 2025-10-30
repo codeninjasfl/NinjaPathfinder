@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Code Ninjas – Program Finder (Fun Facts Build – FIXED)</title>
   <meta name="theme-color" content="#2563eb" />
+  
+  <!-- PWA: minimal additions for iPad fullscreen Add to Home Screen -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Code Ninjas – Program Finder">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
   <style>
     :root{
       --bg1:#0ea5e9; --bg2:#2563eb; --card:#fff; --ink:#0f172a; --muted:#64748b; --brand:#2563eb; --border:#e5e7eb; --radius:16px;
@@ -566,6 +574,13 @@
       console.log('[OK] Sanity checks passed');
     })();
   })();
+  </script>
+
+  <!-- PWA: register service worker (no scope changes) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    }
   </script>
 </body>
 </html>
