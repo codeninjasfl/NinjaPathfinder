@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Code Ninjas – Program Finder (Fun Facts Build – FIXED)</title>
+  <title>Code Ninjas – Program Finder (Emotional Close Build)</title>
   <meta name="theme-color" content="#2563eb" />
   
   <!-- PWA: minimal additions for iPad fullscreen Add to Home Screen -->
@@ -19,8 +19,8 @@
       --shadow:0 12px 30px rgba(2,6,23,.18), 0 2px 8px rgba(2,6,23,.08);
     }
     *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans;color:var(--ink)}
-    .wrap{min-height:100%;display:grid;place-items:start center;padding:20px}
+    html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg1),var(--bg2));background-repeat:no-repeat;background-attachment:fixed;background-size:cover;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans;color:var(--ink)}
+    .wrap{min-height:100svh;display:grid;place-items:start center;padding:20px}
 
     header{color:#eef6ff;text-align:center;margin-bottom:12px}
     header .brand{display:flex;align-items:center;justify-content:center}
@@ -57,6 +57,8 @@
     .btn:disabled{opacity:.5;cursor:not-allowed}
 
     #result{display:none}
+    #personaTitle{text-align:center;margin:0 0 6px}
+    #personaBlurb{text-align:center;color:#334155;margin:0 0 12px}
     #recTitle{text-align:center;margin:0 0 4px}
     #recBlurb{text-align:center;color:#334155;margin:0 0 10px}
     #recPoints{margin:8px 0 0 18px}
@@ -79,6 +81,16 @@
       .opts{grid-template-columns:1fr}
       header img.logo{height:34px}
     }
+      /* --- Fixes: results spacing & centering, background overflow --- */
+    .center{ text-align:center; }
+    #result{ padding:26px 24px; }
+    #result h2{ margin:0 0 10px; line-height:1.2 }
+    #personaBlurb{ margin:8px 0 20px; }
+    #recTitle{ margin-top:14px; }
+    #recBlurb{ margin-bottom:12px; }
+    #recPoints{ margin:12px 0 18px 22px; }
+    #result hr{ margin:18px 0; border:0; border-top:1px solid var(--border); }
+    #stats{ margin-top:16px; gap:12px; }
   </style>
 </head>
 <body>
@@ -151,7 +163,7 @@
       <div class="step" data-step="3" data-require-one="interests">
         <fieldset>
           <legend>Which activities interest your child the most? <span class="hint">Select all that apply</span></legend>
-          <div class="opts">
+        <div class="opts">
             <label class="opt"><input type="checkbox" name="interests" value="GameDev">Building video games</label>
             <label class="opt"><input type="checkbox" name="interests" value="Roblox">Roblox</label>
             <label class="opt"><input type="checkbox" name="interests" value="Minecraft">Minecraft</label>
@@ -216,6 +228,131 @@
         </fieldset>
       </div>
 
+      <!-- NEW: Emotional close questions (Steps 9–18) -->
+      <div class="step" data-step="8">
+        <fieldset>
+          <legend>What inspired you to visit Code Ninjas today? <span class="hint">Reveals emotional driver</span></legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="visitReason" value="FutureReady" required> Coding is the future, and I want to prepare my child</label>
+            <label class="opt"><input type="radio" name="visitReason" value="AIChange"> AI is changing everything too fast — I want my child ready</label>
+            <label class="opt"><input type="radio" name="visitReason" value="LovesGamesTech"> My child loves games or tech</label>
+            <label class="opt"><input type="radio" name="visitReason" value="NeedsConfidenceFocus"> My child needs confidence and focus</label>
+            <label class="opt"><input type="radio" name="visitReason" value="Exploring"> We’re just exploring</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="9">
+        <fieldset>
+          <legend>How does your child usually feel about school and learning?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="schoolFeeling" value="LovesLearning" required> Loves to learn and stays engaged</label>
+            <label class="opt"><input type="radio" name="schoolFeeling" value="LikesSome"> Enjoys some subjects but not others</label>
+            <label class="opt"><input type="radio" name="schoolFeeling" value="GetsBored"> Gets bored easily or distracted</label>
+            <label class="opt"><input type="radio" name="schoolFeeling" value="StrugglesConfidence"> Struggles to stay confident or focused</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="10">
+        <fieldset>
+          <legend>What best describes how your child learns and plays?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="learnPlayStyle" value="CreativeInventive" required> Creative and imaginative — loves to invent</label>
+            <label class="opt"><input type="radio" name="learnPlayStyle" value="LogicalAnalytical"> Logical or analytical — enjoys puzzles</label>
+            <label class="opt"><input type="radio" name="learnPlayStyle" value="HandsOnBuilder"> Hands-on builder — loves to tinker</label>
+            <label class="opt"><input type="radio" name="learnPlayStyle" value="GamerCompetitive"> Gamer or competitive — thrives on goals</label>
+            <label class="opt"><input type="radio" name="learnPlayStyle" value="SocialCollaborative"> Social and collaborative — likes teamwork</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="11">
+        <fieldset>
+          <legend>When something is difficult, how does your child usually respond?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="challengeResponse" value="KeepsTrying" required> Keeps trying until they get it</label>
+            <label class="opt"><input type="radio" name="challengeResponse" value="FrustratedReturn"> Gets frustrated but comes back later</label>
+            <label class="opt"><input type="radio" name="challengeResponse" value="NeedsEncouragement"> Needs encouragement to keep going</label>
+            <label class="opt"><input type="radio" name="challengeResponse" value="AvoidsChallenges"> Avoids challenges altogether</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="12">
+        <fieldset>
+          <legend>What kind of activities spark your child’s curiosity most?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="curiositySpark" value="GamingDesign" required> Gaming and design</label>
+            <label class="opt"><input type="radio" name="curiositySpark" value="BuildingEngineering"> Building or engineering things</label>
+            <label class="opt"><input type="radio" name="curiositySpark" value="RoboticsTech"> Robotics and technology</label>
+            <label class="opt"><input type="radio" name="curiositySpark" value="StorytellingAnimation"> Storytelling or animation</label>
+            <label class="opt"><input type="radio" name="curiositySpark" value="AIFutureTech"> AI or future tech</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="13" data-require-one="growthTargets">
+        <fieldset>
+          <legend>What qualities do you most want to see grow in your child this year? <span class="hint">Select all that apply</span></legend>
+          <div class="opts">
+            <label class="opt"><input type="checkbox" name="growthTargets" value="ConfidenceIndependence"> Confidence and independence</label>
+            <label class="opt"><input type="checkbox" name="growthTargets" value="FocusPersistence"> Focus and persistence</label>
+            <label class="opt"><input type="checkbox" name="growthTargets" value="ProblemSolvingLogic"> Problem-solving and logic</label>
+            <label class="opt"><input type="checkbox" name="growthTargets" value="CreativityImagination"> Creativity and imagination</label>
+            <label class="opt"><input type="checkbox" name="growthTargets" value="FriendshipsTeamwork"> Friendships and teamwork</label>
+          </div>
+          <p class="hint require-msg" aria-live="polite" style="display:none">Select at least one option to continue.</p>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="14">
+        <fieldset>
+          <legend>How confident is your child with technology right now?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="techConfidence" value="Very" required> Very — loves computers or gaming</label>
+            <label class="opt"><input type="radio" name="techConfidence" value="Somewhat"> Somewhat — uses tech but not deeply</label>
+            <label class="opt"><input type="radio" name="techConfidence" value="NotYet"> Not yet — I’d love to see them become confident</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="15">
+        <fieldset>
+          <legend>How do you usually encourage your child’s curiosity or creativity at home?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="homeEncouragement" value="ExploreFreely" required> Encourage them to explore freely</label>
+            <label class="opt"><input type="radio" name="homeEncouragement" value="ToolsKits"> Provide tools or kits for learning</label>
+            <label class="opt"><input type="radio" name="homeEncouragement" value="ProjectsInvolved"> Involve them in projects</label>
+            <label class="opt"><input type="radio" name="homeEncouragement" value="StruggleActivities"> Struggle to find the right activities</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="16">
+        <fieldset>
+          <legend>What do you wish your child’s school offered more of?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="schoolWish" value="CreativityPBL" required> Creativity and project-based learning</label>
+            <label class="opt"><input type="radio" name="schoolWish" value="TechFutureSkills"> Technology and future skills</label>
+            <label class="opt"><input type="radio" name="schoolWish" value="ConfidenceMentoring"> Confidence-building and mentoring</label>
+            <label class="opt"><input type="radio" name="schoolWish" value="HandsOnExperiences"> Hands-on experiences</label>
+            <label class="opt"><input type="radio" name="schoolWish" value="IndividualizedLearning"> Individualized learning</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="step" data-step="17">
+        <fieldset>
+          <legend>How important is it for kids to understand AI and emerging technology now?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="aiImportance" value="VeryEssential" required> Very — it’s essential for their future</label>
+            <label class="opt"><input type="radio" name="aiImportance" value="SomewhatComing"> Somewhat — I know it’s coming fast</label>
+            <label class="opt"><input type="radio" name="aiImportance" value="NotSureYet"> Not sure yet — I just want them to be ready</label>
+          </div>
+        </fieldset>
+      </div>
+
       <div class="actions sticky">
         <button class="btn" id="backBtn" type="button">◀ Back</button>
         <button class="btn primary" id="nextBtn" type="button">Next ▶</button>
@@ -224,6 +361,8 @@
 
     <!-- RESULTS -->
     <section id="result" class="card" aria-live="polite">
+      <h2 id="personaTitle"></h2>
+      <p id="personaBlurb"></p>
       <h2 id="recTitle"></h2>
       <p id="recBlurb"></p>
       <ul id="recPoints"></ul>
@@ -343,7 +482,7 @@
 
     const wizard = $('#wizard');
     const steps = $$('.step');
-    const total = steps.length; // 8 question steps
+    const total = steps.length; // updated automatically with new questions
     const bar = $('#bar');
     const qnum = $('#qnum');
     const qtotal = $('#qtotal'); qtotal.textContent = total;
@@ -424,6 +563,41 @@
     backBtn.addEventListener('click', ()=>{ if(idx>0){ idx--; updateUI(); } });
     nextBtn.addEventListener('click', ()=>{ if(idx<total-1){ idx++; updateUI(); } else { computeResults(); } });
 
+    // ---------- Persona helper ----------
+    function choosePersona({visitReason, schoolFeeling, learnPlayStyle, curiositySpark, challengeResponse, aiImportance}){
+      if(schoolFeeling==='StrugglesConfidence' || visitReason==='NeedsConfidenceFocus') return 'The Confident Pathfinder';
+      if((learnPlayStyle==='HandsOnBuilder' && challengeResponse==='KeepsTrying') || curiositySpark==='BuildingEngineering') return 'The Focused Builder';
+      if(curiositySpark==='AIFutureTech' || visitReason==='AIChange' || aiImportance==='VeryEssential') return 'The Innovative Explorer';
+      if(learnPlayStyle==='GamerCompetitive') return 'The Competitive Strategist';
+      if(learnPlayStyle==='SocialCollaborative') return 'The Collaborative Maker';
+      if(learnPlayStyle==='CreativeInventive' || curiositySpark==='StorytellingAnimation') return 'The Inventive Explorer';
+      return 'The Curious Creator';
+    }
+
+    function phraseGrowthTargets(list){
+      if(!list || !list.length) return '';
+      const map = {
+        ConfidenceIndependence:'confidence and independence',
+        FocusPersistence:'focus and persistence',
+        ProblemSolvingLogic:'problem‑solving and logic',
+        CreativityImagination:'creativity and imagination',
+        FriendshipsTeamwork:'friendships and teamwork'
+      };
+      const words = list.map(v=>map[v]||v);
+      if(words.length===1) return words[0];
+      return words.slice(0,-1).join(', ') + ' and ' + words.slice(-1);
+    }
+
+    function mirrorReason(v){
+      switch(v){
+        case 'FutureReady': return 'prepare your child for a future where coding is a core language';
+        case 'AIChange': return 'help your child stay ahead as AI reshapes every field';
+        case 'LovesGamesTech': return 'channel their love of games and tech into real skills';
+        case 'NeedsConfidenceFocus': return 'build lasting confidence and focus';
+        default: return 'explore what lights them up';
+      }
+    }
+
     // ---------- Recommendation logic ----------
     function computeResults(){
       const fd = new FormData(document.createElement('form'));
@@ -432,6 +606,7 @@
         if(el.name) fd.append(el.name, el.value);
       });
 
+      // Existing inputs
       const age = fd.get('age');
       const exp = parseInt(fd.get('experience')||'3',10);
       const comfort = parseInt(fd.get('comfort')||'3',10);
@@ -441,6 +616,19 @@
       const hopes = fd.getAll('hopes');
       const structure = fd.get('structure');
 
+      // New emotional-close inputs
+      const visitReason = fd.get('visitReason');
+      const schoolFeeling = fd.get('schoolFeeling');
+      const learnPlayStyle = fd.get('learnPlayStyle');
+      const challengeResponse = fd.get('challengeResponse');
+      const curiositySpark = fd.get('curiositySpark');
+      const growthTargets = fd.getAll('growthTargets');
+      const techConfidence = fd.get('techConfidence');
+      const homeEncouragement = fd.get('homeEncouragement');
+      const schoolWish = fd.get('schoolWish');
+      const aiImportance = fd.get('aiImportance');
+
+      // --- Score existing programs (unchanged) ---
       let jr=0, create=0, academy=0;
       if(age==='5-7'){ jr+=5 } else { create+=4 }
       if(age==='11-14' || age==='15+') academy += (exp>=4?2:1);
@@ -458,6 +646,13 @@
       if(style==='Explore') jr++;
       if(hopes.includes('LongTerm')) create++;
       if(hopes.includes('Academic')) academy++;
+
+      // Nudges from emotional answers
+      if(curiositySpark==='AIFutureTech') academy+=2;
+      if(curiositySpark==='RoboticsTech') academy+=1;
+      if(learnPlayStyle==='HandsOnBuilder') create+=1;
+      if(learnPlayStyle==='CreativeInventive') create+=1;
+      if(visitReason==='NeedsConfidenceFocus' && age!=='5-7') create+=1;
 
       const top = [{k:'JR',v:jr},{k:'CREATE',v:create},{k:'ACADEMY',v:academy}].sort((a,b)=>b.v-a.v)[0].k;
 
@@ -492,6 +687,37 @@
       $('#recBlurb').textContent = blurb;
       $('#recPoints').innerHTML = points.map(p=>`<li>${p}</li>`).join('');
 
+      // --- Persona + Emotional paragraph ---
+      const persona = choosePersona({visitReason, schoolFeeling, learnPlayStyle, curiositySpark, challengeResponse, aiImportance});
+      const wants = phraseGrowthTargets(growthTargets);
+      const reason = mirrorReason(visitReason);
+
+      const personaTitle = $('#personaTitle');
+      const personaBlurb = $('#personaBlurb');
+      personaTitle.textContent = `Your Ninja Fit: ${persona}`;
+
+      let aiLine = '';
+      if(aiImportance==='VeryEssential') aiLine = ' In a world reshaped by AI and automation, early fluency becomes a lifelong advantage.';
+      else if(aiImportance==='SomewhatComing') aiLine = ' With AI accelerating, a steady head start now pays off later.';
+
+      let confidenceLine = '';
+      if(schoolFeeling==='StrugglesConfidence' || visitReason==='NeedsConfidenceFocus'){
+        confidenceLine = ' Our mentor‑led dojo is designed to turn hesitation into confidence through small wins and steady encouragement.';
+      }
+
+      let homeBridge = '';
+      switch(homeEncouragement){
+        case 'ExploreFreely': homeBridge = ' We’ll build on the curiosity you already spark at home by turning open‑ended exploration into purposeful projects.'; break;
+        case 'ToolsKits': homeBridge = ' We’ll extend the tools you provide with structured challenges that level up skills each week.'; break;
+        case 'ProjectsInvolved': homeBridge = ' Expect take‑home wins you can cheer on together — we love involving families.'; break;
+        case 'StruggleActivities': homeBridge = ' We’ll make it easy with ready‑made projects that meet them right where they are.'; break;
+      }
+
+      const valuesLine = wants ? ` You mentioned ${wants} — that’s exactly what we build here.` : '';
+      const programLink = programLinks[top] || '#';
+
+      personaBlurb.innerHTML = `Your child’s potential is bigger than a screen — it’s a toolkit for life. You’re here to ${reason}.${aiLine}${confidenceLine}${homeBridge}${valuesLine} At Code Ninjas, they’ll turn imagination into real games and projects, supported by mentors who guide them through challenges. Every week they spend coding now builds confidence, literacy, and independence that lasts a lifetime. <strong><a href="${programLink}" target="_blank" rel="noopener">Enroll today</a></strong> to lock in your tour bonus and start their journey.`;
+
       // --- Stats by program (quantitative) ---
       const statsByProgram = {
         'JR': [
@@ -515,7 +741,7 @@
           { value: 'Multi‑week', label: 'Module length' },
           { value: '≈7–8:1', label: 'Student:Sensei (typical)' },
           { value: 'LEGO SPIKE • VEX GO • Ozobot', label: 'Typical kits' },
-          { value: 'Aug 2025', label: 'Launched' }
+          { value: 'Aug 2025', label: 'Launched' }
         ]
       };
       const stats = $('#stats');
@@ -526,7 +752,7 @@
       const funFactText = $('#funFactText');
       if(codingQuantFacts && codingQuantFacts.length){
         const fact = pickRandom(codingQuantFacts);
-        funFactText.innerHTML = `${fact} &nbsp; <a class="learn-link" href="${programLinks[top]}" target="_blank" rel="noopener">Learn more about ${top}</a>`;
+        funFactText.innerHTML = `${fact} &nbsp; <a class="learn-link" href="${programLink}" target="_blank" rel="noopener">Learn more about ${top}</a>`;
         funFactBox.classList.remove('hidden');
       } else {
         funFactBox.classList.add('hidden');
@@ -571,6 +797,13 @@
       console.assert(Array.isArray(codingQuantFacts) && codingQuantFacts.length>=6, 'Coding quantitative facts missing');
       console.assert(codingQuantFacts.filter(f=>/\d/.test(f)).length>=6, 'Quant facts should contain numbers');
       console.assert(['JR','CREATE','ACADEMY'].every(k=>programLinks[k]), 'Program links missing');
+
+      // Emotional steps present
+      const emotionalNames = ['visitReason','schoolFeeling','learnPlayStyle','challengeResponse','curiositySpark','growthTargets','techConfidence','homeEncouragement','schoolWish','aiImportance'];
+      emotionalNames.forEach(n=>{
+        const el = document.querySelector(`[name="${n}"]`);
+        console.assert(el, 'Missing emotional input: '+n);
+      });
       console.log('[OK] Sanity checks passed');
     })();
   })();
