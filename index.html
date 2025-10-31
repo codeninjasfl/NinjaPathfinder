@@ -228,7 +228,7 @@
         </fieldset>
       </div>
 
-      <!-- NEW: Emotional close questions (Steps 9–18) -->
+      <!-- NEW: Emotional close questions (Steps 9–18 originally; Q15 removed) -->
       <div class="step" data-step="8">
         <fieldset>
           <legend>What inspired you to visit Code Ninjas today? <span class="hint">Reveals emotional driver</span></legend>
@@ -317,19 +317,9 @@
         </fieldset>
       </div>
 
-      <div class="step" data-step="15">
-        <fieldset>
-          <legend>How do you usually encourage your child’s curiosity or creativity at home?</legend>
-          <div class="opts">
-            <label class="opt"><input type="radio" name="homeEncouragement" value="ExploreFreely" required> Encourage them to explore freely</label>
-            <label class="opt"><input type="radio" name="homeEncouragement" value="ToolsKits"> Provide tools or kits for learning</label>
-            <label class="opt"><input type="radio" name="homeEncouragement" value="ProjectsInvolved"> Involve them in projects</label>
-            <label class="opt"><input type="radio" name="homeEncouragement" value="StruggleActivities"> Struggle to find the right activities</label>
-          </div>
-        </fieldset>
-      </div>
+      <!-- REMOVED former Step 15 (homeEncouragement) -->
 
-      <div class="step" data-step="16">
+      <div class="step" data-step="15">
         <fieldset>
           <legend>What do you wish your child’s school offered more of?</legend>
           <div class="opts">
@@ -342,7 +332,7 @@
         </fieldset>
       </div>
 
-      <div class="step" data-step="17">
+      <div class="step" data-step="16">
         <fieldset>
           <legend>How important is it for kids to understand AI and emerging technology now?</legend>
           <div class="opts">
@@ -461,7 +451,6 @@
     };
 
     // Quantitative coding facts (displayed in Fun Fact box)
-    // Source citations provided in chat, not rendered in UI.
     const codingQuantFacts = [
       'In the U.S., software developers earned a median $133,080 in May 2024.',
       'Software developer jobs are projected to grow ~16% from 2024–2034 (much faster than average).',
@@ -624,7 +613,6 @@
       const curiositySpark = fd.get('curiositySpark');
       const growthTargets = fd.getAll('growthTargets');
       const techConfidence = fd.get('techConfidence');
-      const homeEncouragement = fd.get('homeEncouragement');
       const schoolWish = fd.get('schoolWish');
       const aiImportance = fd.get('aiImportance');
 
@@ -705,18 +693,10 @@
         confidenceLine = ' Our mentor‑led dojo is designed to turn hesitation into confidence through small wins and steady encouragement.';
       }
 
-      let homeBridge = '';
-      switch(homeEncouragement){
-        case 'ExploreFreely': homeBridge = ' We’ll build on the curiosity you already spark at home by turning open‑ended exploration into purposeful projects.'; break;
-        case 'ToolsKits': homeBridge = ' We’ll extend the tools you provide with structured challenges that level up skills each week.'; break;
-        case 'ProjectsInvolved': homeBridge = ' Expect take‑home wins you can cheer on together — we love involving families.'; break;
-        case 'StruggleActivities': homeBridge = ' We’ll make it easy with ready‑made projects that meet them right where they are.'; break;
-      }
-
       const valuesLine = wants ? ` You mentioned ${wants} — that’s exactly what we build here.` : '';
       const programLink = programLinks[top] || '#';
 
-      personaBlurb.innerHTML = `Your child’s potential is bigger than a screen — it’s a toolkit for life. You’re here to ${reason}.${aiLine}${confidenceLine}${homeBridge}${valuesLine} At Code Ninjas, they’ll turn imagination into real games and projects, supported by mentors who guide them through challenges. Every week they spend coding now builds confidence, literacy, and independence that lasts a lifetime. <strong><a href="${programLink}" target="_blank" rel="noopener">Enroll today</a></strong> to lock in your tour bonus and start their journey.`;
+      personaBlurb.innerHTML = `Your child’s potential is bigger than a screen — it’s a toolkit for life. You’re here to ${reason}.${aiLine}${confidenceLine}${valuesLine} At Code Ninjas, they’ll turn imagination into real games and projects, supported by mentors who guide them through challenges. Every week they spend coding now builds confidence, literacy, and independence that lasts a lifetime. <strong><a href="${programLink}" target="_blank" rel="noopener">Enroll today</a></strong> to lock in your tour bonus and start their journey.`;
 
       // --- Stats by program (quantitative) ---
       const statsByProgram = {
@@ -792,14 +772,14 @@
       const sample = factsByTopic['Coding'][0];
       console.assert(typeof sample==='string' && sample.length>0, 'factsByTopic fetch failed');
 
-      // New tests (added)
+      // New tests (updated for removed Q15)
       console.assert(window['$1']===undefined, 'Errant $1 symbol present in global scope');
       console.assert(Array.isArray(codingQuantFacts) && codingQuantFacts.length>=6, 'Coding quantitative facts missing');
       console.assert(codingQuantFacts.filter(f=>/\d/.test(f)).length>=6, 'Quant facts should contain numbers');
       console.assert(['JR','CREATE','ACADEMY'].every(k=>programLinks[k]), 'Program links missing');
 
-      // Emotional steps present
-      const emotionalNames = ['visitReason','schoolFeeling','learnPlayStyle','challengeResponse','curiositySpark','growthTargets','techConfidence','homeEncouragement','schoolWish','aiImportance'];
+      // Emotional steps present (homeEncouragement removed)
+      const emotionalNames = ['visitReason','schoolFeeling','learnPlayStyle','challengeResponse','curiositySpark','growthTargets','techConfidence','schoolWish','aiImportance'];
       emotionalNames.forEach(n=>{
         const el = document.querySelector(`[name="${n}"]`);
         console.assert(el, 'Missing emotional input: '+n);
