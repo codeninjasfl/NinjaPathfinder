@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Code Ninjas Path Finder</title>
+  <title>Code Ninjas – Ninja Path Finder</title>
   <meta name="theme-color" content="#2563eb" />
   <style>
     :root {
@@ -15,18 +15,46 @@
     }
     * { box-sizing:border-box; }
     html, body {
-      margin:0; padding:0; min-height:100%;
+      margin:0;
+      padding:0;
+      min-height:100%;
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
       background:linear-gradient(180deg,var(--bg1),var(--bg2));
       background-attachment:fixed;
       color:var(--ink);
     }
-    .wrap { min-height:100svh; display:grid; place-items:start center; padding:18px; }
-    header { color:#eef6ff; text-align:center; margin:4px 0 10px; }
-    header .brand { display:flex; align-items:center; justify-content:center; gap:10px; }
-    header img.logo { height:40px; width:auto; filter:drop-shadow(0 1px 2px rgba(15,23,42,.4)); }
-    header h1 { margin:8px 0 0; font-size:clamp(22px,4vw,32px); font-weight:800; }
-    header p { margin:4px 0 0; font-size:13px; color:#dbeafe; }
+    .wrap {
+      min-height:100svh;
+      display:grid;
+      place-items:start center;
+      padding:18px;
+    }
+    header {
+      color:#eef6ff;
+      text-align:center;
+      margin:4px 0 10px;
+    }
+    header .brand {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+    header img.logo {
+      height:40px;
+      width:auto;
+      filter:drop-shadow(0 1px 2px rgba(15,23,42,.4));
+    }
+    header h1 {
+      margin:8px 0 0;
+      font-size:clamp(22px,4vw,32px);
+      font-weight:800;
+    }
+    header p {
+      margin:4px 0 0;
+      font-size:13px;
+      color:#dbeafe;
+    }
 
     .card {
       width:min(900px,98vw);
@@ -62,19 +90,55 @@
       .card { padding:16px 14px 80px; }
     }
 
-    .topbar { display:flex; align-items:center; gap:10px; margin:0 0 14px; }
-    .progress { flex:1; height:10px; background:#eef2ff; border-radius:999px; overflow:hidden; }
-    .bar { height:100%; width:0; background:linear-gradient(90deg,#2563eb,#22d3ee); transition:width .25s ease; }
-    .count { font-size:12px; font-weight:700; color:#334155; min-width:105px; text-align:right; }
+    .topbar {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0 0 14px;
+    }
+    .progress {
+      flex:1;
+      height:10px;
+      background:#eef2ff;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .bar {
+      height:100%;
+      width:0;
+      background:linear-gradient(90deg,#2563eb,#22d3ee);
+      transition:width .25s ease;
+    }
+    .count {
+      font-size:12px;
+      font-weight:700;
+      color:#334155;
+      min-width:105px;
+      text-align:right;
+    }
 
     .step { display:none; animation:fade .25s ease; }
     .step.active { display:block; }
-    @keyframes fade { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
-    @media (prefers-reduced-motion:reduce) { .step { animation:none; } }
+    @keyframes fade {
+      from { opacity:0; transform:translateY(4px); }
+      to { opacity:1; transform:none; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .step { animation:none; }
+    }
 
     fieldset { border:0; margin:0; padding:0; }
-    legend { font-weight:800; margin:0 0 8px; font-size:17px; color:#0f172a; }
-    .hint { color:var(--muted); font-size:11px; margin:2px 0 4px; }
+    legend {
+      font-weight:800;
+      margin:0 0 8px;
+      font-size:17px;
+      color:#0f172a;
+    }
+    .hint {
+      color:var(--muted);
+      font-size:11px;
+      margin:2px 0 4px;
+    }
 
     .opts {
       display:grid;
@@ -82,7 +146,9 @@
       gap:9px;
     }
     label.opt {
-      display:flex; align-items:flex-start; gap:9px;
+      display:flex;
+      align-items:flex-start;
+      gap:9px;
       padding:11px 11px;
       border-radius:14px;
       border:1px solid var(--border);
@@ -133,14 +199,21 @@
       min-height:42px;
       touch-action:manipulation;
     }
-    .btn.primary { background:var(--brand); color:#ffffff; border-color:var(--brand); }
-    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .btn.primary {
+      background:var(--brand);
+      color:#ffffff;
+      border-color:var(--brand);
+    }
+    .btn:disabled {
+      opacity:.5;
+      cursor:not-allowed;
+    }
 
-    /* Result view */
     #result { display:none; }
+
     #personaTitle {
       text-align:center;
-      margin:0 0 4px;
+      margin:0 0 6px;
       font-size:22px;
       font-weight:800;
     }
@@ -150,9 +223,10 @@
       margin:0 0 10px;
       font-size:13px;
     }
+
     #recTitle {
       text-align:center;
-      margin:12px 0 2px;
+      margin:12px 0 4px;
       font-size:18px;
       font-weight:800;
     }
@@ -254,7 +328,7 @@
       <div class="count"><span id="qnum">1</span> / <span id="qtotal">1</span> questions</div>
     </div>
 
-    <!-- Q1: Age (global) -->
+    <!-- Q1: Age -->
     <div class="step" data-step-id="q1">
       <fieldset>
         <legend id="ageLegend">How old is your child?</legend>
@@ -267,7 +341,7 @@
       </fieldset>
     </div>
 
-    <!-- PATH 1: Early Learner (5-7) -->
+    <!-- PATH 1: 5–7 -->
     <div class="step" data-step-id="q2A" data-show-if="age=5-7">
       <fieldset>
         <legend>Which of these best describe your child? <span class="hint">Choose up to 2</span></legend>
@@ -305,7 +379,7 @@
       </fieldset>
     </div>
 
-    <!-- PATH 2: Junior Coder (8-10) -->
+    <!-- PATH 2: 8–10 -->
     <div class="step" data-step-id="q2B" data-show-if="age=8-10">
       <fieldset>
         <legend>Which traits best describe your child? <span class="hint">Choose up to 2</span></legend>
@@ -375,7 +449,7 @@
       </fieldset>
     </div>
 
-    <!-- PATH 3: Pre-Teen (11-13) -->
+    <!-- PATH 3: 11–13 -->
     <div class="step" data-step-id="q2C" data-show-if="age=11-13">
       <fieldset>
         <legend>Which traits best describe your child? <span class="hint">Choose up to 2</span></legend>
@@ -443,7 +517,7 @@
       </fieldset>
     </div>
 
-    <!-- PATH 4: Teen (14+) -->
+    <!-- PATH 4: 14+ -->
     <div class="step" data-step-id="q2D" data-show-if="age=14+">
       <fieldset>
         <legend>What best describes what motivates your teen?</legend>
@@ -563,6 +637,7 @@
   <section id="result" class="card" aria-live="polite">
     <h2 id="personaTitle"></h2>
     <p id="personaBlurb"></p>
+
     <h2 id="recTitle"></h2>
     <p id="recBlurb"></p>
     <ul id="recPoints"></ul>
@@ -577,8 +652,8 @@
 
     <div class="actions center" style="justify-content:center; margin-top:14px;">
       <button class="btn" id="retakeBtn" type="button">Retake Quiz</button>
-      <button class="btn" id="printBtn" type="button">Print / Save</button>
     </div>
+
     <p class="hint center" id="centerNote"></p>
   </section>
 </div>
@@ -596,7 +671,10 @@
   const $ = (s,root=document) => root.querySelector(s);
   const $$ = (s,root=document) => Array.from(root.querySelectorAll(s));
 
-  // ---------- PRESTART ----------
+  // ---- API Access Toggle (console: API_Access = false to disable) ----
+  window.API_Access = true;
+
+  // ---- PRESTART ----
   const prestart = $('#prestart');
   const startBtn = $('#startQuizBtn');
   const inputsPre = {
@@ -617,7 +695,7 @@
     el.addEventListener('change', syncStartState);
   });
 
-  // ---------- WIZARD ----------
+  // ---- WIZARD STATE ----
   const wizard = $('#wizard');
   const bar = $('#bar');
   const qnum = $('#qnum');
@@ -634,7 +712,7 @@
     const [name, values] = cond.split('=');
     if(!name || !values) return null;
     const allowed = values.split(',').map(v => v.trim());
-    return { name:name.trim(), values:allowed };
+    return { name: name.trim(), values: allowed };
   }
 
   function getValue(name){
@@ -673,7 +751,9 @@
   }
 
   function updateUI(){
-    visibleSteps.forEach((s,i) => s.classList.toggle('active', i === idx));
+    visibleSteps.forEach((s,i) => {
+      s.classList.toggle('active', i === idx);
+    });
 
     const total = visibleSteps.length || 1;
     qtotalSpan.textContent = total;
@@ -695,17 +775,17 @@
         });
       }
     }
-
     nextBtn.textContent = (idx === visibleSteps.length - 1) ? 'See Results ▶' : 'Next ▶';
     nextBtn.disabled = disableNext;
   }
 
   wizard.addEventListener('change', recomputeVisibleSteps);
 
+  // init
   visibleSteps = allSteps;
   updateUI();
 
-  // ---------- START QUIZ ----------
+  // ---- START QUIZ ----
   startBtn.addEventListener('click', () => {
     syncStartState();
     if(!parentFirst || !parentLast || !centerLocation) return;
@@ -714,25 +794,26 @@
     idx = 0;
     recomputeVisibleSteps();
     const ageLegend = $('#ageLegend');
-    if(ageLegend && parentFirst){
+    if(ageLegend){
       ageLegend.textContent = `Hi ${parentFirst}! How old is your child?`;
     }
   });
 
-  // ---------- NAV ----------
+  // ---- NAVIGATION ----
   backBtn.addEventListener('click', () => {
     if(idx > 0){ idx--; updateUI(); }
   });
 
   nextBtn.addEventListener('click', () => {
     if(idx < visibleSteps.length - 1){
-      idx++; updateUI();
+      idx++;
+      updateUI();
     } else {
       computeResultsAndSubmit();
     }
   });
 
-  // ---------- HELPERS ----------
+  // ---- HELPERS ----
   function radioLabel(name){
     const el = $('input[name="'+name+'"]:checked');
     if(!el) return '';
@@ -759,7 +840,7 @@
     return clone.textContent.trim();
   }
 
-  // ---------- PROGRAM LOGIC ----------
+  // ---- PROGRAM LOGIC (BASE) ----
   function recommendedProgram(age){
     if(age === '5-7') return 'JR';
     if(age === '8-10') return 'CREATE';
@@ -768,46 +849,43 @@
     return 'CREATE';
   }
 
-  function programCopy(key){
+  function baseProgramCopy(key){
     if(key === 'JR') return {
-      title:'Recommended Program: Code Ninjas JR (Ages 5–7)',
+      programKey:'JR',
+      title:'Recommended Program: Code Ninjas JR',
       blurb:'Your Ninja is an early explorer! JR uses stories, games, and hands-on projects so young Ninjas discover logic, patterns, and creativity in a playful dojo environment.',
       bullets:[
         'Gentle, game-based introduction to coding concepts',
-        'Frequent small wins to build confidence',
+        'Small wins each visit to build confidence',
         'Perfect for curious, imaginative early learners'
       ],
       stats:[
         ['5–7','Ideal ages'],
         ['Play-based','Learning style'],
-        ['1–2 hrs/week','Consistent routine'],
-        ['Early logic','Patterns & sequencing'],
-        ['Mentor-led','Supportive dojo'],
-        ['Hands-on','Tactile projects']
+        ['1–2 hrs / week','Typical schedule']
       ]
     };
 
     if(key === 'ACADEMY') return {
-      title:'Recommended Path: Code Ninjas Academy (Teen / Advanced)',
-      blurb:'Your Ninja is ready for real-world challenges. Academy channels advanced curiosity into coding, AI, and engineering projects that feel like the future, not homework.',
+      programKey:'ACADEMY',
+      title:'Recommended Path: Code Ninjas Academy',
+      blurb:'Your Ninja is ready for deeper, real-world challenges. Academy channels their curiosity into coding, AI, and engineering projects that feel like the future, not homework.',
       bullets:[
-        'Project-based learning in AI, web, and software dev',
-        'Portfolio-style outcomes for schools & careers',
-        'Ideal for motivated, tech-savvy teens'
+        'Project-based learning in AI, robotics, and advanced coding',
+        'Portfolio-style outcomes for high school, college, and careers',
+        'Ideal for motivated or tech-savvy teens'
       ],
       stats:[
         ['14+','Typical ages'],
         ['Advanced','Challenge level'],
-        ['Career-ready','Future focus'],
-        ['AI & STEM','High-demand fields'],
-        ['Portfolio','Real projects'],
-        ['Mentorship','Guided by experts']
+        ['Career-ready','Future focus']
       ]
     };
 
-    // CREATE default
+    // CREATE base (used for API & as fallback)
     return {
-      title:'Recommended Program: Code Ninjas CREATE (Ages 8–13)',
+      programKey:'CREATE',
+      title:'Recommended Program: Code Ninjas CREATE',
       blurb:'Your Ninja is ready to turn ideas into real games and projects. CREATE guides them from drag-and-drop to real code with a belt system that keeps them fired up.',
       bullets:[
         'Structured path from block coding to JavaScript & beyond',
@@ -817,30 +895,111 @@
       stats:[
         ['8–13','Ideal ages'],
         ['Belt system','Built-in motivation'],
-        ['1–2 hrs/week','Steady progress'],
-        ['Game dev','High engagement'],
-        ['Critical thinking','Logic & debugging'],
-        ['Future skills','Coding & creativity']
+        ['2–3 hrs / week','Consistent progress']
       ]
     };
   }
 
-  // ---------- FUN FACT ----------
+  // ---- CREATE VARIANT (FRONT-END ONLY) ----
+  function decideCreateVariant(goals, aiView, interests14, tech8, tech11, tech14){
+    const aiHigh = (aiView === 'Essential' || aiView === 'Very');
+    const wantsFuture = goals.includes('Future skills') || goals.includes('Academic');
+    const aiInterest = interests14.includes('AI');
+    const roboticsInterest = interests14.includes('Robotics / engineering');
+    const advancedTech =
+      tech8 === 'Advanced' || tech11 === 'Advanced (self-driven)' || tech14 === 'Advanced';
+
+    // Strongest bundle
+    if(wantsFuture && (aiHigh || aiInterest || advancedTech)){
+      return '1+1+1'; // Main CREATE + AI + advanced exposure
+    }
+
+    // Solid combo of CREATE + AI
+    if(aiHigh || aiInterest || roboticsInterest || advancedTech){
+      return '1+1';
+    }
+
+    // Default strong consistency
+    return '2x';
+  }
+
+  function createVariantDisplay(variant){
+    if(variant === '1+1'){
+      return {
+        title:'Recommended Program: Code Ninjas CREATE (1+1 Bundle)',
+        blurb:'A powerful combo: core CREATE sessions to build coding fundamentals plus a dedicated AI/tech session each week so your Ninja connects what they love (games & tech) with future-ready skills.',
+        bullets:[
+          'Core CREATE path plus weekly AI/tech exploration',
+          'Perfect for Ninjas excited about new technology',
+          'Balances fun, structure, and future-focused learning'
+        ],
+        stats:[
+          ['8–13','Ideal ages'],
+          ['CREATE + AI','What they get'],
+          ['2–3 hrs / week','Consistent momentum'],
+          ['High engagement','Game & project based'],
+          ['Future skills','Coding & emerging tech'],
+          ['Mentor-led','Guided progression']
+        ]
+      };
+    }
+
+    if(variant === '1+1+1'){
+      return {
+        title:'Recommended Program: Code Ninjas CREATE (1+1+1 Bundle)',
+        blurb:'Maximum momentum for a driven Ninja: CREATE sessions plus layered AI and project time so they progress faster, explore deeper, and stay challenged all year.',
+        bullets:[
+          'Multiple touchpoints each week for faster growth',
+          'Blends core coding, AI, and creative projects',
+          'Great fit for highly curious or advanced Ninjas'
+        ],
+        stats:[
+          ['8–13','Ideal ages'],
+          ['Max support','High-frequency learning'],
+          ['2–3 hrs / week+','Deeper immersion'],
+          ['AI & projects','Layered experience'],
+          ['Confidence','Frequent wins'],
+          ['Future-ready','Standout skill set']
+        ]
+      };
+    }
+
+    // 2x/week default
+    return {
+      title:'Recommended Program: Code Ninjas CREATE (2x/Week)',
+      blurb:'Two visits each week give your Ninja steady progress, more projects, and extra time with Senseis® so concepts really stick and confidence grows.',
+      bullets:[
+        'Twice-weekly CREATE sessions for consistent progress',
+        'More time to build, troubleshoot, and celebrate wins',
+        'Ideal for families who want faster results without overload'
+      ],
+      stats:[
+        ['8–13','Ideal ages'],
+        ['2x/Week','Best-fit cadence'],
+        ['2–3 hrs / week','Sweet spot for growth'],
+        ['Game dev','High engagement'],
+        ['Problem-solving','Core focus'],
+        ['Mentor-led','Supportive dojo']
+      ]
+    };
+  }
+
+  // ---- FUN FACT ----
   function funFactText(programKey, interests){
     const txt = interests.join(' ').toLowerCase();
     if(/game|roblox|minecraft/.test(txt)){
-      return 'Designing their own games builds systems thinking, creativity, and persistence—the same core skills professional developers rely on every day.';
+      return 'Kids who design and code their own games practice logic, systems thinking, and creativity—the same problem-solving muscles used by real-world software engineers.';
     }
     if(/robot/.test(txt)){
-      return 'Hands-on robotics projects help kids connect code to real-world problem solving, boosting confidence and STEM engagement.';
+      return 'Hands-on robotics strengthens spatial reasoning and persistence, helping kids see themselves as real problem solvers in science and engineering.';
     }
     if(programKey === 'ACADEMY' || /ai/.test(txt)){
-      return 'Early exposure to coding and AI concepts helps teens move from tech consumers to tech creators in some of the fastest-growing career fields.';
+      return 'Early exposure to coding and AI concepts helps teens move from tech consumers to tech creators in some of the fastest-growing career paths.';
     }
-    return 'Learning to code strengthens problem-solving, creativity, and resilience—transferable skills that support success in school and future careers.';
+    return 'Learning to code builds resilience, creativity, and problem-solving skills that support success in every subject—not just technology.';
   }
 
-  // ---------- Q&A SUMMARY ----------
+  // ---- Q&A SUMMARY FOR CENTER ----
   function buildQASummary(){
     const fields = [
       ['age','radio'],
@@ -850,7 +1009,6 @@
       ['motivate14','radio'],['interest14','checkbox'],['tech14','radio'],['career14','radio'],['growth14','radio'],
       ['goals','checkbox'],['visit','radio'],['ai','radio'],['proud','radio']
     ];
-
     const lines = [];
     fields.forEach(([name,type]) => {
       const legend = getLegendForInputName(name);
@@ -863,67 +1021,106 @@
     return lines;
   }
 
-  // ---------- FOLLOW-UP EMAIL (for center only) ----------
-  function buildFollowupTemplate(program, personaLabel, funFact){
-    const greetingName = parentFirst || 'there';
-    const goals = checkboxLabels('goals');
-    const proud = radioLabel('proud');
-    const interests = []
-      .concat(checkboxLabels('traits5'))
-      .concat(checkboxLabels('traits8'))
-      .concat(checkboxLabels('traits11'))
-      .concat(checkboxLabels('interest14'));
-
-    const interestLine = interests.length
-      ? `We noticed strengths and interests like ${interests.slice(0,3).join(', ')}. `
-      : '';
-
-    let whyFit;
-    if(program.title.includes('JR')){
-      whyFit = 'Code Ninjas JR turns that curiosity into playful, story-driven projects that quietly build problem-solving and confidence.';
-    } else if(program.title.includes('Academy')){
-      whyFit = 'Code Ninjas Academy gives them real-world coding and technology projects that line up with where they’re headed next.';
-    } else {
-      whyFit = 'Code Ninjas CREATE lets them build real games and projects so they stay engaged while developing focus, grit, and creativity.';
+  // ---- PROGRAM URL FOR SMS ----
+  function getProgramUrl(programKey){
+    // For SMS we only distinguish JR vs CREATE; others use CREATE link.
+    const isJR = (programKey === 'JR');
+    const base = (centerLocation || '').toLowerCase();
+    if(base.includes('cooper')){
+      return isJR
+        ? 'https://www.codeninjas.com/fl-cooper-city/jr'
+        : 'https://www.codeninjas.com/fl-cooper-city/create';
     }
-
-    const goalsLine = goals.length
-      ? `You shared goals like ${goals.join(', ')}, and this path is designed specifically to support those outcomes.`
-      : 'This path is designed to build confidence, focus, creativity, and future-ready tech skills.';
-
-    const proudLine = proud
-      ? ` Our team will keep your vision of "${proud.toLowerCase()}" in mind as we work with your Ninja.`
-      : '';
-
-    return `Hi ${greetingName},
-
-Thank you for completing our Ninja Path Finder at Code Ninjas ${centerLocation}! Based on your answers, your child is a strong match for our ${program.title.replace('Recommended Program: ','').replace('Recommended Path: ','')} as a "The ${personaLabel}".
-
-${interestLine}${whyFit}
-${goalsLine}${proudLine}
-
-Here’s an insight we shared with you today:
-${funFact || ''}
-
-Next steps:
-• Since you completed this in-center, stop by the front desk at any time so we can secure your Ninja’s spot and walk through scheduling, or
-• Reply to this email or call us at [CENTER PHONE] to confirm enrollment and schedule their first session.
-
-We’re excited to help your Ninja get started!
-
-Best,
-[Center Director Name]
-Center Director, Code Ninjas ${centerLocation}`;
+    if(base.includes('weston')){
+      return isJR
+        ? 'https://www.codeninjas.com/fl-weston/jr'
+        : 'https://www.codeninjas.com/fl-weston/create';
+    }
+    if(base.includes('aventura')){
+      return isJR
+        ? 'https://www.codeninjas.com/fl-aventura/jr'
+        : 'https://www.codeninjas.com/fl-aventura/create';
+    }
+    // Fallback: generic CREATE link (safe default)
+    return 'https://www.codeninjas.com/';
   }
 
-  // ---------- SUBMIT TO WEB3FORMS ----------
+  // ---- SMS TEMPLATES FOR CENTER (NOT SHOWN FRONT-END) ----
+  function buildSmsSamples(programKey, variantLabel){
+    const firstName = parentFirst || 'there';
+    const url = getProgramUrl(programKey);
+    const label = (programKey === 'JR')
+      ? 'JR program'
+      : (variantLabel || 'CREATE program');
+
+    const s1 =
+`Hi ${firstName}, this is Code Ninjas ${centerLocation}! Your Ninja lit up our dojo yesterday 🙌 We’d love to keep that momentum going with our ${label}. Use code CODE3 in the next few days to waive the enrollment fee and make this their new favorite spot: ${url}`;
+
+    const s2 =
+`${firstName}, thanks again for bringing your Ninja by Code Ninjas ${centerLocation}. With how curious and capable they are, our ${label} is an easy next step to build real skills and confidence. Drop in anytime we’re open and mention CODE3 to waive the enrollment fee. Details: ${url}`;
+
+    const s3 =
+`Hey ${firstName}! We haven’t stopped talking about your Ninja’s potential here at Code Ninjas ${centerLocation}. Our ${label} gives them a fun, consistent place to build those skills you care about—coding, focus, and confidence. Come by anytime and enroll with CODE3 (limited-time) to waive the enrollment fee: ${url}`;
+
+    return [s1,s2,s3];
+  }
+
+  // ---- FOLLOW-UP EMAIL TEMPLATE FOR CENTER (NOT SHOWN FRONT-END) ----
+  function buildFollowupEmail(baseProgramTitle, funFact){
+    const greetingName = parentFirst || 'there';
+    const fullName = `${parentFirst} ${parentLast}`.trim();
+    const goals = checkboxLabels('goals');
+    const visit = radioLabel('visit');
+    const proud = radioLabel('proud');
+
+    const goalsLine = goals.length
+      ? `You shared that you’d love to see growth in areas like ${goals.join(', ')}. `
+      : '';
+    const visitLine = visit
+      ? `You stopped by because of "${visit}," which tells us you’re intentional about finding the right environment for your Ninja. `
+      : '';
+    const proudLine = proud
+      ? `Our team will keep your vision of your Ninja becoming "${proud.toLowerCase()}" at the center of their journey with us.`
+      : '';
+
+    return (
+`Hi ${greetingName},
+
+Thank you again for visiting Code Ninjas ${centerLocation} and completing our Ninja Path Finder${fullName ? ' with ' + fullName : ''}. Based on your responses, your child is a strong match for our ${baseProgramTitle}.
+
+${goalsLine}${visitLine}${proudLine}
+
+Here’s a quick insight we shared with you in-center:
+${funFact}
+
+As a thank-you for taking the time, you can use code CODE3 to waive the enrollment fee when you enroll within the next few days.
+
+Next steps are simple:
+• Since you completed this at the center, you can stop by the front desk anytime we’re open to get your Ninja started, or
+• Call or reply so we can set everything up for you.
+
+We’re excited to help your Ninja build confidence, creativity, and real coding skills.
+
+Best regards,
+[Center Director Name]
+Center Director, Code Ninjas ${centerLocation}`
+    );
+  }
+
+  // ---- SUBMIT TO WEB3FORMS ----
   function submitToWeb3Forms(message){
+    if(window.API_Access === false){
+      console.log('API_Access is disabled; skipping Web3Forms submission.');
+      return;
+    }
     const form = $('#web3Form');
     const msgField = $('#wf_message');
     const subjField = $('#wf_subject');
     if(!form || !msgField || !subjField) return;
+
     subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
     msgField.value = message;
+
     const fd = new FormData(form);
     fetch(form.action, { method:'POST', body:fd })
       .then(r => r.json())
@@ -931,124 +1128,144 @@ Center Director, Code Ninjas ${centerLocation}`;
       .catch(err => console.warn('Web3Forms error', err));
   }
 
-  // ---------- COMPUTE RESULTS + SEND ----------
+  // ---- MAIN RESULT + API BUILD ----
   function computeResultsAndSubmit(){
     const ageVal = getValue('age');
-    const programKey = recommendedProgram(ageVal);
-    const program = programCopy(programKey);
+    const baseKey = recommendedProgram(ageVal);
+    const baseProgram = baseProgramCopy(baseKey);
 
     const goals = checkboxLabels('goals');
-    const allTraits = []
-      .concat(checkboxLabels('traits5'))
-      .concat(checkboxLabels('traits8'))
-      .concat(checkboxLabels('traits11'))
-      .concat(checkboxLabels('interest14'));
+    const traits5 = checkboxLabels('traits5');
+    const traits8 = checkboxLabels('traits8');
+    const traits11 = checkboxLabels('traits11');
+    const interests14 = checkboxLabels('interest14');
+    const allTraits = [].concat(traits5, traits8, traits11, interests14);
 
-    // Persona label WITHOUT "The"
-    let personaLabel = 'Curious Creator Ninja';
-    if(goals.includes('Confidence')) personaLabel = 'Confidence-Boosting Ninja';
-    else if(goals.includes('Future skills')) personaLabel = 'Future-Ready Ninja';
-    else if(allTraits.some(t => /Game/i.test(t))) personaLabel = 'Game Maker Ninja';
-    else if(allTraits.some(t => /Robotics|Engineering/i.test(t))) personaLabel = 'Builder Ninja';
+    let persona = 'The Curious Creator Ninja';
+    if(goals.includes('Confidence')) persona = 'The Confidence-Boosting Ninja';
+    else if(goals.includes('Future skills')) persona = 'The Future-Ready Ninja';
+    else if(allTraits.some(t => /Game/i.test(t))) persona = 'The Game Maker Ninja';
+    else if(allTraits.some(t => /Robotics|Engineering/i.test(t))) persona = 'The Builder Ninja';
 
     const visit = radioLabel('visit');
     const aiView = radioLabel('ai');
     const proud = radioLabel('proud');
 
-    const agePhrase = (() => {
-      if(ageVal === '5-7') return 'full of imagination and early curiosity';
-      if(ageVal === '8-10') return 'ready to experiment, explore, and turn ideas into things they can see and play';
-      if(ageVal === '11-13') return 'on the edge of bigger challenges and ready for more independence';
-      if(ageVal === '14+') return 'thinking ahead and ready to start building their future';
-      return 'brimming with potential';
-    })();
+    const reasonBits = [];
+    if(visit){
+      reasonBits.push(`You chose to stop by because of "${visit}," which shows how intentional you are about their growth.`);
+    }
+    if(aiView === 'Essential' || aiView === 'Very'){
+      reasonBits.push('You also see how important technology and AI will be—which already puts your Ninja a step ahead.');
+    }
+    if(proud){
+      reasonBits.push(`Together, we’ll work toward your vision of them becoming "${proud.toLowerCase()}" over the next year.`);
+    }
+    const personaBlurb = reasonBits.join(' ');
 
-    const uniqueTraits = [...new Set(allTraits)].map(t => t.split('(')[0].trim());
-    const traitsPhrase = uniqueTraits.length
-      ? ` You highlighted strengths like ${uniqueTraits.slice(0,3).join(', ')}—powerful building blocks for coding, problem-solving, and leadership.`
-      : '';
+    // CREATE variant (front-end only)
+    let displayProgram = { ...baseProgram };
+    let createVariant = null;
 
-    const goalsPhrase = goals.length
-      ? ` The goals you chose (${goals.slice(0,3).join(', ')}) show you’re already thinking intentionally about their growth.`
-      : '';
+    if(baseKey === 'CREATE'){
+      const tech8 = radioLabel('tech8');
+      const tech11 = radioLabel('tech11');
+      const tech14 = radioLabel('tech14');
+      const variant = decideCreateVariant(
+        goals,
+        aiView,
+        interests14,
+        tech8,
+        tech11,
+        tech14
+      );
+      createVariant = variant;
+      displayProgram = createVariantDisplay(variant);
+    }
 
-    const visitPhrase = visit
-      ? ` Stopping by because of "${visit}" tells us you’re looking for more than just another activity—you’re looking for the right environment.`
-      : '';
-
-    const aiPhrase = (aiView === 'Essential' || aiView === 'Very')
-      ? ` You also recognize how important technology and AI will be, which gives your Ninja a real edge by starting now.`
-      : '';
-
-    const proudPhrase = proud
-      ? ` This path is built to move them closer to being "${proud.toLowerCase()}" over the next year.`
-      : '';
-
-    const personaDescription =
-      `Your Ninja is ${agePhrase}.${traitsPhrase}${goalsPhrase}${visitPhrase}${aiPhrase}${proudPhrase}`;
-
-    // Update UI
-    $('#personaTitle').textContent = `Your Ninja Profile: The ${personaLabel}`;
-    $('#personaBlurb').textContent = personaDescription;
-
-    $('#recTitle').textContent = program.title;
-    $('#recBlurb').textContent = program.blurb;
-    $('#recPoints').innerHTML = program.bullets.map(b => `<li>${b}</li>`).join('');
-
-    // At-a-glance stats
-    $('#stats').innerHTML = program.stats
-      .map(([v,l]) => `<div class="stat"><h3>${v}</h3><p>${l}</p></div>`)
-      .join('');
-
-    // Fun Fact
+    // Fun fact
     const interestSignals = []
       .concat(goals)
       .concat(allTraits)
       .concat([radioLabel('play5'), radioLabel('tried8')].filter(Boolean));
-    const funFact = funFactText(programKey, interestSignals);
+    const funFact = funFactText(baseKey, interestSignals);
+
+    // ---- Update UI ----
+    $('#personaTitle').textContent = `Your Ninja Profile: ${persona}`;
+    $('#personaBlurb').textContent = personaBlurb || 'Your Ninja is already showing strengths that align beautifully with what we build at Code Ninjas.';
+
+    $('#recTitle').textContent = displayProgram.title;
+    $('#recBlurb').textContent = displayProgram.blurb;
+    $('#recPoints').innerHTML = (displayProgram.bullets || [])
+      .map(b => `<li>${b}</li>`).join('');
+
+    $('#stats').innerHTML = (displayProgram.stats || [])
+      .map(([v,l]) => `<div class="stat"><h3>${v}</h3><p>${l}</p></div>`)
+      .join('');
+
     if(funFact){
       $('#funFactText').textContent = funFact;
       $('#funFact').classList.remove('hidden');
+    } else {
+      $('#funFact').classList.add('hidden');
     }
 
-    // In-center call to action
     $('#centerNote').textContent =
-      `Before you head out, stop by the front desk at Code Ninjas ${centerLocation} so we can confirm this path and reserve your Ninja’s spot. A summary of your responses has been shared with the center.`;
-
-    // Build email payload
-    const qaSummary = buildQASummary();
-    const followupTemplate = buildFollowupTemplate(program, personaLabel, funFact || '');
-    const fullName = `${parentFirst} ${parentLast}`.trim();
-    const timestamp = new Date().toLocaleString();
-
-    const msg = [
-      `Parent: ${fullName}`,
-      `Location: Code Ninjas ${centerLocation}`,
-      `Submitted: ${timestamp}`,
-      '',
-      `Recommended: ${program.title}`,
-      `Persona: The ${personaLabel}`,
-      '',
-      'Q&A Summary:',
-      ...qaSummary.map(l => '• ' + l),
-      '',
-      'Fun Fact shown to parent:',
-      funFact || 'N/A',
-      '',
-      'Personalized Follow-up Email Template (for Center Director to copy & send):',
-      followupTemplate
-    ].join('\n');
-
-    submitToWeb3Forms(msg);
+      `Before you head out, stop by the front desk at Code Ninjas ${centerLocation} so we can walk through this recommendation and reserve your Ninja’s spot. A summary has been shared with the center team.`;
 
     wizard.classList.add('hidden');
     result.style.display = 'block';
     window.scrollTo({ top:0, behavior:'smooth' });
+
+    // ---- Build API payload for center (no bundle variants) ----
+    const qaSummary = buildQASummary();
+    const followupEmail = buildFollowupEmail(baseProgram.title.replace('Recommended Program: ','').replace('Recommended Path: ',''), funFact);
+    const smsSamples = buildSmsSamples(baseKey, createVariant ? `CREATE (${createVariant === '2x' ? '2x/Week' : createVariant + ' Bundle'})` : '');
+
+    const fullName = `${parentFirst} ${parentLast}`.trim();
+    const timestamp = new Date().toLocaleString();
+
+    const message =
+`Parent: ${fullName}
+Location: Code Ninjas ${centerLocation}
+Submitted: ${timestamp}
+
+Recommended Base Program: ${baseProgram.title}
+
+Persona: ${persona}
+
+Fun Fact Shared:
+${funFact}
+
+Q&A Summary:
+${qaSummary.map(l => '• ' + l).join('\n')}
+
+--------------------------------
+Follow-up Email Template (for Center Director):
+--------------------------------
+${followupEmail}
+
+--------------------------------
+Suggested Next-Day SMS Templates (for Center Director):
+--------------------------------
+1)
+${smsSamples[0]}
+
+2)
+${smsSamples[1]}
+
+3)
+${smsSamples[2]}
+`;
+
+    submitToWeb3Forms(message);
   }
 
-  // ---------- RETAKE / PRINT ----------
-  $('#retakeBtn').addEventListener('click', () => window.location.reload());
-  $('#printBtn').addEventListener('click', () => window.print());
+  // Retake
+  $('#retakeBtn').addEventListener('click', () => {
+    window.location.reload();
+  });
+
 })();
 </script>
 </body>
