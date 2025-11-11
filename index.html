@@ -556,8 +556,12 @@
 <!-- Web3Forms form (hidden; includes required fields) -->
 <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
+
+  <!-- Keep name (center uses it); avoid duplicate by NOT adding it again in message body -->
   <input type="hidden" id="wf_name"   name="name"  value="">
   <textarea name="message" id="wf_message" style="display:none;"></textarea>
+
+  <!-- Optional helpers for the center -->
   <input type="hidden" id="wf_subject" name="subject" value="New Ninja Path Finder Lead">
   <input type="hidden" name="from_name" value="Code Ninjas Program Finder">
 </form>
@@ -566,7 +570,7 @@
 (function(){
   const $  = (s,root=document) => root.querySelector(s);
   const $$ = (s,root=document) => Array.from(root.querySelectorAll(s));
-  window.API_Access = true;
+  window.API_Access = true; // set to false to skip Web3Forms submit
 
   // ---------- PRESTART ----------
   const prestart = $('#prestart');
@@ -737,22 +741,22 @@
       return { label:'1+1+1 Bundle', type:'1+1+1' };
     }
     if(future === 'Coding + AI'){
-      return { label:'1+1 Bundle (CREATE + AI)', type:'1+1_AI' };
-       }
+      return { label:'1+1 Bundle (CREATE + AI Academy)', type:'1+1_AI' };
+    }
     if(future === 'Coding + Robotics'){
-      return { label:'1+1 Bundle (CREATE + Robotics)', type:'1+1_Robotics' };
+      return { label:'1+1 Bundle (CREATE + Robotics Academy)', type:'1+1_Robotics' };
     }
     if(future === 'Coding core'){
       return { label:'2x/Week', type:'2x' };
     }
     if(future === 'Not sure'){
       if(goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced'){
-        return { label:'1+1 Bundle (CREATE + AI)', type:'1+1_AI' };
+        return { label:'1+1 Bundle (CREATE + AI Academy)', type:'1+1_AI' };
       }
       return { label:'2x/Week', type:'2x' };
     }
     if(goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced'){
-      return { label:'1+1 Bundle (CREATE + AI)', type:'1+1_AI' };
+      return { label:'1+1 Bundle (CREATE + AI Academy)', type:'1+1_AI' };
     }
     return { label:'2x/Week', type:'2x' };
   }
@@ -830,10 +834,11 @@
     // CREATE with bundles
     const bundle = chooseCreateBundle();
 
+    // Base stats
     let stats = [
       ['8–13', 'Ideal ages'],
       ['Belt system', 'Built-in motivation'],
-      ['3–4 hrs / week', 'Recommended time'],
+      ['3–4 hrs / week', 'Recommended time'], // default; override below
       ['Game creation', 'High engagement'],
       ['Future skills', 'Coding & logic'],
       ['Mentor support', 'Guided progress']
@@ -843,7 +848,7 @@
     let bulletsExtra = [];
 
     if(bundle.type === '2x'){
-      variantLine = ' Code Ninjas CREATE (2x/Week • Coding Only)';
+      variantLine = ' Code Ninjas CREATE (2x/Week)';
       stats[2] = ['3–4 hrs / week', 'Recommended time'];
       bulletsExtra = [
         'Two focused CREATE sessions each week for consistent progress',
@@ -852,7 +857,7 @@
       ];
     } else if(bundle.type === '1+1_AI'){
       variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + AI Academy)';
-      stats[2] = ['2–3 hrs / week', 'Recommended time'];
+      stats[2] = ['2–3 hrs / week', 'Recommended time']; // per request
       bulletsExtra = [
         'One CREATE session + one AI Academy session each week',
         'Blend core coding with age-appropriate AI concepts and tools',
@@ -860,7 +865,7 @@
       ];
     } else if(bundle.type === '1+1_Robotics'){
       variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + Robotics Academy)';
-      stats[2] = ['2–3 hrs / week', 'Recommended time'];
+      stats[2] = ['2–3 hrs / week', 'Recommended time']; // per request
       bulletsExtra = [
         'One CREATE session + one Robotics Academy session each week',
         'Turn code into motion with engineering challenges and builds',
@@ -868,7 +873,7 @@
       ];
     } else if(bundle.type === '1+1+1'){
       variantLine = ' Code Ninjas CREATE (1+1+1 Bundle: Coding + Academies + Clubs)';
-      stats[2] = ['3–4 hrs / week', 'Recommended time'];
+      stats[2] = ['3–4 hrs / week', 'Recommended time']; // three combined
       const baseThree = [
         'Structured path from block coding into real languages',
         'Mentor-led dojo that feels fun, not like more school',
@@ -941,76 +946,70 @@
     return lines;
   }
 
-  // ---------- VISIT INTRO (custom, no quotes) ----------
-  function visitIntroLine(visit){
-    switch(visit){
-      case 'Referral':
-        return 'A friend or school sent you our way — thanks for trusting their recommendation.';
-      case 'Online':
-        return 'Glad we first connected online, and thanks for coming in to see the dojo in person.';
-      case 'After-school':
-        return 'Appreciate that you thought of us while exploring after-school options.';
-      case 'Camps':
-        return 'Great to hear our camps sparked your visit — we can keep that momentum going year-round.';
-      case 'Coding/AI':
-        return 'Love that curiosity about coding and AI brought you in.';
-      default:
-        return 'Thanks for stopping by today — we’re excited to support your Ninja’s goals.';
-    }
+  // ---------- Tone helpers (email) ----------
+  function craftTraitLine(traits){
+    const t = (traits || []).map(v => v.toLowerCase());
+    if(t.includes('competitive')) return "Your Ninja’s competitive streak will feel right at home in our dojo—friendly challenges keep them engaged while they learn to win the right way: by improving their work.";
+    if(t.includes('focused') || t.includes('analytical')) return "That steady, analytical way of thinking is a real advantage here; we’ll channel it into planning, testing, and finishing projects they’re proud of.";
+    if(t.includes('curious')) return "Curiosity is rocket fuel at Code Ninjas—mentors turn those “what if?” moments into experiments and real breakthroughs.";
+    if(t.includes('creative')) return "A creative eye goes a long way here; we encourage original ideas, design choices, and storytelling inside each build.";
+    if(t.includes('team-player') || t.includes('social') || t.includes('collaboration')) return "They’ll fit into our collaborative dojo culture, where pair-problem-solving and sharing progress are part of the rhythm.";
+    if(t.includes('independent')) return "We’ll respect that independent streak and teach them how to scope work, ask smart questions, and ship finished projects.";
+    return "";
   }
 
-  // ---------- FOLLOW-UP EMAIL (center sends) ----------
-  function buildFollowupEmail(apiProgramName, personaLabel, funFact){
-    const greeting = parentFirst || 'there';
-    const goals = checkboxLabels('goals');
-    const future = radioLabel('futurefocus');
-    const visit = radioLabel('visit');
-    const aiView = radioLabel('ai');
-    const proud = radioLabel('proud');
+  function craftGoalsLines(goals){
+    const g = (goals || []).map(v => v.toLowerCase());
+    const lines = [];
+    if(g.includes('focus')) lines.push("You mentioned focus and discipline. That’s top of mind for many families right now. In a world designed for short bursts of attention, we slow things down just enough to build habits—planning, debugging, and finishing—without losing the fun.");
+    if(g.includes('teamwork')) lines.push("You care about teamwork and communication. Our dojo is built around collaboration and peer feedback, so kids learn to explain ideas and celebrate wins together.");
+    if(g.includes('creativity')) lines.push("Creativity isn’t an afterthought here; it’s baked in. From game design to robotics builds, we make space for choices and personal style.");
+    if(g.includes('confidence')) lines.push("If confidence is the goal, we’ll stack small wins. Belts, badges, and finished projects make progress visible—and kids start to trust themselves with harder challenges.");
+    if(g.includes('academic')) lines.push("Looking for an academic edge? Coding quietly supports math, reading, and problem-solving—skills that transfer back to schoolwork.");
+    if(g.includes('future skills')) lines.push("You’re thinking ahead about future skills. We introduce AI, automation, and real-world tech thoughtfully, so kids learn how to use powerful tools responsibly.");
+    return lines.join("\n");
+  }
 
-    const interestBits = []
+  // ---------- FOLLOW-UP EMAIL (for center, in API only) ----------
+  function buildFollowupEmail(apiProgramName, personaLabel, funFact, bundleType){
+    const greeting = parentFirst || 'there';
+    const goals = checkboxLabels('goals').map(s => s.split('&')[0].trim()); // normalize
+    const future = radioLabel('futurefocus');
+
+    const traits = []
       .concat(checkboxLabels('traits5'))
       .concat(checkboxLabels('traits8'))
-      .concat(checkboxLabels('traits11'))
-      .concat(checkboxLabels('interest14'));
+      .concat(checkboxLabels('traits11'));
 
-    const interestLine = interestBits.length
-      ? `We noticed strengths and interests like ${interestBits.slice(0,3).join(', ')}, which align really well with what we build in the dojo.\n\n`
-      : '';
+    // Program display with bundle included when applicable
+    let programDisplay = apiProgramName;
+    if(apiProgramName === 'Code Ninjas CREATE'){
+      if(bundleType === '1+1_AI') programDisplay += ' (1+1 Bundle: CREATE + AI Academy)';
+      else if(bundleType === '1+1_Robotics') programDisplay += ' (1+1 Bundle: CREATE + Robotics Academy)';
+      else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
+      else if(bundleType === '2x') programDisplay += ' (2x/Week)';
+    }
 
-    const goalsLine = goals.length
-      ? `You shared that you’d love to see ${goals.join(', ')}. Our ${apiProgramName} path is designed to support those outcomes in a fun, structured way.\n`
-      : `Our ${apiProgramName} path is designed to build confidence, focus, creativity, and future-ready skills in a fun, structured way.\n`;
+    const traitLine = craftTraitLine(traits);
+    const goalsLines = craftGoalsLines(goals);
 
-    const futureLine = future && future !== 'Not sure'
-      ? `This track also reflects your priorities around future-ready skills for your Ninja this year.\n`
-      : '';
+    const futureLine = (future && future !== 'Not sure')
+      ? "Your priorities around future-ready skills line up well with this track."
+      : "";
 
-    const visitIntro = visitIntroLine(visit);
+    const funFactLine = funFact ? `\nA quick insight we shared today:\n${funFact}\n` : '';
 
-    const aiLine = (aiView === 'Essential' || aiView === 'Very')
-      ? `You’re absolutely right to be thinking about technology and AI now; we introduce these concepts in an age-appropriate, confidence-building way.\n`
-      : '';
-
-    const proudLine = proud
-      ? `Our team will keep your vision of "${proud.toLowerCase()}" in mind as we work with your Ninja.\n`
-      : '';
-
-    const funFactLine = funFact ? `\nHere’s a fun insight we shared with you:\n${funFact}\n` : '';
-
+    // One “Thank you”, remove “Social media / online” mention, no bold/asterisks
     return (
 `Hi ${greeting},
 
-${visitIntro}
+Thanks for stopping by Code Ninjas ${centerLocation} today. Based on what you shared, your child is a strong fit for ${programDisplay}.
 
-Thank you for completing our Ninja Path Finder at Code Ninjas ${centerLocation}! Based on what you shared, your child is a strong fit for our ${apiProgramName}.
+${traitLine ? traitLine + "\n" : ""}${goalsLines ? goalsLines + "\n" : ""}${futureLine ? futureLine + "\n" : ""}${funFactLine}Next steps are simple:
+• Stop by the front desk and we’ll walk you through getting started, or
+• Call anytime and we’ll help you enroll and answer questions.
 
-${interestLine}${goalsLine}${futureLine}${aiLine}${proudLine}${funFactLine}
-Next steps are easy:
-• Since you completed this in-center, you can stop by the front desk before you leave and we’ll walk you through getting started, or
-• Call or email us anytime and we’ll help you enroll and answer any questions.
-
-As a thank-you for taking the time today, feel free to use code CODE3 to waive the enrollment fee if you enroll within the next 48 hours.
+As a thank-you for visiting, you can use code C9J5 to waive the enrollment fee if you enroll in the next few days.
 
 We’re excited to help your Ninja get started.
 
@@ -1020,14 +1019,14 @@ Center Director, Code Ninjas ${centerLocation}`
     );
   }
 
-  // ---------- SMS SAMPLE TEMPLATES (center internal) ----------
-  function buildSmsSamples(){
+  // ---------- SMS SAMPLE TEMPLATES (for center, in API only) ----------
+  function buildSmsSamples(programDisplay){
     return [
-`Hi ${parentFirst || ''}, it’s Code Ninjas ${centerLocation}! Your Ninja lit up our dojo yesterday. We’d love to lock in their spot so they can keep building that momentum. Use code CODE3 within the next 48 hours to waive the enrollment fee. You can drop in anytime we’re open, or start here: [RECOMMENDED_PROGRAM_LINK]`,
+`Hi ${parentFirst || ''}, Code Ninjas ${centerLocation} here! We recommended ${programDisplay} for your Ninja. We’d love to lock in their spot so they can keep that momentum going. You can drop in anytime we’re open, or start here: [RECOMMENDED_PROGRAM_LINK]`,
 
-`Hey ${parentFirst || ''}, thanks for bringing your Ninja by Code Ninjas ${centerLocation}! With how curious and driven they are, our recommended program is a great fit to keep them challenged (and having fun). Enroll with CODE3 within the next 48 hours to waive the enrollment fee. Drop in anytime or start here: [RECOMMENDED_PROGRAM_LINK]`,
+`Hey ${parentFirst || ''}, thanks for visiting Code Ninjas ${centerLocation}! Based on what you shared, ${programDisplay} will keep your Ninja challenged (and having fun). If you have questions, reply here or stop by and we’ll help you get set up.`,
 
-`Hi ${parentFirst || ''}, Code Ninjas ${centerLocation} here 👋 Your Ninja fit right in with our dojo. If you’d like them to keep building those skills, enroll with CODE3 within the next 48 hours (enrollment fee waived). No schedule pressure—just drop in when we’re open or head to: [RECOMMENDED_PROGRAM_LINK]`
+`Hi ${parentFirst || ''}, quick note from Code Ninjas ${centerLocation}. If you’re ready, you can enroll in ${programDisplay} and use code C9J5 in the next 48 hours to waive the enrollment fee. No pressure—drop in anytime we’re open or tap: [RECOMMENDED_PROGRAM_LINK]`
     ].join('\n\n');
   }
 
@@ -1088,6 +1087,7 @@ Center Director, Code Ninjas ${centerLocation}`
       radioLabel('play5'), radioLabel('tried8'), radioLabel('futurefocus'), radioLabel('ai')
     ].filter(Boolean));
     const funFact = funFactText(baseKey, signals);
+
     if(funFact){ $('#funFactText').textContent = funFact; $('#funFact').classList.remove('hidden'); }
     else { $('#funFact').classList.add('hidden'); }
 
@@ -1095,21 +1095,31 @@ Center Director, Code Ninjas ${centerLocation}`
     $('#centerNote').textContent =
       `Before you head out today, stop by the front desk at Code Ninjas ${centerLocation} so we can walk you through this path and help you enroll. A summary of your results has been shared with the center.`;
 
-    // API message
-    const qaSummary = buildQASummary();
+    // Email/SMS content with improved tone and bundle naming
     const apiProgramName = programUI.apiProgram;
-    const followupEmail = buildFollowupEmail(apiProgramName, persona, funFact);
-    const smsSamples = buildSmsSamples();
 
-    const fullName = `${parentFirst} ${parentLast}`.trim();
+    // Build a programDisplay for SMS (same rules as email)
+    let programDisplay = apiProgramName;
+    if(apiProgramName === 'Code Ninjas CREATE'){
+      if(bundleType === '1+1_AI') programDisplay += ' (1+1 Bundle: CREATE + AI Academy)';
+      else if(bundleType === '1+1_Robotics') programDisplay += ' (1+1 Bundle: CREATE + Robotics Academy)';
+      else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
+      else if(bundleType === '2x') programDisplay += ' (2x/Week)';
+    }
+
+    const followupEmail = buildFollowupEmail(apiProgramName, persona, funFact, bundleType);
+    const smsSamples = buildSmsSamples(programDisplay);
+
     const timestamp = new Date().toLocaleString();
 
+    // IMPORTANT: do not repeat parent name here (the form already has it)
+    const qaSummary = buildQASummary();
+
     const message =
-`Parent: ${fullName}
-Location: Code Ninjas ${centerLocation}
+`Location: Code Ninjas ${centerLocation}
 Submitted: ${timestamp}
 
-Recommended Base Program: ${apiProgramName}
+Recommended Program: ${programDisplay}
 Persona Label: ${persona}
 
 Q&A Summary:
@@ -1118,9 +1128,7 @@ ${qaSummary.map(l => '• ' + l).join('\n')}
 Fun Fact shown to parent:
 ${funFact || ''}
 
-Follow-up Email Template (copy + send):
-(Send immediately after completion)
-
+Follow-up Email Template (copy and send):
 ${followupEmail}
 
 Sample Next-Day SMS Messages (internal use, choose/adapt one):
