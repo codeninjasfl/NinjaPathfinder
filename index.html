@@ -856,18 +856,41 @@
       return { label:'2x/Week', type:'2x' };
     }
     if(future === 'Not sure'){
-      // If they’re unsure but clearly future-focused/advanced, gently bump to 1+1, else keep it simple with 2x
       if(goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced'){
         return { label:'1+1 Bundle (CREATE + AI)', type:'1+1_AI' };
       }
       return { label:'2x/Week', type:'2x' };
     }
 
-    // Fallback if somehow unanswered
     if(goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced'){
       return { label:'1+1 Bundle (CREATE + AI)', type:'1+1_AI' };
     }
     return { label:'2x/Week', type:'2x' };
+  }
+
+  // NEW: Paragraph-length, bundle-specific Ninja profiles
+  function personaBlurbByBundle(ageKey, bundleType){
+    if(ageKey === 'JR'){
+      return "Your Ninja thrives when learning feels like play. In Code Ninjas JR we channel big imagination into bite-sized wins—story-driven activities, hands-on tinkering, and gentle challenges that grow confidence without overwhelm. As they build patterns, sequences, and early problem-solving habits, mentors cheer them on so trying again feels natural and fun. It’s the perfect launchpad for curiosity to become capability.";
+    }
+    if(ageKey === 'ACADEMY'){
+      return "Your Ninja is hungry for real challenges and real outcomes. In Academy, they’ll take on portfolio-ready projects, explore AI and modern development tools, and learn to plan, iterate, and ship—just like pros do. With mentors who coach mindsets as much as mechanics, they’ll build independence, leadership, and the kind of confidence that shows up in school, interviews, and beyond. It’s serious growth without losing the joy.";
+    }
+    // CREATE bundles
+    if(bundleType === '2x'){
+      return "Your Ninja is ready to lock in focused momentum. With CREATE 2x, we double down on coding only—steady weekly rhythm, clear milestones, and mentor feedback that compounds. This path builds real fluency: reading code, fixing bugs, and finishing games that actually work. The consistency keeps motivation high while the belt system turns progress into something they can see and be proud of.";
+    }
+    if(bundleType === '1+1_AI'){
+      return "Your Ninja loves building—and they’re curious about the smart tools shaping the world. The CREATE 1+1 (CREATE + AI Academy) bundle blends solid coding foundations with age-appropriate AI concepts, from problem-solving with intelligent helpers to designing projects that feel a little bit magical. Mentors keep it safe, understandable, and exciting, so curiosity becomes capability and big ideas feel within reach.";
+      }
+    if(bundleType === '1+1_Robotics'){
+      return "Your Ninja wants to see code come to life. The CREATE 1+1 (CREATE + Robotics Academy) bundle pairs core coding progress with hands-on engineering—sensors, motion, and builds they can hold. They’ll learn to plan, test, and iterate while celebrating every wobbly prototype that gets a little better. It’s a confidence-boosting mix of logic and making that turns tinkering into real skills.";
+    }
+    if(bundleType === '1+1+1'){
+      return "Your Ninja thrives on variety and momentum. The CREATE 1+1+1 bundle layers coding with rotating academy and club experiences, so each week feels fresh while skills stack up. They’ll deepen fundamentals, sample AI and robotics, and plug into a community that celebrates progress. It’s the all-around path for kids who want to explore widely, grow steadily, and stay excited all year long.";
+    }
+    // Fallback for CREATE if somehow no bundle detected
+    return "Your Ninja likes to build, tinker, and see progress fast. In CREATE, mentors guide them through projects that make coding feel rewarding, not intimidating—so they keep going even when challenges pop up. They’ll level up through our belt system, learn to debug with confidence, and finish creations they’re proud to share. It’s structured, fun, and designed for real growth.";
   }
 
   function buildProgramUI(age){
@@ -890,7 +913,8 @@
           ['Early logic', 'Patterns & sequencing'],
           ['Fun & safe', 'Dojo environment']
         ],
-        apiProgram: 'Code Ninjas JR'
+        apiProgram: 'Code Ninjas JR',
+        bundleType: null
       };
     }
 
@@ -911,7 +935,8 @@
           ['Mentorship', 'Guided growth'],
           ['Future-focused', 'College & career skills']
         ],
-        apiProgram: 'Code Ninjas Academy'
+        apiProgram: 'Code Ninjas Academy',
+        bundleType: null
       };
     }
 
@@ -920,34 +945,56 @@
 
     let variantLine = '';
     let bulletsExtra = [];
+    let stats = [
+      ['8–13', 'Ideal ages'],
+      ['Belt system', 'Built-in motivation'],
+      ['3–4 hrs / week', 'Recommended time'],
+      ['Game creation', 'High engagement'],
+      ['Future skills', 'Coding & logic'],
+      ['Mentor support', 'Guided progress']
+    ];
+
     if(bundle.type === '2x'){
-      variantLine = ' Code Ninjas CREATE (2x/Week)';
+      variantLine = ' Code Ninjas CREATE (2x/Week • Coding Only)';
       bulletsExtra = [
         'Two focused CREATE sessions each week for consistent progress',
-        'Dialed-in for families who want a strong core in coding',
-        'Perfect when you want depth in one powerful track'
+        'Locked in on coding fundamentals—no additional academies or clubs',
+        'Perfect when you want depth and mastery in one powerful track'
       ];
     } else if(bundle.type === '1+1_AI'){
-      variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + AI)';
+      variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + AI Academy)';
       bulletsExtra = [
-        'One CREATE session + one AI-focused session each week',
-        'Blends core coding with modern AI concepts in a fun, safe way',
-        'Great for future-facing Ninjas curious about smart tech'
+        'One CREATE session + one AI Academy session each week',
+        'Blend core coding with age-appropriate AI concepts and tools',
+        'Great for future-facing Ninjas curious about smart technology'
       ];
     } else if(bundle.type === '1+1_Robotics'){
-      variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + Robotics)';
+      variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + Robotics Academy)';
       bulletsExtra = [
-        'One CREATE session + one Robotics session each week',
-        'Turns coding into real-world engineering & problem-solving',
-        'Great for hands-on builders who love to see things move'
+        'One CREATE session + one Robotics Academy session each week',
+        'Turn code into motion with engineering challenges and builds',
+        'Ideal for hands-on builders who love to see things move'
       ];
     } else if(bundle.type === '1+1+1'){
-      variantLine = ' Code Ninjas CREATE (1+1+1 Bundle: CREATE + AI + Robotics/Clubs)';
-      bulletsExtra = [
-        'CREATE plus rotating AI, Robotics, and club experiences',
-        'Maximum variety to keep advanced or hungry Ninjas engaged',
-        'Ideal when you want all three: coding depth, AI, and engineering'
+      variantLine = ' Code Ninjas CREATE (1+1+1 Bundle: Coding + Academies + Clubs)';
+      const baseThree = [
+        'Structured path from block coding into real languages',
+        'Mentor-led dojo that feels fun, not like more school',
+        'Builds confidence, focus, and perseverance through challenges'
       ];
+      const extraForTriple = [
+        'Coding', // required exact 4th bullet
+        'Rotating AI and Robotics Academy experiences across the year',
+        'Clubs/community add variety and momentum for hungry learners'
+      ];
+      return {
+        uiTitle: 'Recommended Program:' + variantLine,
+        uiBlurb: 'Your Ninja is ready for our CREATE Dojo—where they build real games, sharpen problem-solving, and level up through our belt system in a space that feels like home.',
+        bullets: [...baseThree, ...extraForTriple],
+        stats,
+        apiProgram: 'Code Ninjas CREATE',
+        bundleType: bundle.type
+      };
     }
 
     return {
@@ -959,15 +1006,9 @@
         'Builds confidence, focus, and perseverance through challenges',
         ...bulletsExtra
       ],
-      stats: [
-        ['8–13', 'Ideal ages'],
-        ['Belt system', 'Built-in motivation'],
-        ['2–3 hrs / week', 'Recommended time'],
-        ['Game creation', 'High engagement'],
-        ['Future skills', 'Coding & logic'],
-        ['Mentor support', 'Guided progress']
-      ],
-      apiProgram: 'Code Ninjas CREATE' // bundle excluded from API payload per requirements
+      stats,
+      apiProgram: 'Code Ninjas CREATE',
+      bundleType: bundle.type
     };
   }
 
@@ -1075,7 +1116,6 @@ Center Director, Code Ninjas ${centerLocation}`
 
   // ---------- SMS SAMPLE TEMPLATES (for center, in API only) ----------
   function buildSmsSamples(){
-    // These are generic; center can choose per lead.
     return [
 `Hi ${parentFirst || ''}, it’s Code Ninjas ${centerLocation}! Your Ninja lit up our dojo yesterday. We’d love to lock in their spot so they can keep building that momentum. Use code CODE3 in the next few days to waive the enrollment fee. You can drop in anytime we’re open, or start here: [RECOMMENDED_PROGRAM_LINK]`,
 
@@ -1112,16 +1152,13 @@ Center Director, Code Ninjas ${centerLocation}`
     const baseKey = baseProgramKey(ageVal);
     const programUI = buildProgramUI(ageVal);
 
-    // Persona / profile
+    // Persona / profile (title logic unchanged)
     const goals = checkboxLabels('goals');
     const allTraits = []
       .concat(checkboxLabels('traits5'))
       .concat(checkboxLabels('traits8'))
       .concat(checkboxLabels('traits11'))
       .concat(checkboxLabels('interest14'));
-    const visit = radioLabel('visit');
-    const aiView = radioLabel('ai');
-    const proud = radioLabel('proud');
 
     let persona = 'The Curious Creator Ninja';
     if(goals.includes('Confidence')) persona = 'The Confidence-Boosting Ninja';
@@ -1129,29 +1166,9 @@ Center Director, Code Ninjas ${centerLocation}`
     else if(allTraits.some(t => /Game/i.test(t))) persona = 'The Game Maker Ninja';
     else if(allTraits.some(t => /Robotics|Engineering/i.test(t))) persona = 'The Builder Ninja';
 
-    const traitsPhrase = allTraits.length
-      ? `You highlighted strengths like ${[...new Set(allTraits)].slice(0,3).join(', ')}—those are powerful building blocks for coding and problem-solving. `
-      : '';
-
-    const goalsPhrase = goals.length
-      ? `You’re aiming to grow ${goals.slice(0,3).join(', ')}. `
-      : '';
-
-    const visitPhrase = visit
-      ? `Stopping in because of "${visit}" shows how intentional you are about finding the right environment, not just another activity. `
-      : '';
-
-    const aiPhrase = (aiView === 'Essential' || aiView === 'Very')
-      ? `You also recognize how important technology and AI will be, which gives your Ninja an edge by starting now. `
-      : '';
-
-    const proudPhrase = proud
-      ? `Everything in this recommended path is built to move them closer to being "${proud.toLowerCase()}" over the next year.`
-      : '';
-
-    const personaBlurb =
-      `${traitsPhrase}${goalsPhrase}${visitPhrase}${aiPhrase}${proudPhrase}`.trim()
-      || `Your Ninja is already showing strengths that align beautifully with what we build here at Code Ninjas.`;
+    // NEW: paragraph-length, bundle-specific blurb
+    const bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
+    const personaBlurb = personaBlurbByBundle(baseKey, bundleType);
 
     // UI updates
     $('#personaTitle').textContent = `Your Ninja Profile: ${persona}`;
