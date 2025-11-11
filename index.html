@@ -40,7 +40,7 @@
 
     .prestart-grid {
       display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-columns:repeat(5,minmax(0,1fr));
       gap:10px;
       align-items:center;
       margin-top:6px;
@@ -56,6 +56,7 @@
     .prestart-label { font-size:12px; color:var(--muted); }
     #startQuizBtn { white-space:nowrap; }
 
+    @media (max-width:900px) { .prestart-grid { grid-template-columns:repeat(2,1fr); } }
     @media (max-width:720px) {
       .prestart-grid { grid-template-columns:1fr; }
       #startQuizBtn { width:100%; }
@@ -236,8 +237,9 @@
   <section id="prestart" class="card" aria-label="Parent details">
     <div class="prestart-label">Start by telling us who you are and which center you're visiting.</div>
     <div class="prestart-grid">
-      <input id="parentFirst" placeholder="Parent first name" autocomplete="off">
-      <input id="parentLast" placeholder="Parent last name" autocomplete="off">
+      <input id="parentFirst" placeholder="Parent first name" autocomplete="given-name">
+      <input id="parentLast" placeholder="Parent last name" autocomplete="family-name">
+      <input id="parentEmail" type="email" placeholder="Parent email" autocomplete="email">
       <select id="location" aria-label="Location">
         <option value="">Select location</option>
         <option value="Aventura">Aventura</option>
@@ -246,7 +248,7 @@
       </select>
       <button id="startQuizBtn" class="btn primary" type="button" disabled>Start Quiz ▶</button>
     </div>
-    <div class="hint">We'll use this to share your child's personalized program match with your chosen center.</div>
+    <div class="hint">We’ll use this to share your child's personalized program match with your chosen center.</div>
   </section>
 
   <!-- WIZARD -->
@@ -532,7 +534,7 @@
       </fieldset>
     </div>
 
-    <!-- NEW: Future-Facing Skills (8–10 & 11–13 only; decides CREATE bundle) -->
+    <!-- Future-Facing Skills (8–10 & 11–13 only; decides CREATE bundle) -->
     <div class="step" data-step-id="qFuture" data-show-if="age=8-10,11-13">
       <fieldset>
         <legend>If we focused your Ninja’s time on future-ready skills, which feels most important this year?</legend>
@@ -643,12 +645,17 @@
   </section>
 </div>
 
-<!-- Hidden Web3Forms form (API integration; gated by API_Access flag) -->
+<!-- Web3Forms form (now includes required fields) -->
 <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
+  <!-- REQUIRED by Web3Forms -->
+  <input type="hidden" id="wf_name"   name="name"  value="">
+  <input type="hidden" id="wf_email"  name="email" value="">
+  <textarea name="message" id="wf_message" style="display:none;"></textarea>
+
+  <!-- Optional helpers for the center -->
   <input type="hidden" id="wf_subject" name="subject" value="New Ninja Path Finder Lead">
   <input type="hidden" name="from_name" value="Code Ninjas Program Finder">
-  <textarea name="message" id="wf_message" style="display:none;"></textarea>
 </form>
 
 <script>
@@ -656,7 +663,7 @@
   const $  = (s,root=document) => root.querySelector(s);
   const $$ = (s,root=document) => Array.from(root.querySelectorAll(s));
 
-  // Global toggle: in console, set window.API_Access = false to disable API submission.
+  // Global toggle: set window.API_Access = false to skip API submission.
   window.API_Access = true;
 
   // ---------- PRESTART ----------
@@ -664,16 +671,22 @@
   const startBtn = $('#startQuizBtn');
   const inputsPre = {
     parentFirst: $('#parentFirst'),
-    parentLast: $('#parentLast'),
-    location: $('#location')
+    parentLast:  $('#parentLast'),
+    parentEmail: $('#parentEmail'),
+    location:    $('#location')
   };
-  let parentFirst = '', parentLast = '', centerLocation = '';
+  let parentFirst = '', parentLast = '', parentEmail = '', centerLocation = '';
+
+  function validEmail(v){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
 
   function syncStartState(){
     parentFirst = (inputsPre.parentFirst.value || '').trim();
-    parentLast = (inputsPre.parentLast.value || '').trim();
+    parentLast  = (inputsPre.parentLast.value  || '').trim();
+    parentEmail = (inputsPre.parentEmail.value || '').trim();
     centerLocation = (inputsPre.location.value || '').trim();
-    startBtn.disabled = !(parentFirst && parentLast && centerLocation);
+    startBtn.disabled = !(parentFirst && parentLast && validEmail(parentEmail) && centerLocation);
   }
   Object.values(inputsPre).forEach(el => {
     el.addEventListener('input', syncStartState);
@@ -773,7 +786,7 @@
   // ---------- START QUIZ ----------
   startBtn.addEventListener('click', () => {
     syncStartState();
-    if(!parentFirst || !parentLast || !centerLocation) return;
+    if(!(parentFirst && parentLast && validEmail(parentEmail) && centerLocation)) return;
     prestart.classList.add('hidden');
     wizard.classList.remove('hidden');
     idx = 0;
@@ -801,21 +814,19 @@
     }
   });
 
-  // ---------- HELPERS ----------
+  // ---------- LABEL HELPERS ----------
   function radioLabel(name){
     const el = $('input[name="'+name+'"]:checked');
     if(!el) return '';
     const lab = el.closest('label');
     return lab ? lab.textContent.trim() : el.value;
   }
-
   function checkboxLabels(name){
     return $$('input[name="'+name+'"]:checked').map(el => {
       const lab = el.closest('label');
       return lab ? lab.textContent.trim() : el.value;
     });
   }
-
   function getLegendForInputName(name){
     const input = document.querySelector('[name="'+name+'"]');
     if(!input) return '';
@@ -837,12 +848,11 @@
   }
 
   function chooseCreateBundle(){
-    const future = getValue('futurefocus'); // string or ''
+    const future = getValue('futurefocus');
     const goals = checkboxLabels('goals');
     const tech8 = getValue('tech8');
     const tech11 = getValue('tech11');
 
-    // Direct mapping from priority question
     if(future === 'All three'){
       return { label:'1+1+1 Bundle', type:'1+1+1' };
     }
@@ -861,14 +871,13 @@
       }
       return { label:'2x/Week', type:'2x' };
     }
-
     if(goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced'){
       return { label:'1+1 Bundle (CREATE + AI)', type:'1+1_AI' };
     }
     return { label:'2x/Week', type:'2x' };
   }
 
-  // NEW: Paragraph-length, bundle-specific Ninja profiles
+  // Paragraph-length, bundle-specific Ninja profiles
   function personaBlurbByBundle(ageKey, bundleType){
     if(ageKey === 'JR'){
       return "Your Ninja thrives when learning feels like play. In Code Ninjas JR we channel big imagination into bite-sized wins—story-driven activities, hands-on tinkering, and gentle challenges that grow confidence without overwhelm. As they build patterns, sequences, and early problem-solving habits, mentors cheer them on so trying again feels natural and fun. It’s the perfect launchpad for curiosity to become capability.";
@@ -876,20 +885,18 @@
     if(ageKey === 'ACADEMY'){
       return "Your Ninja is hungry for real challenges and real outcomes. In Academy, they’ll take on portfolio-ready projects, explore AI and modern development tools, and learn to plan, iterate, and ship—just like pros do. With mentors who coach mindsets as much as mechanics, they’ll build independence, leadership, and the kind of confidence that shows up in school, interviews, and beyond. It’s serious growth without losing the joy.";
     }
-    // CREATE bundles
     if(bundleType === '2x'){
       return "Your Ninja is ready to lock in focused momentum. With CREATE 2x, we double down on coding only—steady weekly rhythm, clear milestones, and mentor feedback that compounds. This path builds real fluency: reading code, fixing bugs, and finishing games that actually work. The consistency keeps motivation high while the belt system turns progress into something they can see and be proud of.";
     }
     if(bundleType === '1+1_AI'){
       return "Your Ninja loves building—and they’re curious about the smart tools shaping the world. The CREATE 1+1 (CREATE + AI Academy) bundle blends solid coding foundations with age-appropriate AI concepts, from problem-solving with intelligent helpers to designing projects that feel a little bit magical. Mentors keep it safe, understandable, and exciting, so curiosity becomes capability and big ideas feel within reach.";
-      }
+    }
     if(bundleType === '1+1_Robotics'){
       return "Your Ninja wants to see code come to life. The CREATE 1+1 (CREATE + Robotics Academy) bundle pairs core coding progress with hands-on engineering—sensors, motion, and builds they can hold. They’ll learn to plan, test, and iterate while celebrating every wobbly prototype that gets a little better. It’s a confidence-boosting mix of logic and making that turns tinkering into real skills.";
     }
     if(bundleType === '1+1+1'){
       return "Your Ninja thrives on variety and momentum. The CREATE 1+1+1 bundle layers coding with rotating academy and club experiences, so each week feels fresh while skills stack up. They’ll deepen fundamentals, sample AI and robotics, and plug into a community that celebrates progress. It’s the all-around path for kids who want to explore widely, grow steadily, and stay excited all year long.";
     }
-    // Fallback for CREATE if somehow no bundle detected
     return "Your Ninja likes to build, tinker, and see progress fast. In CREATE, mentors guide them through projects that make coding feel rewarding, not intimidating—so they keep going even when challenges pop up. They’ll level up through our belt system, learn to debug with confidence, and finish creations they’re proud to share. It’s structured, fun, and designed for real growth.";
   }
 
@@ -943,19 +950,22 @@
     // CREATE with bundles
     const bundle = chooseCreateBundle();
 
-    let variantLine = '';
-    let bulletsExtra = [];
+    // Base stats; will override time per bundle as requested
     let stats = [
       ['8–13', 'Ideal ages'],
       ['Belt system', 'Built-in motivation'],
-      ['3–4 hrs / week', 'Recommended time'],
+      ['3–4 hrs / week', 'Recommended time'], // default, overridden below
       ['Game creation', 'High engagement'],
       ['Future skills', 'Coding & logic'],
       ['Mentor support', 'Guided progress']
     ];
 
+    let variantLine = '';
+    let bulletsExtra = [];
+
     if(bundle.type === '2x'){
       variantLine = ' Code Ninjas CREATE (2x/Week • Coding Only)';
+      stats[2] = ['3–4 hrs / week', 'Recommended time']; // 2x stays 3–4
       bulletsExtra = [
         'Two focused CREATE sessions each week for consistent progress',
         'Locked in on coding fundamentals—no additional academies or clubs',
@@ -963,6 +973,7 @@
       ];
     } else if(bundle.type === '1+1_AI'){
       variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + AI Academy)';
+      stats[2] = ['2–3 hrs / week', 'Recommended time']; // per request
       bulletsExtra = [
         'One CREATE session + one AI Academy session each week',
         'Blend core coding with age-appropriate AI concepts and tools',
@@ -970,6 +981,7 @@
       ];
     } else if(bundle.type === '1+1_Robotics'){
       variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + Robotics Academy)';
+      stats[2] = ['2–3 hrs / week', 'Recommended time']; // per request
       bulletsExtra = [
         'One CREATE session + one Robotics Academy session each week',
         'Turn code into motion with engineering challenges and builds',
@@ -977,13 +989,14 @@
       ];
     } else if(bundle.type === '1+1+1'){
       variantLine = ' Code Ninjas CREATE (1+1+1 Bundle: Coding + Academies + Clubs)';
+      stats[2] = ['3–4 hrs / week', 'Recommended time']; // 3 combined shows 3–4
       const baseThree = [
         'Structured path from block coding into real languages',
         'Mentor-led dojo that feels fun, not like more school',
         'Builds confidence, focus, and perseverance through challenges'
       ];
       const extraForTriple = [
-        'Coding', // required exact 4th bullet
+        'Coding', // exact wording required
         'Rotating AI and Robotics Academy experiences across the year',
         'Clubs/community add variety and momentum for hungry learners'
       ];
@@ -1134,9 +1147,13 @@ Center Director, Code Ninjas ${centerLocation}`
     const form = $('#web3Form');
     const msgField = $('#wf_message');
     const subjField = $('#wf_subject');
-    if(!form || !msgField || !subjField) return;
+    const nameField = $('#wf_name');
+    const emailField = $('#wf_email');
+    if(!form || !msgField || !subjField || !nameField || !emailField) return;
 
     subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
+    nameField.value = `${parentFirst} ${parentLast}`.trim();
+    emailField.value = parentEmail;
     msgField.value = message;
 
     const fd = new FormData(form);
@@ -1152,7 +1169,6 @@ Center Director, Code Ninjas ${centerLocation}`
     const baseKey = baseProgramKey(ageVal);
     const programUI = buildProgramUI(ageVal);
 
-    // Persona / profile (title logic unchanged)
     const goals = checkboxLabels('goals');
     const allTraits = []
       .concat(checkboxLabels('traits5'))
@@ -1166,11 +1182,10 @@ Center Director, Code Ninjas ${centerLocation}`
     else if(allTraits.some(t => /Game/i.test(t))) persona = 'The Game Maker Ninja';
     else if(allTraits.some(t => /Robotics|Engineering/i.test(t))) persona = 'The Builder Ninja';
 
-    // NEW: paragraph-length, bundle-specific blurb
     const bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
     const personaBlurb = personaBlurbByBundle(baseKey, bundleType);
 
-    // UI updates
+    // UI
     $('#personaTitle').textContent = `Your Ninja Profile: ${persona}`;
     $('#personaBlurb').textContent = personaBlurb;
 
@@ -1205,7 +1220,7 @@ Center Director, Code Ninjas ${centerLocation}`
     $('#centerNote').textContent =
       `Before you head out today, stop by the front desk at Code Ninjas ${centerLocation} so we can walk you through this path and help you enroll. A summary of your results has been shared with the center.`;
 
-    // Build API payload (NO bundle specifics in program name)
+    // Build API payload
     const qaSummary = buildQASummary();
     const apiProgramName = programUI.apiProgram;
     const followupEmail = buildFollowupEmail(apiProgramName, persona, funFact);
@@ -1216,6 +1231,7 @@ Center Director, Code Ninjas ${centerLocation}`
 
     const message =
 `Parent: ${fullName}
+Email: ${parentEmail}
 Location: Code Ninjas ${centerLocation}
 Submitted: ${timestamp}
 
