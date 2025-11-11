@@ -556,12 +556,8 @@
 <!-- Web3Forms form (hidden; includes required fields) -->
 <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
-
-  <!-- No reply-to and no email field -->
   <input type="hidden" id="wf_name"   name="name"  value="">
   <textarea name="message" id="wf_message" style="display:none;"></textarea>
-
-  <!-- Optional helpers for the center -->
   <input type="hidden" id="wf_subject" name="subject" value="New Ninja Path Finder Lead">
   <input type="hidden" name="from_name" value="Code Ninjas Program Finder">
 </form>
@@ -570,7 +566,7 @@
 (function(){
   const $  = (s,root=document) => root.querySelector(s);
   const $$ = (s,root=document) => Array.from(root.querySelectorAll(s));
-  window.API_Access = true; // set to false to skip Web3Forms submit
+  window.API_Access = true;
 
   // ---------- PRESTART ----------
   const prestart = $('#prestart');
@@ -742,7 +738,7 @@
     }
     if(future === 'Coding + AI'){
       return { label:'1+1 Bundle (CREATE + AI)', type:'1+1_AI' };
-    }
+       }
     if(future === 'Coding + Robotics'){
       return { label:'1+1 Bundle (CREATE + Robotics)', type:'1+1_Robotics' };
     }
@@ -834,11 +830,10 @@
     // CREATE with bundles
     const bundle = chooseCreateBundle();
 
-    // Base stats; overridden per bundle per your rule
     let stats = [
       ['8–13', 'Ideal ages'],
       ['Belt system', 'Built-in motivation'],
-      ['3–4 hrs / week', 'Recommended time'], // default; override below
+      ['3–4 hrs / week', 'Recommended time'],
       ['Game creation', 'High engagement'],
       ['Future skills', 'Coding & logic'],
       ['Mentor support', 'Guided progress']
@@ -857,7 +852,7 @@
       ];
     } else if(bundle.type === '1+1_AI'){
       variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + AI Academy)';
-      stats[2] = ['2–3 hrs / week', 'Recommended time']; // per request
+      stats[2] = ['2–3 hrs / week', 'Recommended time'];
       bulletsExtra = [
         'One CREATE session + one AI Academy session each week',
         'Blend core coding with age-appropriate AI concepts and tools',
@@ -865,7 +860,7 @@
       ];
     } else if(bundle.type === '1+1_Robotics'){
       variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + Robotics Academy)';
-      stats[2] = ['2–3 hrs / week', 'Recommended time']; // per request
+      stats[2] = ['2–3 hrs / week', 'Recommended time'];
       bulletsExtra = [
         'One CREATE session + one Robotics Academy session each week',
         'Turn code into motion with engineering challenges and builds',
@@ -873,7 +868,7 @@
       ];
     } else if(bundle.type === '1+1+1'){
       variantLine = ' Code Ninjas CREATE (1+1+1 Bundle: Coding + Academies + Clubs)';
-      stats[2] = ['3–4 hrs / week', 'Recommended time']; // three combined
+      stats[2] = ['3–4 hrs / week', 'Recommended time'];
       const baseThree = [
         'Structured path from block coding into real languages',
         'Mentor-led dojo that feels fun, not like more school',
@@ -946,7 +941,25 @@
     return lines;
   }
 
-  // ---------- FOLLOW-UP EMAIL (for center, in API only) ----------
+  // ---------- VISIT INTRO (custom, no quotes) ----------
+  function visitIntroLine(visit){
+    switch(visit){
+      case 'Referral':
+        return 'A friend or school sent you our way — thanks for trusting their recommendation.';
+      case 'Online':
+        return 'Glad we first connected online, and thanks for coming in to see the dojo in person.';
+      case 'After-school':
+        return 'Appreciate that you thought of us while exploring after-school options.';
+      case 'Camps':
+        return 'Great to hear our camps sparked your visit — we can keep that momentum going year-round.';
+      case 'Coding/AI':
+        return 'Love that curiosity about coding and AI brought you in.';
+      default:
+        return 'Thanks for stopping by today — we’re excited to support your Ninja’s goals.';
+    }
+  }
+
+  // ---------- FOLLOW-UP EMAIL (center sends) ----------
   function buildFollowupEmail(apiProgramName, personaLabel, funFact){
     const greeting = parentFirst || 'there';
     const goals = checkboxLabels('goals');
@@ -973,9 +986,7 @@
       ? `This track also reflects your priorities around future-ready skills for your Ninja this year.\n`
       : '';
 
-    const visitLine = visit
-      ? `It means a lot that you stopped in because of "${visit}"—it tells us you’re intentional about finding the right environment for your child.\n`
-      : '';
+    const visitIntro = visitIntroLine(visit);
 
     const aiLine = (aiView === 'Essential' || aiView === 'Very')
       ? `You’re absolutely right to be thinking about technology and AI now; we introduce these concepts in an age-appropriate, confidence-building way.\n`
@@ -990,14 +1001,16 @@
     return (
 `Hi ${greeting},
 
+${visitIntro}
+
 Thank you for completing our Ninja Path Finder at Code Ninjas ${centerLocation}! Based on what you shared, your child is a strong fit for our ${apiProgramName}.
 
-${interestLine}${goalsLine}${futureLine}${visitLine}${aiLine}${proudLine}${funFactLine}
+${interestLine}${goalsLine}${futureLine}${aiLine}${proudLine}${funFactLine}
 Next steps are easy:
 • Since you completed this in-center, you can stop by the front desk before you leave and we’ll walk you through getting started, or
 • Call or email us anytime and we’ll help you enroll and answer any questions.
 
-As a thank-you for taking the time today, feel free to use code CODE3 to waive the enrollment fee if you enroll within the next few days.
+As a thank-you for taking the time today, feel free to use code CODE3 to waive the enrollment fee if you enroll within the next 48 hours.
 
 We’re excited to help your Ninja get started.
 
@@ -1007,14 +1020,14 @@ Center Director, Code Ninjas ${centerLocation}`
     );
   }
 
-  // ---------- SMS SAMPLE TEMPLATES (for center, in API only) ----------
+  // ---------- SMS SAMPLE TEMPLATES (center internal) ----------
   function buildSmsSamples(){
     return [
-`Hi ${parentFirst || ''}, it’s Code Ninjas ${centerLocation}! Your Ninja lit up our dojo yesterday. We’d love to lock in their spot so they can keep building that momentum. Use code CODE3 in the next few days to waive the enrollment fee. You can drop in anytime we’re open, or start here: [RECOMMENDED_PROGRAM_LINK]`,
+`Hi ${parentFirst || ''}, it’s Code Ninjas ${centerLocation}! Your Ninja lit up our dojo yesterday. We’d love to lock in their spot so they can keep building that momentum. Use code CODE3 within the next 48 hours to waive the enrollment fee. You can drop in anytime we’re open, or start here: [RECOMMENDED_PROGRAM_LINK]`,
 
-`Hey ${parentFirst || ''}, thanks for bringing your Ninja by Code Ninjas ${centerLocation}! With how curious and driven they are, our recommended program is a great fit to keep them challenged (and having fun). Enroll with CODE3 soon to waive the enrollment fee. Drop in anytime or start here: [RECOMMENDED_PROGRAM_LINK]`,
+`Hey ${parentFirst || ''}, thanks for bringing your Ninja by Code Ninjas ${centerLocation}! With how curious and driven they are, our recommended program is a great fit to keep them challenged (and having fun). Enroll with CODE3 within the next 48 hours to waive the enrollment fee. Drop in anytime or start here: [RECOMMENDED_PROGRAM_LINK]`,
 
-`Hi ${parentFirst || ''}, Code Ninjas ${centerLocation} here 👋 Your Ninja fit right in with our dojo. If you’d like them to keep building those skills, you can enroll with CODE3 (enrollment fee waived for a limited time). No schedule pressure—just drop in when we’re open or head to: [RECOMMENDED_PROGRAM_LINK]`
+`Hi ${parentFirst || ''}, Code Ninjas ${centerLocation} here 👋 Your Ninja fit right in with our dojo. If you’d like them to keep building those skills, enroll with CODE3 within the next 48 hours (enrollment fee waived). No schedule pressure—just drop in when we’re open or head to: [RECOMMENDED_PROGRAM_LINK]`
     ].join('\n\n');
   }
 
@@ -1106,6 +1119,8 @@ Fun Fact shown to parent:
 ${funFact || ''}
 
 Follow-up Email Template (copy + send):
+(Send immediately after completion)
+
 ${followupEmail}
 
 Sample Next-Day SMS Messages (internal use, choose/adapt one):
@@ -1126,4 +1141,3 @@ ${smsSamples}
 </script>
 </body>
 </html>
-```0
