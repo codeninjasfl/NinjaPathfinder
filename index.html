@@ -569,9 +569,13 @@
 <!-- Web3Forms form (hidden; includes required fields) -->
 <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
-  <!-- REQUIRED by Web3Forms -->
+  <!-- Disable Reply-To completely -->
+  <input type="hidden" name="replyto" value="false">
+
+  <!-- Optional name/email fields (email left blank; not used as Reply-To) -->
   <input type="hidden" id="wf_name"   name="name"  value="">
   <input type="hidden" id="wf_email"  name="email" value="">
+
   <textarea name="message" id="wf_message" style="display:none;"></textarea>
 
   <!-- Optional helpers for the center -->
@@ -893,7 +897,7 @@
         'Builds confidence, focus, and perseverance through challenges'
       ];
       const extraForTriple = [
-        'Coding', // exact requirement: 4th bullet shows "Coding"
+        'Coding', // required exact wording
         'Rotating AI and Robotics Academy experiences across the year',
         'Clubs/community add variety and momentum for hungry learners'
       ];
@@ -1043,8 +1047,8 @@ Center Director, Code Ninjas ${centerLocation}`
 
     subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
     nameField.value = `${parentFirst} ${parentLast}`.trim();
-    // No parent email collected at prestart; use a safe placeholder to satisfy Web3Forms requirement.
-    emailField.value = 'noreply@codeninjas.com';
+    // No Reply-To: leave email blank and replyto=false ensures no reply header.
+    emailField.value = '';
     msgField.value = message;
 
     const fd = new FormData(form);
