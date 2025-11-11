@@ -438,7 +438,7 @@
           <label class="opt"><input type="radio" name="growth14" value="Collaboration"> Collaboration</label>
           <label class="opt"><input type="radio" name="growth14" value="Creativity"> Creativity</label>
         </div>
-      </fieldset>
+      </fieldset}
     </div>
 
     <!-- SHARED GOALS -->
@@ -569,13 +569,9 @@
 <!-- Web3Forms form (hidden; includes required fields) -->
 <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
-  <!-- Disable Reply-To completely -->
-  <input type="hidden" name="replyto" value="false">
 
-  <!-- Optional name/email fields (email left blank; not used as Reply-To) -->
+  <!-- No reply-to and no email field -->
   <input type="hidden" id="wf_name"   name="name"  value="">
-  <input type="hidden" id="wf_email"  name="email" value="">
-
   <textarea name="message" id="wf_message" style="display:none;"></textarea>
 
   <!-- Optional helpers for the center -->
@@ -897,7 +893,7 @@
         'Builds confidence, focus, and perseverance through challenges'
       ];
       const extraForTriple = [
-        'Coding', // required exact wording
+        'Coding',
         'Rotating AI and Robotics Academy experiences across the year',
         'Clubs/community add variety and momentum for hungry learners'
       ];
@@ -1042,13 +1038,10 @@ Center Director, Code Ninjas ${centerLocation}`
     const msgField = $('#wf_message');
     const subjField = $('#wf_subject');
     const nameField = $('#wf_name');
-    const emailField = $('#wf_email');
-    if(!form || !msgField || !subjField || !nameField || !emailField) return;
+    if(!form || !msgField || !subjField || !nameField) return;
 
     subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
     nameField.value = `${parentFirst} ${parentLast}`.trim();
-    // No Reply-To: leave email blank and replyto=false ensures no reply header.
-    emailField.value = '';
     msgField.value = message;
 
     const fd = new FormData(form);
