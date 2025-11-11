@@ -19,7 +19,7 @@
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
       background:linear-gradient(180deg,var(--bg1),var(--bg2));
       background-attachment:fixed;
-      color:var(--ink);
+      color:#0f172a;
     }
     .wrap { min-height:100svh; display:grid; place-items:start center; padding:18px; }
     header { color:#eef6ff; text-align:center; margin:4px 0 10px; }
@@ -30,17 +30,17 @@
 
     .card {
       width:min(900px,98vw);
-      background:var(--card);
-      border-radius:var(--radius);
+      background:#fff;
+      border-radius:18px;
       padding:20px 20px 18px;
-      box-shadow:var(--shadow);
+      box-shadow:0 14px 40px rgba(15,23,42,.18);
       border:1px solid rgba(148,163,253,.18);
     }
     .hidden { display:none !important; }
 
     .prestart-grid {
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:10px;
       align-items:center;
       margin-top:6px;
@@ -49,14 +49,13 @@
     .prestart-grid select {
       padding:11px 12px;
       border-radius:12px;
-      border:1px solid var(--border);
+      border:1px solid #e5e7eb;
       font-size:15px;
       width:100%;
     }
-    .prestart-label { font-size:12px; color:var(--muted); }
+    .prestart-label { font-size:12px; color:#64748b; }
     #startQuizBtn { white-space:nowrap; }
 
-    @media (max-width:900px) { .prestart-grid { grid-template-columns:repeat(2,1fr); } }
     @media (max-width:720px) {
       .prestart-grid { grid-template-columns:1fr; }
       #startQuizBtn { width:100%; }
@@ -75,7 +74,7 @@
 
     fieldset { border:0; margin:0; padding:0; }
     legend { font-weight:800; margin:0 0 8px; font-size:17px; color:#0f172a; }
-    .hint { color:var(--muted); font-size:11px; margin:2px 0 4px; }
+    .hint { color:#64748b; font-size:11px; margin:2px 0 4px; }
 
     .opts {
       display:grid;
@@ -88,7 +87,7 @@
       gap:9px;
       padding:11px;
       border-radius:14px;
-      border:1px solid var(--border);
+      border:1px solid #e5e7eb;
       font-size:14px;
       line-height:1.3;
       cursor:pointer;
@@ -100,9 +99,8 @@
     }
     label.opt input {
       margin-top:2px;
-      accent-color:var(--brand);
-      width:18px;
-      height:18px;
+      accent-color:#2563eb;
+      width:18px; height:18px;
     }
     label.opt:focus-within {
       outline:2px solid rgba(37,99,235,.4);
@@ -110,117 +108,42 @@
     }
 
     .actions {
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      margin-top:14px;
+      display:flex; justify-content:space-between; gap:8px; margin-top:14px;
     }
     .actions.sticky {
-      position:sticky;
-      bottom:calc(env(safe-area-inset-bottom) + 8px);
+      position:sticky; bottom:calc(env(safe-area-inset-bottom) + 8px);
       padding-top:6px;
       background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.96));
       backdrop-filter:blur(4px) saturate(1.05);
-      border-radius:0 0 var(--radius) var(--radius);
+      border-radius:0 0 18px 18px;
     }
     .btn {
-      appearance:none;
-      border-radius:12px;
-      padding:10px 15px;
-      font-weight:800;
-      font-size:13px;
-      border:1px solid var(--border);
-      background:#f8fafc;
-      color:#0f172a;
-      cursor:pointer;
-      min-height:42px;
-      touch-action:manipulation;
+      appearance:none; border-radius:12px; padding:10px 15px;
+      font-weight:800; font-size:13px; border:1px solid #e5e7eb;
+      background:#f8fafc; color:#0f172a; cursor:pointer; min-height:42px;
     }
-    .btn.primary {
-      background:var(--brand);
-      color:#ffffff;
-      border-color:var(--brand);
-    }
+    .btn.primary { background:#2563eb; color:#ffffff; border-color:#2563eb; }
     .btn:disabled { opacity:.5; cursor:not-allowed; }
 
     #result { display:none; }
-    #personaTitle {
-      text-align:center;
-      margin:0 0 6px;
-      font-size:22px;
-      font-weight:800;
-    }
-    #personaBlurb {
-      text-align:center;
-      color:#334155;
-      margin:0 0 10px;
-      font-size:13px;
-    }
-    #recTitle {
-      text-align:center;
-      margin:12px 0 4px;
-      font-size:18px;
-      font-weight:800;
-    }
-    #recBlurb {
-      text-align:center;
-      color:#334155;
-      margin:0 0 8px;
-      font-size:13px;
-    }
-    #recPoints {
-      margin:6px 0 0 20px;
-      padding:0;
-    }
-    #recPoints li {
-      margin-bottom:4px;
-      font-size:13px;
-    }
+    #personaTitle { text-align:center; margin:0 0 6px; font-size:22px; font-weight:800; }
+    #personaBlurb { text-align:center; color:#334155; margin:0 0 10px; font-size:13px; }
+    #recTitle { text-align:center; margin:12px 0 4px; font-size:18px; font-weight:800; }
+    #recBlurb { text-align:center; color:#334155; margin:0 0 8px; font-size:13px; }
+    #recPoints { margin:6px 0 0 20px; padding:0; }
+    #recPoints li { margin-bottom:4px; font-size:13px; }
 
-    #funFact {
-      margin-top:10px;
-      padding:10px 11px;
-      border-radius:12px;
-      border:1px dashed #cbd5e1;
-      background:#f8fafc;
-      font-size:12px;
-    }
+    #funFact { margin-top:10px; padding:10px 11px; border-radius:12px; border:1px dashed #cbd5e1; background:#f8fafc; font-size:12px; }
     #funFact strong { display:block; margin-bottom:2px; }
 
-    #stats {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
-      gap:9px;
-      margin-top:10px;
-    }
-    .stat {
-      padding:10px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      text-align:center;
-      font-size:11px;
-    }
-    .stat h3 {
-      margin:0;
-      font-size:17px;
-      font-weight:800;
-      color:#1e293b;
-    }
-    .stat p {
-      margin:3px 0 0;
-      color:#6b7280;
-    }
+    #stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:9px; margin-top:10px; }
+    .stat { padding:10px; border-radius:12px; border:1px solid #e5e7eb; text-align:center; font-size:11px; }
+    .stat h3 { margin:0; font-size:17px; font-weight:800; color:#1e293b; }
+    .stat p { margin:3px 0 0; color:#6b7280; }
 
     .center { text-align:center; }
     .hint.center { margin-top:8px; }
-
-    @media (max-width:640px) {
-      .opts { grid-template-columns:1fr; }
-      .actions { flex-wrap:wrap; }
-      .actions .btn.primary { flex:1 0 100%; }
-      .actions .btn:not(.primary) { flex:0 0 auto; }
-      .count { min-width:88px; }
-    }
+    @media (max-width:640px){ .opts{grid-template-columns:1fr;} .actions{flex-wrap:wrap;} .actions .btn.primary{flex:1 0 100%;} }
   </style>
 </head>
 <body>
@@ -239,7 +162,6 @@
     <div class="prestart-grid">
       <input id="parentFirst" placeholder="Parent first name" autocomplete="given-name">
       <input id="parentLast" placeholder="Parent last name" autocomplete="family-name">
-      <input id="parentEmail" type="email" placeholder="Parent email" autocomplete="email">
       <select id="location" aria-label="Location">
         <option value="">Select location</option>
         <option value="Aventura">Aventura</option>
@@ -248,7 +170,7 @@
       </select>
       <button id="startQuizBtn" class="btn primary" type="button" disabled>Start Quiz ▶</button>
     </div>
-    <div class="hint">We’ll use this to share your child's personalized program match with your chosen center.</div>
+    <div class="hint">We'll use this to share your child's personalized program match with your chosen center.</div>
   </section>
 
   <!-- WIZARD -->
@@ -534,7 +456,6 @@
       </fieldset>
     </div>
 
-    <!-- Future-Facing Skills (8–10 & 11–13 only; decides CREATE bundle) -->
     <div class="step" data-step-id="qFuture" data-show-if="age=8-10,11-13">
       <fieldset>
         <legend>If we focused your Ninja’s time on future-ready skills, which feels most important this year?</legend>
@@ -645,7 +566,7 @@
   </section>
 </div>
 
-<!-- Web3Forms form (now includes required fields) -->
+<!-- Web3Forms form (hidden; includes required fields) -->
 <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
   <!-- REQUIRED by Web3Forms -->
@@ -662,9 +583,7 @@
 (function(){
   const $  = (s,root=document) => root.querySelector(s);
   const $$ = (s,root=document) => Array.from(root.querySelectorAll(s));
-
-  // Global toggle: set window.API_Access = false to skip API submission.
-  window.API_Access = true;
+  window.API_Access = true; // set to false to skip Web3Forms submit
 
   // ---------- PRESTART ----------
   const prestart = $('#prestart');
@@ -672,21 +591,15 @@
   const inputsPre = {
     parentFirst: $('#parentFirst'),
     parentLast:  $('#parentLast'),
-    parentEmail: $('#parentEmail'),
     location:    $('#location')
   };
-  let parentFirst = '', parentLast = '', parentEmail = '', centerLocation = '';
-
-  function validEmail(v){
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  }
+  let parentFirst = '', parentLast = '', centerLocation = '';
 
   function syncStartState(){
-    parentFirst = (inputsPre.parentFirst.value || '').trim();
-    parentLast  = (inputsPre.parentLast.value  || '').trim();
-    parentEmail = (inputsPre.parentEmail.value || '').trim();
-    centerLocation = (inputsPre.location.value || '').trim();
-    startBtn.disabled = !(parentFirst && parentLast && validEmail(parentEmail) && centerLocation);
+    parentFirst    = (inputsPre.parentFirst.value || '').trim();
+    parentLast     = (inputsPre.parentLast.value  || '').trim();
+    centerLocation = (inputsPre.location.value    || '').trim();
+    startBtn.disabled = !(parentFirst && parentLast && centerLocation);
   }
   Object.values(inputsPre).forEach(el => {
     el.addEventListener('input', syncStartState);
@@ -750,7 +663,6 @@
 
   function updateUI(){
     visibleSteps.forEach((s,i) => s.classList.toggle('active', i === idx));
-
     const total = visibleSteps.length || 1;
     qtotalSpan.textContent = total;
     qnum.textContent = idx + 1;
@@ -759,7 +671,6 @@
 
     const active = visibleSteps[idx];
     let disableNext = false;
-
     if(active){
       const radios = $$('input[type=radio]', active);
       if(radios.length){
@@ -772,21 +683,17 @@
         });
       }
     }
-
     nextBtn.textContent = (idx === visibleSteps.length - 1) ? 'See Results ▶' : 'Next ▶';
     nextBtn.disabled = disableNext;
   }
 
   wizard.addEventListener('change', recomputeVisibleSteps);
-
-  // Init
-  visibleSteps = allSteps;
-  updateUI();
+  visibleSteps = allSteps; updateUI();
 
   // ---------- START QUIZ ----------
   startBtn.addEventListener('click', () => {
     syncStartState();
-    if(!(parentFirst && parentLast && validEmail(parentEmail) && centerLocation)) return;
+    if(!(parentFirst && parentLast && centerLocation)) return;
     prestart.classList.add('hidden');
     wizard.classList.remove('hidden');
     idx = 0;
@@ -798,31 +705,21 @@
   });
 
   // ---------- NAV ----------
-  backBtn.addEventListener('click', () => {
-    if(idx > 0){
-      idx--;
-      updateUI();
-    }
-  });
-
-  nextBtn.addEventListener('click', () => {
-    if(idx < visibleSteps.length - 1){
-      idx++;
-      updateUI();
-    } else {
-      computeResultsAndSubmit();
-    }
+  $('#backBtn').addEventListener('click', () => { if(idx>0){ idx--; updateUI(); } });
+  $('#nextBtn').addEventListener('click', () => {
+    if(idx < visibleSteps.length - 1){ idx++; updateUI(); }
+    else { computeResultsAndSubmit(); }
   });
 
   // ---------- LABEL HELPERS ----------
   function radioLabel(name){
-    const el = $('input[name="'+name+'"]:checked');
+    const el = document.querySelector('input[name="'+name+'"]:checked');
     if(!el) return '';
     const lab = el.closest('label');
     return lab ? lab.textContent.trim() : el.value;
   }
   function checkboxLabels(name){
-    return $$('input[name="'+name+'"]:checked').map(el => {
+    return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(el => {
       const lab = el.closest('label');
       return lab ? lab.textContent.trim() : el.value;
     });
@@ -909,7 +806,7 @@
         uiBlurb: 'Playful, story-driven sessions where young Ninjas (5–7) explore early coding, logic, and creativity with tons of encouragement.',
         bullets: [
           'Gentle, game-based introduction to core concepts',
-          'Hands-on projects that feel like play, not school',
+          'Hands-on projects that feel like play, not like school',
           'Builds early confidence, focus, and curiosity'
         ],
         stats: [
@@ -950,11 +847,11 @@
     // CREATE with bundles
     const bundle = chooseCreateBundle();
 
-    // Base stats; will override time per bundle as requested
+    // Base stats; overridden per bundle per your rule
     let stats = [
       ['8–13', 'Ideal ages'],
       ['Belt system', 'Built-in motivation'],
-      ['3–4 hrs / week', 'Recommended time'], // default, overridden below
+      ['3–4 hrs / week', 'Recommended time'], // default; override below
       ['Game creation', 'High engagement'],
       ['Future skills', 'Coding & logic'],
       ['Mentor support', 'Guided progress']
@@ -965,7 +862,7 @@
 
     if(bundle.type === '2x'){
       variantLine = ' Code Ninjas CREATE (2x/Week • Coding Only)';
-      stats[2] = ['3–4 hrs / week', 'Recommended time']; // 2x stays 3–4
+      stats[2] = ['3–4 hrs / week', 'Recommended time'];
       bulletsExtra = [
         'Two focused CREATE sessions each week for consistent progress',
         'Locked in on coding fundamentals—no additional academies or clubs',
@@ -989,14 +886,14 @@
       ];
     } else if(bundle.type === '1+1+1'){
       variantLine = ' Code Ninjas CREATE (1+1+1 Bundle: Coding + Academies + Clubs)';
-      stats[2] = ['3–4 hrs / week', 'Recommended time']; // 3 combined shows 3–4
+      stats[2] = ['3–4 hrs / week', 'Recommended time']; // three combined
       const baseThree = [
         'Structured path from block coding into real languages',
         'Mentor-led dojo that feels fun, not like more school',
         'Builds confidence, focus, and perseverance through challenges'
       ];
       const extraForTriple = [
-        'Coding', // exact wording required
+        'Coding', // exact requirement: 4th bullet shows "Coding"
         'Rotating AI and Robotics Academy experiences across the year',
         'Clubs/community add variety and momentum for hungry learners'
       ];
@@ -1057,9 +954,7 @@
       let ans = (type === 'radio')
         ? radioLabel(name)
         : checkboxLabels(name).join(', ');
-      if(ans){
-        lines.push(legend + ' → ' + ans);
-      }
+      if(ans) lines.push(legend + ' → ' + ans);
     });
     return lines;
   }
@@ -1103,9 +998,7 @@
       ? `Our team will keep your vision of "${proud.toLowerCase()}" in mind as we work with your Ninja.\n`
       : '';
 
-    const funFactLine = funFact
-      ? `\nHere’s a fun insight we shared with you:\n${funFact}\n`
-      : '';
+    const funFactLine = funFact ? `\nHere’s a fun insight we shared with you:\n${funFact}\n` : '';
 
     return (
 `Hi ${greeting},
@@ -1140,10 +1033,7 @@ Center Director, Code Ninjas ${centerLocation}`
 
   // ---------- API SUBMIT ----------
   function submitToWeb3Forms(message){
-    if(window.API_Access === false){
-      console.log('API submission skipped: API_Access is false.');
-      return;
-    }
+    if(window.API_Access === false){ console.log('API submission skipped'); return; }
     const form = $('#web3Form');
     const msgField = $('#wf_message');
     const subjField = $('#wf_subject');
@@ -1153,7 +1043,8 @@ Center Director, Code Ninjas ${centerLocation}`
 
     subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
     nameField.value = `${parentFirst} ${parentLast}`.trim();
-    emailField.value = parentEmail;
+    // No parent email collected at prestart; use a safe placeholder to satisfy Web3Forms requirement.
+    emailField.value = 'noreply@codeninjas.com';
     msgField.value = message;
 
     const fd = new FormData(form);
@@ -1169,13 +1060,13 @@ Center Director, Code Ninjas ${centerLocation}`
     const baseKey = baseProgramKey(ageVal);
     const programUI = buildProgramUI(ageVal);
 
+    // Persona title
     const goals = checkboxLabels('goals');
     const allTraits = []
       .concat(checkboxLabels('traits5'))
       .concat(checkboxLabels('traits8'))
       .concat(checkboxLabels('traits11'))
       .concat(checkboxLabels('interest14'));
-
     let persona = 'The Curious Creator Ninja';
     if(goals.includes('Confidence')) persona = 'The Confidence-Boosting Ninja';
     else if(goals.includes('Future skills')) persona = 'The Future-Ready Ninja';
@@ -1193,34 +1084,21 @@ Center Director, Code Ninjas ${centerLocation}`
     $('#recBlurb').textContent = programUI.uiBlurb;
     $('#recPoints').innerHTML = programUI.bullets.map(b => `<li>${b}</li>`).join('');
 
-    $('#stats').innerHTML = programUI.stats
-      .map(([v,l]) => `<div class="stat"><h3>${v}</h3><p>${l}</p></div>`)
-      .join('');
+    $('#stats').innerHTML = programUI.stats.map(([v,l]) => `<div class="stat"><h3>${v}</h3><p>${l}</p></div>`).join('');
 
-    // Fun fact signals
-    const signals = []
-      .concat(allTraits)
-      .concat(goals)
-      .concat([
-        radioLabel('play5'),
-        radioLabel('tried8'),
-        radioLabel('futurefocus'),
-        radioLabel('ai')
-      ].filter(Boolean));
-
+    // Fun fact
+    const signals = [].concat(allTraits, goals, [
+      radioLabel('play5'), radioLabel('tried8'), radioLabel('futurefocus'), radioLabel('ai')
+    ].filter(Boolean));
     const funFact = funFactText(baseKey, signals);
-    if(funFact){
-      $('#funFactText').textContent = funFact;
-      $('#funFact').classList.remove('hidden');
-    } else {
-      $('#funFact').classList.add('hidden');
-    }
+    if(funFact){ $('#funFactText').textContent = funFact; $('#funFact').classList.remove('hidden'); }
+    else { $('#funFact').classList.add('hidden'); }
 
     // Center note
     $('#centerNote').textContent =
       `Before you head out today, stop by the front desk at Code Ninjas ${centerLocation} so we can walk you through this path and help you enroll. A summary of your results has been shared with the center.`;
 
-    // Build API payload
+    // API message
     const qaSummary = buildQASummary();
     const apiProgramName = programUI.apiProgram;
     const followupEmail = buildFollowupEmail(apiProgramName, persona, funFact);
@@ -1231,7 +1109,6 @@ Center Director, Code Ninjas ${centerLocation}`
 
     const message =
 `Parent: ${fullName}
-Email: ${parentEmail}
 Location: Code Ninjas ${centerLocation}
 Submitted: ${timestamp}
 
@@ -1260,9 +1137,7 @@ ${smsSamples}
   }
 
   // ---------- RETAKE ----------
-  $('#retakeBtn').addEventListener('click', () => {
-    window.location.reload();
-  });
+  $('#retakeBtn').addEventListener('click', () => { window.location.reload(); });
 })();
 </script>
 </body>
