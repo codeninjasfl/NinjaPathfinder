@@ -524,6 +524,97 @@
       </fieldset>
     </div>
 
+    <!-- MARKETING ATTRIBUTION SECTION -->
+    <div class="step" data-step-id="q18">
+      <p style="font-size:13px; margin:0 0 10px;">
+        <strong>You’re almost done!</strong><br>
+        Thanks for sharing about your Ninja — just one last quick question before we wrap up.<br>
+        As a thank-you for your time, you’ll receive a temporary code to waive the $99 enrollment fee once you submit your answers below.
+      </p>
+      <fieldset>
+        <legend>How did you first hear about Code Ninjas?</legend>
+        <div class="hint">Choose one that best fits</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="hearAbout" value="Friend"> A friend or another parent told us about you</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="School"> Through our child’s school or teacher</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Social"> On social media (Facebook, Instagram, etc.)</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Search"> Google or another online search</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Event"> At a local event or community fair</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Returning"> We’ve been here before (returning family)</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Other"> Other (not listed here)</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- Friend / another parent follow-up -->
+    <div class="step" data-step-id="q18A" data-show-if="hearAbout=Friend">
+      <fieldset>
+        <legend>What did they share that made you want to check us out?</legend>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="Their child loved coming here"> Their child loved coming here</label>
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="They mentioned better focus and confidence"> They mentioned better focus and confidence</label>
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="They said their child was doing better in school after joining"> They said their child was doing better in school after joining</label>
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="They showed something their child built"> They showed something their child built</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- School / teacher follow-up -->
+    <div class="step" data-step-id="q18B" data-show-if="hearAbout=School">
+      <fieldset>
+        <legend>How did the school share Code Ninjas?</legend>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" name="schoolShare" value="Flyer or email"> Flyer or email</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="School newsletter"> School newsletter</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="In-school visit or demo"> In-school visit or demo</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="Teacher recommendation"> Teacher recommendation</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- Social media follow-up -->
+    <div class="step" data-step-id="q18C" data-show-if="hearAbout=Social">
+      <fieldset>
+        <legend>Which platform?</legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="socialPlatform" value="Facebook"> Facebook</label>
+          <label class="opt"><input type="radio" name="socialPlatform" value="Instagram"> Instagram</label>
+          <label class="opt"><input type="radio" name="socialPlatform" value="TikTok"> TikTok</label>
+          <label class="opt"><input type="radio" name="socialPlatform" value="Not sure"> Not sure</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- Google / online search follow-up -->
+    <div class="step" data-step-id="q18D" data-show-if="hearAbout=Search">
+      <fieldset>
+        <legend>What were you searching for when you found us?</legend>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" name="searchTopics" value="Coding classes"> Coding classes</label>
+          <label class="opt"><input type="checkbox" name="searchTopics" value="Robotics classes"> Robotics classes</label>
+          <label class="opt"><input type="checkbox" name="searchTopics" value="AI programs"> AI programs</label>
+          <label class="opt"><input type="checkbox" name="searchTopics" value="STEM classes or camps"> STEM classes or camps</label>
+          <label class="opt"><input type="checkbox" name="searchTopics" value="After-school programs"> After-school programs</label>
+          <label class="opt"><input type="checkbox" name="searchTopics" value="Summer camps"> Summer camps</label>
+          <label class="opt"><input type="checkbox" name="searchTopics" value="Other / something else"> Other / something else</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>What made you click on Code Ninjas?</legend>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The program description or curriculum"> The program description or curriculum</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Positive reviews from other parents"> Positive reviews from other parents</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The convenient location"> The convenient location</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The special offer or free session"> The special offer or free session</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The visuals (photos, videos, or ad design)"> The visuals (photos, videos, or ad design)</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Other / something else"> Other / something else</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- No extra follow-up for Event/Other (per request, no text boxes) -->
+
     <div class="actions sticky">
       <button class="btn" id="backBtn" type="button">◀ Back</button>
       <button class="btn primary" id="nextBtn" type="button">Next ▶</button>
@@ -710,6 +801,11 @@
       const lab = el.closest('label');
       return lab ? lab.textContent.trim() : el.value;
     });
+  }
+  function textValue(name){
+    const input = document.querySelector('[name="'+name+'"]');
+    if(!input) return '';
+    return (input.value || '').trim();
   }
   function getLegendForInputName(name){
     const input = document.querySelector('[name="'+name+'"]');
@@ -932,15 +1028,26 @@
       ['traits8','checkbox'],['learn8','radio'],['school8','radio'],['reengage8','radio'],['tech8','radio'],['tried8','radio'],
       ['traits11','checkbox'],['challenge11','radio'],['school11','radio'],['enjoy11','radio'],['tech11','radio'],['leader11','radio'],
       ['motivate14','radio'],['interest14','checkbox'],['tech14','radio'],['career14','radio'],['growth14','radio'],
-      ['goals','checkbox'],['futurefocus','radio'],['visit','radio'],['ai','radio'],['traitsGrow','checkbox'],['proud','radio']
+      ['goals','checkbox'],['futurefocus','radio'],['visit','radio'],['ai','radio'],['traitsGrow','checkbox'],['proud','radio'],
+      ['hearAbout','radio'],
+      ['hearFriendShare','checkbox'],
+      ['schoolShare','checkbox'],
+      ['socialPlatform','radio'],
+      ['searchTopics','checkbox'],
+      ['searchClickWhy','checkbox']
     ];
     const lines = [];
     fields.forEach(([name,type]) => {
       const legend = getLegendForInputName(name);
       if(!legend) return;
-      let ans = (type === 'radio')
-        ? radioLabel(name)
-        : checkboxLabels(name).join(', ');
+      let ans = '';
+      if(type === 'radio'){
+        ans = radioLabel(name);
+      } else if(type === 'checkbox'){
+        ans = checkboxLabels(name).join(', ');
+      } else if(type === 'text'){
+        ans = textValue(name);
+      }
       if(ans) lines.push(legend + ' → ' + ans);
     });
     return lines;
@@ -999,7 +1106,7 @@
 
     const funFactLine = funFact ? `\nA quick insight we shared today:\n${funFact}\n` : '';
 
-    // One “Thank you”, remove “Social media / online” mention, no bold/asterisks
+    // One “Thank you”, eliminate online phrasing, no bold/asterisks
     return (
 `Hi ${greeting},
 
@@ -1072,6 +1179,70 @@ Center Director, Code Ninjas ${centerLocation}`
     const bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
     const personaBlurb = personaBlurbByBundle(baseKey, bundleType);
 
+    // Marketing attribution
+    const hearCode = getValue('hearAbout'); // Friend, School, Social, Search, Event, Returning, Other
+    let marketingSource = '';
+    let marketingSubsource = '';
+    const hearLabel = radioLabel('hearAbout');
+
+    if(hearCode){
+      switch(hearCode){
+        case 'Friend': {
+          marketingSource = 'Friend / Parent Referral';
+          const friendReasons = checkboxLabels('hearFriendShare');
+          marketingSubsource = [
+            `Primary source: ${hearLabel}`,
+            friendReasons.length ? `What they shared: ${friendReasons.join(', ')}` : ''
+          ].filter(Boolean).join('\n');
+          break;
+        }
+        case 'School': {
+          marketingSource = 'School / Teacher';
+          const schoolShare = checkboxLabels('schoolShare');
+          marketingSubsource = [
+            `Primary source: ${hearLabel}`,
+            schoolShare.length ? `How school shared: ${schoolShare.join(', ')}` : ''
+          ].filter(Boolean).join('\n');
+          break;
+        }
+        case 'Social': {
+          marketingSource = 'Social Media';
+          const socialPlatform = radioLabel('socialPlatform');
+          marketingSubsource = [
+            `Primary source: ${hearLabel}`,
+            socialPlatform ? `Platform: ${socialPlatform}` : ''
+          ].filter(Boolean).join('\n');
+          break;
+        }
+        case 'Search': {
+          marketingSource = 'Google / Online Search';
+          const searchTopics = checkboxLabels('searchTopics');
+          const clickReasons = checkboxLabels('searchClickWhy');
+          marketingSubsource = [
+            `Primary source: ${hearLabel}`,
+            searchTopics.length ? `What they were searching for: ${searchTopics.join(', ')}` : '',
+            clickReasons.length ? `What made them click: ${clickReasons.join(', ')}` : ''
+          ].filter(Boolean).join('\n');
+          break;
+        }
+        case 'Event': {
+          marketingSource = 'Event / Fair / Camp';
+          marketingSubsource = `Primary source: ${hearLabel}`;
+          break;
+        }
+        case 'Returning': {
+          marketingSource = 'Returning Family';
+          marketingSubsource = `Primary source: ${hearLabel}`;
+          break;
+        }
+        case 'Other': {
+          marketingSource = 'Other';
+          marketingSubsource = `Primary source: ${hearLabel}`;
+          break;
+        }
+      }
+    }
+
     // UI
     $('#personaTitle').textContent = `Your Ninja Profile: ${persona}`;
     $('#personaBlurb').textContent = personaBlurb;
@@ -1095,7 +1266,7 @@ Center Director, Code Ninjas ${centerLocation}`
     $('#centerNote').textContent =
       `Before you head out today, stop by the front desk at Code Ninjas ${centerLocation} so we can walk you through this path and help you enroll. A summary of your results has been shared with the center.`;
 
-    // Email/SMS content with improved tone and bundle naming
+    // Email/SMS content with bundle naming
     const apiProgramName = programUI.apiProgram;
 
     // Build a programDisplay for SMS (same rules as email)
@@ -1121,6 +1292,10 @@ Submitted: ${timestamp}
 
 Recommended Program: ${programDisplay}
 Persona Label: ${persona}
+
+marketing_source: ${marketingSource || 'N/A'}
+marketing_sub_source:
+${marketingSubsource || 'N/A'}
 
 Q&A Summary:
 ${qaSummary.map(l => '• ' + l).join('\n')}
