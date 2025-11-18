@@ -808,25 +808,41 @@ Audience:
 - Parent or guardian of a child who just visited Code Ninjas ${centerName}.
 
 EMAIL GOALS AND ORDER:
-1) Open warmly and talk about their child first — their excitement, interests, and personality traits (based on persona and answers).
+1) Open warmly and talk about their child first — their excitement, interests, and personality traits (based on what the parent shared AND what you observed in the dojo).
 2) Then briefly explain why the recommended path "${programDisplay}" is a strong fit, in clear, parent-friendly language.
 3) Then invite them to take simple next steps.
 4) Finally, include the enrollment link + code line as described below.
 
 TONE:
-- Warm, human, encouraging, professional.
+- Warm, human, encouraging, conversational.
+- Sound like a real person who just spent time with their family, not a corporate marketing email.
+- Use natural, everyday language and contractions (we're, they're, you'll, etc.).
 - No emojis. No markdown. No bullet points in the email.
 - 3 short paragraphs max, plus a closing line.
 - 160 words or fewer total.
 
+VISIT CONTEXT (VERY IMPORTANT):
+- Most families are visiting for a free game-building session in the dojo.
+- However, if the Program family (see context below) is "Code Ninjas JR", you should describe what the child did as "JR activities", "hands-on JR activities", or "JR learning activities" instead of calling it a free game-building session.
+- When you reference what you saw in the dojo, pick wording that matches the program:
+  - For CREATE or Academy: it’s fine to say things like "during the free game-building session" or "while they were building their game".
+  - For Code Ninjas JR: use language like "during the JR activities" or "while they were working through our hands-on JR activities", not "game-building session".
+
 EMAIL REQUIREMENTS:
 - Start with: "Dear ${greetingName},"
 - Talk clearly about the child and what matters to this family before describing the program.
+- When you mention traits like "creative", "focused", "curious", etc., connect them to BOTH:
+  1) what the parent shared, and
+  2) what you noticed during the visit.
+  Use natural phrases such as:
+  "You mentioned they’re very creative, and we definitely saw that while they were in the dojo today."
+  or
+  "You talked about how focused they can be, and we really noticed that as they were working with us."
 - Must clearly mention the recommended path as: "${programDisplay}".
 - MUST include this exact sentence somewhere in the body (use the placeholder as written):
 "As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll within 72 hours."
 - In that sentence, keep the placeholder [ENROLLMENT_LINK] exactly as written (do not replace it with a URL).
-- End with a warm signoff and center name, e.g.:
+- End with a warm, conversational signoff and center name, for example:
 "Warmly,
 [Center Director Name]
 Code Ninjas ${centerName}"
@@ -1392,7 +1408,6 @@ Code Ninjas ${centerName}`;
       switch(hearCode){
         case 'Friend': {
           marketingSource = 'Friend / Parent Referral';
-          // User requested we not include a "What they shared:" line in the internal notes.
           marketingSubsource = `Primary source: ${hearLabel}`;
           break;
         }
