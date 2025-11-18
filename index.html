@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Code Ninjas – Ninja Path Finder</title>
   <meta name="theme-color" content="#2563eb" />
+
+  <!-- --- PWA SETUP START --- -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <!-- --- PWA SETUP END --- -->
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -914,9 +922,9 @@ SMS REQUIREMENTS:
   - Include the phrase "code C9J5".
   - Refer to the enrollment link using the placeholder [ENROLLMENT_LINK] exactly as written (do not invent a real URL).
   - Clearly say they can enroll using [ENROLLMENT_LINK] and that code C9J5 waives the enrollment fee if they enroll within the next few days.
-- You may gently invite them to reply with questions or to talk more, but keep it friendly and low-pressure.
-- No greetings like "Hi, this is...". Just the message body.
-- No markdown or numbering inside the SMS messages themselves.
+  - You may gently invite them to reply with questions or to talk more, but keep it friendly and low-pressure.
+  - No greetings like "Hi, this is...". Just the message body.
+  - No markdown or numbering inside the SMS messages themselves.
 
 CONTEXT ABOUT THIS FAMILY:
 - Persona label for the child: ${personaLabel}
@@ -1671,6 +1679,17 @@ AI-Generated SMS Options (choose one to text the parent):
   $('#retakeBtn').addEventListener('click', () => { window.location.reload(); });
 })();
 </script>
+<!-- --- SERVICE WORKER REGISTRATION START --- -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => console.log('Service Worker registered!', reg))
+        .catch((err) => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
+<!-- --- SERVICE WORKER REGISTRATION END --- -->
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
