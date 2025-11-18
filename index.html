@@ -97,8 +97,15 @@
     }
     
     /* Centered Start Button - constrained width */
-    #startQuizBtn {
+    #startQuizBtn, #confirmChildrenBtn {
       flex: 1 1 100%;
+      width: 100%;
+      max-width: 320px; /* Wider but constrained */
+      margin: 8px auto 0;
+      display: block;
+    }
+    #startChildQuizBtn, #nextChildBtn {
+       flex: 1 1 100%;
       width: 100%;
       max-width: 320px; /* Wider but constrained */
       margin: 8px auto 0;
@@ -117,6 +124,12 @@
     .progress { flex:1; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; }
     .bar { height:100%; width:0; background:var(--brand); transition:width .4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 999px; }
     .count { font-size:13px; font-weight:700; color:var(--muted); min-width:90px; text-align:right; }
+    .current-child-banner {
+      background: var(--highlight); color: var(--brand);
+      padding: 8px 12px; border-radius: 8px; font-weight: 700;
+      text-align: center; margin-bottom: 16px; font-size: 14px;
+      border: 1px solid #bfdbfe;
+    }
 
     .step { display:none; }
     .step.active { display:block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -126,14 +139,22 @@
     legend { font-weight:800; margin:0 0 16px; font-size:20px; color:var(--ink); line-height: 1.3; letter-spacing: -0.01em; }
     .hint { color:var(--muted); font-size:14px; margin:6px 0 0; font-weight: 500; display: block; }
 
-    /* Updated to Flexbox for button scaling */
+    /* Updated to Grid for 4-option questions (2x2 grid) or flex for others */
     .opts {
-      display:flex;
+      display: flex;
       flex-wrap: wrap;
-      gap:10px;
+      gap: 10px;
     }
+
+    /* Specifically target sets with exactly 4 options to be a 2x2 grid on larger screens */
+    /* This makes them look like even squares/boxes */
+    .opts.grid-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    
     label.opt {
-      flex: 1 1 200px; /* Flex grow allows buttons to stretch */
+      flex: 1 1 200px; /* Default flex behavior */
       display:flex;
       align-items:flex-start;
       gap:10px;
@@ -148,6 +169,7 @@
       color: var(--ink);
       font-weight: 500;
       position: relative;
+      height: 100%; /* Fill height in grid */
     }
     label.opt:hover {
       background: #f1f5f9;
@@ -182,7 +204,17 @@
     }
     @media (max-width: 600px) {
        .actions.sticky { margin: 24px -20px -80px; padding: 16px 20px 32px; border-radius: 0 0 var(--radius) var(--radius); }
+       /* On mobile, maybe stack them or keep 2x2 if space permits. Let's keep 2x2 for grid-4 if possible, otherwise stack */
+       .opts.grid-4 {
+          grid-template-columns: 1fr 1fr; 
+       }
     }
+    @media (max-width: 400px) {
+       .opts.grid-4 {
+          grid-template-columns: 1fr; /* Stack on very small screens */
+       }
+    }
+
 
     .btn {
       appearance:none; border-radius:12px; padding:12px 24px;
@@ -267,6 +299,30 @@
       80% { opacity:1; transform:translateY(0); }
       100% { opacity:0; transform:translateY(-3px); }
     }
+    
+    /* Child Info Group Styling */
+    .child-info-group {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        width: 100%;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .child-info-group h4 {
+        flex: 0 0 100%;
+        margin: 0 0 8px;
+        font-size: 15px;
+        color: var(--brand);
+        font-weight: 700;
+    }
+    .child-info-group input, .child-info-group select {
+        flex: 1 1 150px;
+    }
   </style>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -286,7 +342,6 @@
     <div class="prestart-grid">
       <input id="parentFirst" placeholder="Parent first name" autocomplete="given-name">
       <input id="parentLast" placeholder="Parent last name" autocomplete="family-name">
-      <!-- Email removed as requested -->
       <select id="location" aria-label="Location">
         <option value="">Select location</option>
         <option value="Aventura">Aventura</option>
@@ -298,25 +353,55 @@
     <div class="hint" style="text-align:center; margin-top:12px;">We'll use this to share your child's personalized program match with your chosen center.</div>
   </section>
 
+  <!-- CHILD SETUP (NEW) -->
+  <section id="child-setup" class="card hidden" aria-live="polite">
+    <h2 class="center" style="color:var(--brand); margin:0 0 20px; font-size: 20px;">Just one more thing...</h2>
+    <fieldset>
+      <legend style="text-align:center; margin-bottom:20px;">How many children are joining us today?</legend>
+      <div class="opts grid-4">
+        <label class="opt"><input type="radio" name="numChildrenChoice" value="1" checked> 1 Child</label>
+        <label class="opt"><input type="radio" name="numChildrenChoice" value="2"> 2 Children</label>
+        <label class="opt"><input type="radio" name="numChildrenChoice" value="3"> 3 Children</label>
+        <label class="opt"><input type="radio" name="numChildrenChoice" value="4"> 4 Children</label>
+      </div>
+    </fieldset>
+
+    <div id="child-names-area" class="hidden" style="margin-top:24px;">
+       <p class="hint" style="text-align:center; margin-bottom:12px;">Please provide details for each child:</p>
+       <div id="child-names-inputs" style="display:flex; flex-direction:column; gap:16px;">
+          <!-- Inputs generated here -->
+       </div>
+    </div>
+
+    <div class="actions center" style="margin-top:32px; justify-content:center;">
+       <button id="confirmChildrenBtn" class="btn primary" type="button" style="width:100%; max-width:320px;">Begin Questionnaire ▶</button>
+    </div>
+  </section>
+
+
   <!-- WIZARD -->
   <section id="wizard" class="card hidden" aria-live="polite">
+    <!-- Banner for multi-child context -->
+    <div id="childContextBanner" class="current-child-banner hidden"></div>
+
     <div class="topbar" aria-hidden="true">
       <div class="progress"><div id="bar" class="bar"></div></div>
       <div class="count"><span id="qnum">1</span> / <span id="qtotal">1</span> questions</div>
     </div>
-
-    <!-- Q1: Age -->
-    <div class="step" data-step-id="q1">
+    
+    <!-- Q0: Gender (NEW) -->
+    <div class="step" data-step-id="q0">
       <fieldset>
-        <legend id="ageLegend">How old is your child?</legend>
-        <div class="opts">
-          <label class="opt"><input type="radio" name="age" value="5-7"> 5–7</label>
-          <label class="opt"><input type="radio" name="age" value="8-10"> 8–10</label>
-          <label class="opt"><input type="radio" name="age" value="11-13"> 11–13</label>
-          <label class="opt"><input type="radio" name="age" value="14+"> 14+</label>
+        <legend id="genderLegend">My child is a...</legend>
+        <div class="opts grid-4">
+          <label class="opt"><input type="radio" name="gender" value="Boy"> Boy</label>
+          <label class="opt"><input type="radio" name="gender" value="Girl"> Girl</label>
         </div>
       </fieldset>
     </div>
+    
+    <!-- NOTE: Age step removed from wizard flow because it is now captured in setup -->
+    <!-- The active age value is stored in currentChildAge variable in JS -->
 
     <!-- PATH 1: JR (5–7) -->
     <div class="step" data-step-id="q2A" data-show-if="age=5-7">
@@ -335,13 +420,13 @@
 
     <div class="step" data-step-id="q3A" data-show-if="age=5-7">
       <fieldset>
-        <legend>What kind of play do they enjoy most?</legend>
+        <legend>What kind of play do they enjoy most? <span class="hint">Select all that apply</span></legend>
         <div class="opts">
-          <label class="opt"><input type="radio" name="play5" value="Building"> Building (blocks, Legos, etc.)</label>
-          <label class="opt"><input type="radio" name="play5" value="Imaginative"> Imaginative or pretend play</label>
-          <label class="opt"><input type="radio" name="play5" value="Games"> Games on a tablet or device</label>
-          <label class="opt"><input type="radio" name="play5" value="Arts"> Arts & crafts</label>
-          <label class="opt"><input type="radio" name="play5" value="Outdoor"> Outdoor or active play</label>
+          <label class="opt"><input type="checkbox" name="play5" value="Building"> Building (blocks, Legos, etc.)</label>
+          <label class="opt"><input type="checkbox" name="play5" value="Imaginative"> Imaginative or pretend play</label>
+          <label class="opt"><input type="checkbox" name="play5" value="Games"> Games on a tablet or device</label>
+          <label class="opt"><input type="checkbox" name="play5" value="Arts"> Arts & crafts</label>
+          <label class="opt"><input type="checkbox" name="play5" value="Outdoor"> Outdoor or active play</label>
         </div>
       </fieldset>
     </div>
@@ -349,7 +434,7 @@
     <div class="step" data-step-id="q4A" data-show-if="age=5-7">
       <fieldset>
         <legend>When something doesn’t work right away, they usually…</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="radio" name="grit5" value="Keeps trying"> Keep trying</label>
           <label class="opt"><input type="radio" name="grit5" value="Asks for help"> Ask for help</label>
           <label class="opt"><input type="radio" name="grit5" value="Frustrated"> Get frustrated</label>
@@ -375,25 +460,25 @@
 
     <div class="step" data-step-id="q3B" data-show-if="age=8-10">
       <fieldset>
-        <legend>How does your child learn best?</legend>
+        <legend>How does your child learn best? <span class="hint">Select all that apply</span></legend>
         <div class="opts">
-          <label class="opt"><input type="radio" name="learn8" value="Hands-on"> Hands-on</label>
-          <label class="opt"><input type="radio" name="learn8" value="Visual"> Visual examples</label>
-          <label class="opt"><input type="radio" name="learn8" value="Listening"> Listening</label>
-          <label class="opt"><input type="radio" name="learn8" value="With friends"> With friends</label>
-          <label class="opt"><input type="radio" name="learn8" value="Step-by-step"> Step-by-step instructions</label>
+          <label class="opt"><input type="checkbox" name="learn8" value="Hands-on"> Hands-on</label>
+          <label class="opt"><input type="checkbox" name="learn8" value="Visual"> Visual examples</label>
+          <label class="opt"><input type="checkbox" name="learn8" value="Listening"> Listening</label>
+          <label class="opt"><input type="checkbox" name="learn8" value="With friends"> With friends</label>
+          <label class="opt"><input type="checkbox" name="learn8" value="Step-by-step"> Step-by-step instructions</label>
         </div>
       </fieldset>
     </div>
 
     <div class="step" data-step-id="q4B" data-show-if="age=8-10">
       <fieldset>
-        <legend>How do they feel about school and learning?</legend>
-        <div class="opts">
-          <label class="opt"><input type="radio" name="school8" value="Loves learning"> Loves learning</label>
-          <label class="opt"><input type="radio" name="school8" value="Likes when fun"> Likes it when it’s fun</label>
-          <label class="opt"><input type="radio" name="school8" value="Bored"> Gets bored easily</label>
-          <label class="opt"><input type="radio" name="school8" value="Struggles focus"> Struggles to stay focused</label>
+        <legend>How do they feel about school and learning? <span class="hint">Select all that apply</span></legend>
+        <div class="opts grid-4">
+          <label class="opt"><input type="checkbox" name="school8" value="Loves learning"> Loves learning</label>
+          <label class="opt"><input type="checkbox" name="school8" value="Likes when fun"> Likes it when it’s fun</label>
+          <label class="opt"><input type="checkbox" name="school8" value="Bored"> Gets bored easily</label>
+          <label class="opt"><input type="checkbox" name="school8" value="Struggles focus"> Struggles to stay focused</label>
         </div>
       </fieldset>
     </div>
@@ -401,7 +486,7 @@
     <div class="step" data-step-id="q4B-1" data-show-if="school8=Bored,Struggles focus">
       <fieldset>
         <legend>What usually helps them re-engage?</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="radio" name="reengage8" value="Encouragement"> Encouragement from adults</label>
           <label class="opt"><input type="radio" name="reengage8" value="Competition"> Friendly competition</label>
           <label class="opt"><input type="radio" name="reengage8" value="Rewards"> Rewards or milestones</label>
@@ -423,12 +508,12 @@
 
     <div class="step" data-step-id="q5B-1" data-show-if="tech8=Advanced">
       <fieldset>
-        <legend>What have they tried so far?</legend>
-        <div class="opts">
-          <label class="opt"><input type="radio" name="tried8" value="Roblox/Minecraft"> Minecraft mods or Roblox Studio</label>
-          <label class="opt"><input type="radio" name="tried8" value="Scratch"> Scratch / block coding</label>
-          <label class="opt"><input type="radio" name="tried8" value="Robotics"> Robotics kits</label>
-          <label class="opt"><input type="radio" name="tried8" value="Interested"> Not yet, but very interested</label>
+        <legend>What have they tried so far? <span class="hint">Select all that apply</span></legend>
+        <div class="opts grid-4">
+          <label class="opt"><input type="checkbox" name="tried8" value="Roblox/Minecraft"> Minecraft mods or Roblox Studio</label>
+          <label class="opt"><input type="checkbox" name="tried8" value="Scratch"> Scratch / block coding</label>
+          <label class="opt"><input type="checkbox" name="tried8" value="Robotics"> Robotics kits</label>
+          <label class="opt"><input type="checkbox" name="tried8" value="Interested"> Not yet, but very interested</label>
         </div>
       </fieldset>
     </div>
@@ -451,7 +536,7 @@
     <div class="step" data-step-id="q3C" data-show-if="age=11-13">
       <fieldset>
         <legend>When faced with a challenge, they usually…</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="radio" name="challenge11" value="Persist"> Keep trying</label>
           <label class="opt"><input type="radio" name="challenge11" value="Research"> Research / experiment</label>
           <label class="opt"><input type="radio" name="challenge11" value="Frustrated"> Get frustrated easily</label>
@@ -462,24 +547,24 @@
 
     <div class="step" data-step-id="q4C" data-show-if="age=11-13">
       <fieldset>
-        <legend>How do they feel about school?</legend>
-        <div class="opts">
-          <label class="opt"><input type="radio" name="school11" value="Motivated"> Motivated and focused</label>
-          <label class="opt"><input type="radio" name="school11" value="Bored"> Does fine but gets bored</label>
-          <label class="opt"><input type="radio" name="school11" value="Struggles"> Struggles to stay focused</label>
-          <label class="opt"><input type="radio" name="school11" value="Disengaged"> Disengaged from classes</label>
+        <legend>How do they feel about school? <span class="hint">Select all that apply</span></legend>
+        <div class="opts grid-4">
+          <label class="opt"><input type="checkbox" name="school11" value="Motivated"> Motivated and focused</label>
+          <label class="opt"><input type="checkbox" name="school11" value="Bored"> Does fine but gets bored</label>
+          <label class="opt"><input type="checkbox" name="school11" value="Struggles"> Struggles to stay focused</label>
+          <label class="opt"><input type="checkbox" name="school11" value="Disengaged"> Disengaged from classes</label>
         </div>
       </fieldset>
     </div>
 
     <div class="step" data-step-id="q4C-1" data-show-if="school11=Bored,Disengaged">
       <fieldset>
-        <legend>What would help them enjoy learning more?</legend>
-        <div class="opts">
-          <label class="opt"><input type="radio" name="enjoy11" value="Projects"> Real-world projects</label>
-          <label class="opt"><input type="radio" name="enjoy11" value="Freedom"> Freedom to create</label>
-          <label class="opt"><input type="radio" name="enjoy11" value="Tech/Games"> Using tech and games</label>
-          <label class="opt"><input type="radio" name="enjoy11" value="Peers"> Working with peers</label>
+        <legend>What would help them enjoy learning more? <span class="hint">Select all that apply</span></legend>
+        <div class="opts grid-4">
+          <label class="opt"><input type="checkbox" name="enjoy11" value="Projects"> Real-world projects</label>
+          <label class="opt"><input type="checkbox" name="enjoy11" value="Freedom"> Freedom to create</label>
+          <label class="opt"><input type="checkbox" name="enjoy11" value="Tech/Games"> Using tech and games</label>
+          <label class="opt"><input type="checkbox" name="enjoy11" value="Peers"> Working with peers</label>
         </div>
       </fieldset>
     </div>
@@ -510,7 +595,7 @@
     <div class="step" data-step-id="q2D" data-show-if="age=14+">
       <fieldset>
         <legend>What best describes what motivates your teen?</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="radio" name="motivate14" value="Competition"> Competition & clear goals</label>
           <label class="opt"><input type="radio" name="motivate14" value="Recognition"> Recognition & achievements</label>
           <label class="opt"><input type="radio" name="motivate14" value="Curiosity"> Curiosity & learning</label>
@@ -557,7 +642,7 @@
     <div class="step" data-step-id="q5D" data-show-if="age=14+">
       <fieldset>
         <legend>Which growth area is most important this year?</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="radio" name="growth14" value="Leadership"> Leadership</label>
           <label class="opt"><input type="radio" name="growth14" value="Time management"> Time management</label>
           <label class="opt"><input type="radio" name="growth14" value="Collaboration"> Collaboration</label>
@@ -614,7 +699,7 @@
     <div class="step" data-step-id="q16">
       <fieldset>
         <legend>How important is it for kids to understand AI & emerging technology?</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="radio" name="ai" value="Essential"> Essential</label>
           <label class="opt"><input type="radio" name="ai" value="Very"> Very important</label>
           <label class="opt"><input type="radio" name="ai" value="Somewhat"> Somewhat important</label>
@@ -625,8 +710,8 @@
     
     <!-- Q17 REMOVED AS REQUESTED -->
 
-    <!-- MARKETING ATTRIBUTION SECTION -->
-    <div class="step" data-step-id="q18">
+    <!-- MARKETING ATTRIBUTION SECTION - Tagged as 'marketing-step' to be skipped for subsequent children -->
+    <div class="step marketing-step" data-step-id="q18">
       <p style="font-size:15px; margin:0 0 10px; line-height: 1.5; color: var(--ink);">
         <strong style="color: var(--brand);">You’re almost done!</strong><br>
         Thanks for sharing about your Ninja — just one last quick question before we wrap up.<br>
@@ -642,16 +727,16 @@
           <label class="opt"><input type="radio" name="hearAbout" value="Search"> Google or another online search</label>
           <label class="opt"><input type="radio" name="hearAbout" value="Event"> At a local event or community fair</label>
           <label class="opt"><input type="radio" name="hearAbout" value="Returning"> We’ve been here before (returning family)</label>
-          <label class="opt"><input type="radio" name="hearAbout" value="Other"> Other (not listed here)</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Other"> Other (please specify)</label>
         </div>
       </fieldset>
     </div>
 
     <!-- Friend / another parent follow-up -->
-    <div class="step" data-step-id="q18A" data-show-if="hearAbout=Friend">
+    <div class="step marketing-step" data-step-id="q18A" data-show-if="hearAbout=Friend">
       <fieldset>
         <legend>What did they share that made you want to check us out?</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="checkbox" name="hearFriendShare" value="Their child loved coming here"> Their child loved coming here</label>
           <label class="opt"><input type="checkbox" name="hearFriendShare" value="They mentioned better focus and confidence"> They mentioned better focus and confidence</label>
           <label class="opt"><input type="checkbox" name="hearFriendShare" value="They said their child was doing better in school after joining"> They said their child was doing better in school after joining</label>
@@ -662,9 +747,9 @@
     </div>
 
     <!-- School / teacher follow-up -->
-    <div class="step" data-step-id="q18B" data-show-if="hearAbout=School">
+    <div class="step marketing-step" data-step-id="q18B" data-show-if="hearAbout=School">
       <fieldset>
-        <legend>How did the school share Code Ninjas?</legend>
+        <legend>How did the school share Code Ninjas? <span class="hint">Select all that apply</span></legend>
         <div class="opts">
           <label class="opt"><input type="checkbox" name="schoolShare" value="Flyer or email"> Flyer or email</label>
           <label class="opt"><input type="checkbox" name="schoolShare" value="School newsletter"> School newsletter</label>
@@ -673,23 +758,18 @@
           <label class="opt"><input type="checkbox" name="schoolShare" value="School event"> School event</label>
           <label class="opt"><input type="checkbox" name="schoolShare" value="School social media"> School social media</label>
         </div>
-        <input type="text" id="schoolNameInput" name="schoolNameInput" placeholder="School Name" class="step-input">
-      </fieldset>
-    </div>
-
-    <!-- Teacher specific follow-up (Only if Teacher recommendation selected) -->
-    <div class="step" data-step-id="q18B-1" data-show-if="schoolShare=Teacher recommendation">
-      <fieldset>
-        <legend>What is the teacher's name?</legend>
-        <input type="text" id="teacherNameInput" name="teacherNameInput" placeholder="Teacher Name" class="step-input">
+        <div class="prestart-grid" style="margin-top:10px; display:block;">
+            <input type="text" id="schoolNameInput" name="schoolNameInput" placeholder="School Name" class="step-input" style="margin-bottom:10px;">
+            <input type="text" id="teacherNameInput" name="teacherNameInput" placeholder="Teacher Name (Optional)" class="step-input">
+        </div>
       </fieldset>
     </div>
 
     <!-- Social media follow-up -->
-    <div class="step" data-step-id="q18C" data-show-if="hearAbout=Social">
+    <div class="step marketing-step" data-step-id="q18C" data-show-if="hearAbout=Social">
       <fieldset>
         <legend>Which platform?</legend>
-        <div class="opts">
+        <div class="opts grid-4">
           <label class="opt"><input type="radio" name="socialPlatform" value="Facebook"> Facebook</label>
           <label class="opt"><input type="radio" name="socialPlatform" value="Instagram"> Instagram</label>
           <label class="opt"><input type="radio" name="socialPlatform" value="TikTok"> TikTok</label>
@@ -699,9 +779,9 @@
     </div>
 
     <!-- Google / online search follow-up -->
-    <div class="step" data-step-id="q18D" data-show-if="hearAbout=Search">
+    <div class="step marketing-step" data-step-id="q18D" data-show-if="hearAbout=Search">
       <fieldset>
-        <legend>What were you searching for when you found us?</legend>
+        <legend>What were you searching for when you found us? <span class="hint">Select all that apply</span></legend>
         <div class="opts">
           <label class="opt"><input type="checkbox" name="searchTopics" value="Coding classes"> Coding classes</label>
           <label class="opt"><input type="checkbox" name="searchTopics" value="Robotics classes"> Robotics classes</label>
@@ -714,7 +794,7 @@
       </fieldset>
 
       <fieldset style="margin-top:12px;">
-        <legend>What made you click on Code Ninjas?</legend>
+        <legend>What made you click on Code Ninjas? <span class="hint">Select all that apply</span></legend>
         <div class="opts">
           <label class="opt"><input type="checkbox" name="searchClickWhy" value="The program description or curriculum"> The program description or curriculum</label>
           <label class="opt"><input type="checkbox" name="searchClickWhy" value="Positive reviews from other parents"> Positive reviews from other parents</label>
@@ -726,7 +806,21 @@
       </fieldset>
     </div>
 
-    <!-- No extra follow-up for Event/Other -->
+    <!-- Event follow-up -->
+    <div class="step marketing-step" data-step-id="q18E" data-show-if="hearAbout=Event">
+      <fieldset>
+        <legend>Which event or location?</legend>
+        <input type="text" name="eventDetails" placeholder="Event or Location Name" class="step-input">
+      </fieldset>
+    </div>
+
+    <!-- Other follow-up -->
+    <div class="step marketing-step" data-step-id="q18F" data-show-if="hearAbout=Other">
+      <fieldset>
+        <legend>Please specify</legend>
+        <input type="text" name="otherDetails" placeholder="Details" class="step-input">
+      </fieldset>
+    </div>
 
     <div class="actions sticky">
       <button class="btn" id="backBtn" type="button">◀ Back</button>
@@ -757,8 +851,10 @@
     <h3 class="center" style="margin:24px 0 12px; color: var(--brand);">At-a-glance match</h3>
     <div id="stats"></div>
 
-    <div class="actions center" style="justify-content:center; margin-top:32px;">
-      <button class="btn" id="retakeBtn" type="button">Retake Quiz</button>
+    <div class="actions center" style="justify-content:center; margin-top:32px; flex-wrap:wrap;">
+       <!-- If multi-child, this button will say "Next Child" -->
+      <button class="btn primary" id="nextChildBtn" type="button" style="display:none; margin-bottom:12px;">Start Next Child ▶</button>
+      <button class="btn" id="retakeBtn" type="button">Back To Home</button>
     </div>
     <p class="hint center" id="centerNote"></p>
   </section>
@@ -770,6 +866,7 @@
 <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" target="hidden_iframe">
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
   <input type="hidden" name="name" id="wf_name" required>
+  <!-- Email removed as requested -->
   <textarea name="message" id="wf_message" style="display:none;" required></textarea>
   <input type="hidden" name="subject" id="wf_subject" value="New Ninja Path Finder Lead">
   <input type="hidden" name="from_name" value="Code Ninjas Program Finder">
@@ -784,18 +881,117 @@
   // ---------- PRESTART ----------
   const prestart = $('#prestart');
   const startBtn = $('#startQuizBtn');
+  const childSetup = $('#child-setup');
+  const confirmChildrenBtn = $('#confirmChildrenBtn');
+  const childNamesArea = $('#child-names-area');
+  const childNamesContainer = $('#child-names-inputs');
+  
   const inputsPre = {
     parentFirst: $('#parentFirst'),
     parentLast:  $('#parentLast'),
-    // Email input removed
     location:    $('#location')
   };
+  
   let parentFirst = '', parentLast = '', centerLocation = '';
+  let numChildren = 1;
+  let childNames = []; // Array of {name, age} objects
+  let currentChildIndex = 0; // 0-based index for flow
+  let currentChildAge = ''; // Store current age for logic
+
+  // ---------- CHILD SETUP LOGIC ----------
+  // Listen for radio changes
+  const childRadios = $$('input[name="numChildrenChoice"]', childSetup);
+  childRadios.forEach(r => {
+     r.addEventListener('change', updateChildInputs);
+  });
+  
+  function updateChildInputs() {
+    const selected = $('input[name="numChildrenChoice"]:checked', childSetup);
+    const n = parseInt(selected ? selected.value : 1, 10);
+    numChildren = n;
+    
+    childNamesContainer.innerHTML = '';
+    
+    if(n > 1) {
+      childNamesArea.classList.remove('hidden');
+    } else {
+      // Even for 1 child, show input now to capture age and name
+      childNamesArea.classList.remove('hidden'); 
+    }
+    
+    for(let i=0; i<n; i++) {
+      const group = document.createElement('div');
+      group.className = 'child-info-group';
+      
+      const label = document.createElement('h4');
+      label.textContent = `Child ${i+1}`;
+      group.appendChild(label);
+      
+      const nameInp = document.createElement('input');
+      nameInp.placeholder = `Name`;
+      nameInp.className = 'step-input';
+      nameInp.dataset.type = 'name';
+      nameInp.dataset.index = i;
+      nameInp.style.margin = '0'; // override step-input margin
+      nameInp.addEventListener('input', validateChildSetup);
+      group.appendChild(nameInp);
+      
+      const ageSelect = document.createElement('select');
+      ageSelect.className = 'step-input';
+      ageSelect.dataset.type = 'age';
+      ageSelect.dataset.index = i;
+      ageSelect.style.margin = '0';
+      ageSelect.innerHTML = `
+        <option value="">Select Age</option>
+        <option value="5-7">5-7</option>
+        <option value="8-10">8-10</option>
+        <option value="11-13">11-13</option>
+        <option value="14+">14+</option>
+      `;
+      ageSelect.addEventListener('change', validateChildSetup);
+      group.appendChild(ageSelect);
+      
+      childNamesContainer.appendChild(group);
+    }
+    
+    validateChildSetup();
+  }
+
+  function validateChildSetup(){
+      const nameInputs = $$('input[data-type="name"]', childNamesContainer);
+      const ageSelects = $$('select[data-type="age"]', childNamesContainer);
+      
+      const allFilled = nameInputs.every(i => i.value.trim().length > 0) && 
+                        ageSelects.every(s => s.value !== "");
+      
+      confirmChildrenBtn.disabled = !allFilled;
+      
+      if(allFilled){
+          childNames = nameInputs.map((inp, i) => ({
+              name: inp.value.trim(),
+              age: ageSelects[i].value
+          }));
+      }
+  }
+
+  function syncStartState(){
+    parentFirst    = (inputsPre.parentFirst.value || '').trim();
+    parentLast     = (inputsPre.parentLast.value  || '').trim();
+    centerLocation = (inputsPre.location.value    || '').trim();
+    startBtn.disabled = !(parentFirst && parentLast && centerLocation);
+  }
+  
+  Object.values(inputsPre).forEach(el => {
+    el.addEventListener('input', syncStartState);
+    el.addEventListener('change', syncStartState);
+  });
 
   // ---------- GEMINI CONFIG (Pathfinder) ----------
   const GEMINI_API_KEY = "AIzaSyBsLtykpP5kAuEE4LVJiTx-HwxwQtg7GFA";
   const GEMINI_MODEL_CANDIDATES = [
-    "gemini-2.5-flash"
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash", 
+    "gemini-3.0-pro-preview"
   ];
 
   async function callGemini(promptText){
@@ -826,8 +1022,7 @@
         );
 
         if(!res.ok){
-          const errJson = await res.json().catch(() => null);
-          console.warn("Gemini error for model", model, errJson || res.status);
+          // silently continue to next model
           continue;
         }
 
@@ -860,96 +1055,201 @@
       bundleType,
       marketingSource,
       marketingSubsource,
-      qaSummaryLines
+      qaSummaryLines,
+      currentChildName // Added context
     } = options;
+    
+    // Get Gender from Q0
+    const gender = options.gender || '';
 
     const greetingName = parentFirst || "there";
     const centerName = centerLocation || "your local center";
+    // Incorporate specific child name if multi-child
+    const childRef = currentChildName ? currentChildName : "your child";
+    
+    // Construct pronoun hint based on gender
+    let pronounHint = "";
+    if(gender === 'Boy') pronounHint = `IMPORTANT: The child is a Boy. Use he/him/his pronouns when referring to ${childRef}.`;
+    else if(gender === 'Girl') pronounHint = `IMPORTANT: The child is a Girl. Use she/her/her pronouns when referring to ${childRef}.`;
+    else pronounHint = `Use they/them pronouns or the child's name when referring to ${childRef}.`;
+
 
     const prompt =
-`You are an enrollment advisor at Code Ninjas. A parent just completed an in-center Pathfinder survey.
+`You are an enrollment advisor at Code Ninjas.
+A parent just completed an in-center tour and filled out the Pathfinder questionnaire.
+Your task is to produce:
+1) A short, natural enrollment email
+2) A next-day SMS
+3) A 3-day follow-up SMS with urgency
+The goal:
+Use the survey insights (translated into human observation), the in-center experience, the recommended program path, and the parent's goals to create emotionally persuasive, human messaging.
+You must not sound like a robot, and you must never mirror the questionnaire literally.
+You must translate traits into real-world observations that a parent finds believable, reassuring, and compelling.
 
-You must produce a SHORT email (friendly recap) and THREE SMS options.
+${pronounHint}
 
-Audience:
-- Parent or guardian of a child who just visited Code Ninjas ${centerName} and completed the program finder questionnaire.
+🔥 SECTION 1 — USING SURVEY ANSWERS (CRITICAL)
+You must use the survey responses as emotional insight, not literal text.
+❌ Do NOT:
+Repeat traits word-for-word (“curious,” “competitive,” “shy”)
+Reference the form (“you selected…”, “you shared in the questionnaire…”)
+✅ DO translate traits into natural observations:
+Examples you may use or vary:
+Curious → “They asked thoughtful questions once they got into the activity.”
+Creative → “They liked putting their own spin on things.”
+Competitive → “They really leaned into the challenge once they realized they could level up.”
+Shy → “They opened up nicely once they felt comfortable.”
+Energetic → “They were happiest when they could move between steps and keep momentum.”
+Easily distracted → “They stayed engaged much longer once they had something hands-on to work with.”
+Bored easily → “They lit up when learning felt fast-paced and interactive.”
+Use these insights subtly; parents must feel seen and understood.
 
-VISIT CONTEXT (CRITICAL FOR EMOTIONAL CONNECTION):
-- If the recommended program involves "JR" (ages 5-7), the child participated in "hands-on activities" or "JR activities".
-- If the recommended program involves "CREATE" or "Academy" (ages 8+), the child participated in a "free game-building session".
-- YOU MUST CONNECT the parent's described traits (e.g., competitive, social, creative) to what was observed during this specific session.
-- Avoid blunt statements like "You shared that...". Use a smoother bridge.
-- GOOD (Pathos - Game Building): "On our questionnaire, you mentioned [Child Name] is competitive and social, and we could really see that in action as they were building their game in the dojo today. [Then emphasize their enthusiasm]."
-- GOOD (Pathos - JR): "On our questionnaire, you mentioned [Child Name] is curious, and we could really see that in action while they worked on the hands-on activities. [Then emphasize]."
-- IMPORTANT: If the program is CREATE or Academy, use the phrase "building their game" or "game-building session" when describing their engagement.
+🔥 SECTION 2 — VISIT CONTEXT RULES (MANDATORY)
+You must reference the child’s experience:
+JR (Ages 5–7)
+“hands-on STEM activities”
+“little engineering challenges”
+“creative building activities”
+CREATE (Ages 8–13)
+“their game-building session”
+“experimenting with game logic”
+“designing their first playable game element”
+ACADEMY (Ages 14+)
+“their game-building/tech session”
+“diving into the more advanced tools”
+“approaching the work with maturity / real focus”
+Use believable, specific-sounding lines like:
+“They really locked in once they realized they could make something move.”
+“They warmed up quickly after seeing how the game-building tools worked.”
+“They were proud when they got that first piece working.”
 
-EMAIL GOALS AND ORDER:
-1) Open warmly and talk about their child first. Use the "Visit Context" rule above to link their traits to the specific session type (game-building vs activities).
-2) Then briefly explain why the recommended path "${programDisplay}" is a strong fit, in clear, parent-friendly language.
-3) Then invite them to take simple next steps.
-4) Finally, include the enrollment link + code line as described below.
+🔥 SECTION 3 — PROGRAM-SPECIFIC PERSUASION
+You must include logic tied to why the recommended program ${programDisplay} fits.
+Use the matching persuasion style:
+JR PROGRAM (Ages 5–7)
+Focus on:
+confidence
+early problem-solving
+structure without pressure
+creativity & hands-on fun
+independence at their pace
+Suggested phrasing:
+“JR gives them the right balance of structure and playful exploration.”
+“Kids this age grow fast when learning feels like building, creating, and discovering.”
+CREATE PROGRAM (Ages 8–13)
+Focus on:
+focus/engagement
+small wins
+creativity and logic together
+mastery & belt progression
+consistency leading to skills
+Suggested phrasing:
+“CREATE keeps kids engaged because they get to build real games and see instant results.”
+“The structured belts help kids who need steady progress and kids who crave challenge.”
+ACADEMY / TEENS (14+)
+Focus on:
+future skills
+responsibility
+project ownership
+leadership or mentoring
+portfolio building
+AI, robotics, or advanced coding
+Suggested phrasing:
+“ACADEMY gives teens real-world skills that matter on resumes, in high school, and beyond.”
+“It channels their interests into meaningful projects they can feel proud of.”
 
-TONE:
-- Warm, human, encouraging, conversational.
-- Sound like a real person, not a corporate marketing email.
-- Use natural, everyday language and contractions (we're, they're, you'll, etc.).
-- No emojis. No markdown. No bullet points in the email.
-- 3 short paragraphs max, plus a closing line.
-- 160 words or fewer total.
+🔥 SECTION 4 — TONE MODES
+(Your system must detect and use the appropriate tone based on the child’s path and the parent’s stated goals.)
+Your writing must seamlessly choose the best tone based on cues:
+Soft/Nurturing Tone
+Use when the child is:
+shy
+anxious
+easily frustrated
+younger
+or parent prioritizes confidence/comfort
+Key phrases:
+“at their own pace”
+“feel comfortable and supported”
+“gently build confidence”
+High-Conversion / Confident Tone
+Use when:
+parent expresses academic goals
+child is competitive / advanced
+family values future skills
+parent is already leaning toward joining
+Key phrases:
+“This is the ideal next step.”
+“They’re ready for something more challenging.”
+“This path will move them forward quickly.”
 
-EMAIL REQUIREMENTS:
-- Start with: "Dear ${greetingName},"
-- Talk clearly about the child and what matters to this family before describing the program.
-- Must clearly mention the recommended path as: "${programDisplay}".
-- MUST include this exact sentence somewhere in the body (use the placeholder as written):
+🔥 SECTION 5 — EMAIL REQUIREMENTS
+Your email must:
+Start with: “Dear ${greetingName},”
+Open with something warm about the child (translated observation + their session type)
+Explain why ${programDisplay} is the right fit
+Invite enrollment
+Include this exact sentence:
 "As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days."
-- In that sentence, keep the placeholder [ENROLLMENT_LINK] exactly as written (do not replace it with a URL).
-- End with a warm, conversational signoff and center name, for example:
+Close with:
 "Warmly,
 [Center Director Name]
 Code Ninjas ${centerName}"
+Email length limits:
+3 short paragraphs
+160 words max
+No emojis
+No corporate or robotic tone
 
-SMS REQUIREMENTS:
-- Provide THREE distinct SMS options.
-- Context: These texts will be sent the NEXT DAY to follow up.
-- Each SMS: conversational and warm, 2–3 short sentences, up to about 280 characters.
-- Each SMS must:
-  - Feel personal and relational.
-  - Briefly reference their child’s excitement, interests, or goals before mentioning logistics.
-  - Mention "Code Ninjas ${centerName}".
-  - Mention "${programDisplay}".
-  - Include the phrase "code C9J5".
-  - Refer to the enrollment link using the placeholder [ENROLLMENT_LINK] exactly as written (do not invent a real URL).
-  - Clearly say they can enroll using [ENROLLMENT_LINK] and that code C9J5 waives the enrollment fee if they enroll within the next few days.
-  - You may gently invite them to reply with questions or to talk more, but keep it friendly and low-pressure.
-  - No greetings like "Hi, this is...". Just the message body.
-  - No markdown or numbering inside the SMS messages themselves.
+🔥 SECTION 6 — SMS MESSAGES
+Return exactly two SMS options.
+    SMS #1 — Next-Day Emotional Nudge
+    1–2 sentences
+    Human, warm, conversational
+    Use translated observation
+    Mention hands-on activity or game-building
+    Tie to a parent goal
+    Include [ENROLLMENT_LINK]
+    Mention urgency: offer expires "within the next few days" (do NOT say 48 hours)
+    No emojis
+    Example ideas:
+    “They really lit up once they started building their game. Don't forget to enroll: [ENROLLMENT_LINK] (expires in a few days).”
+    “Yesterday showed how quickly they engage when learning feels creative. Save their spot here: [ENROLLMENT_LINK] (offer ends in a few days).”
+SMS #2 — Sent 3 Days After, With 48-Hour Expiration
+Requirements:
+1–2 sentences max
+Reference a positive observation
+Mention code C9J5
+State it expires in 48 hours
+Include [ENROLLMENT_LINK]
+Warm, respectful urgency
+Example ideas:
+“Since you mentioned wanting more confidence/focus/skills for them, I didn’t want you to miss this.”
+“Given how engaged they were during their session, I wanted to remind you the code expires soon.”
 
-CONTEXT ABOUT THIS FAMILY:
-- Persona label for the child: ${personaLabel}
-- Recommended path / program: ${programDisplay}
-- Program family: ${apiProgramName} (bundle type: ${bundleType || "n/a"})
-- Main marketing source: ${marketingSource || "N/A"}
-- Extra marketing notes:
-${marketingSubsource || "N/A"}
-
-Fun fact we shared during the visit:
-${funFact || "None provided."}
-
-Summary of their answers (each bullet is "question → answer"):
-${(qaSummaryLines || []).map(l => "• " + l).join("\n")}
-
-OUTPUT FORMAT (VERY IMPORTANT):
-Write your answer in this exact structure, with these markers on their own lines:
-
+🔥 SECTION 7 — OUTPUT FORMAT
+Return your final answer in this exact structure, using these separators:
 ---EMAIL---
-[short email body]
+<email content>
 ---SMS1---
-[sms option 1]
+<SMS 1 text>
 ---SMS2---
-[sms option 2]
----SMS3---
-[sms option 3]`;
+<SMS 2 text>
+
+DATA CONTEXT:
+- Parent Name: ${greetingName}
+- Child Name: ${childRef}
+- Child Gender: ${gender}
+- Center Location: ${centerName}
+- Persona: ${personaLabel}
+- Recommended Program: ${programDisplay}
+- Program Family: ${apiProgramName}
+- Bundle Type: ${bundleType || "Standard"}
+- Marketing Source: ${marketingSource || "N/A"}
+- Marketing Notes: ${marketingSubsource || "N/A"}
+- Fun Fact Shared: ${funFact || "N/A"}
+- Survey Answers:
+${(qaSummaryLines || []).map(l => "  - " + l).join("\n")}`;
 
     const raw = await callGemini(prompt);
     if(!raw) return null;
@@ -957,8 +1257,8 @@ Write your answer in this exact structure, with these markers on their own lines
     const email = extractSection(raw, 'EMAIL');
     const sms1  = extractSection(raw, 'SMS1');
     const sms2  = extractSection(raw, 'SMS2');
-    const sms3  = extractSection(raw, 'SMS3');
-    const sms = [sms1, sms2, sms3].filter(Boolean).map(s => s.replace(/\s+/g,' ').trim());
+    // SMS3 removed from prompt
+    const sms = [sms1, sms2].filter(Boolean).map(s => s.replace(/\s+/g,' ').trim());
 
     if(!email || sms.length === 0) return null;
 
@@ -966,14 +1266,15 @@ Write your answer in this exact structure, with these markers on their own lines
   }
 
   // Fallback if Gemini fails
-  function buildFallbackComms(programDisplay){
+  function buildFallbackComms(programDisplay, childName){
     const greetingName = parentFirst || 'there';
     const centerName = centerLocation || 'your local center';
+    const childRef = childName || 'your child';
 
     const email =
 `Dear ${greetingName},
 
-It was truly a pleasure meeting you and your child today. Hearing about your family and seeing your Ninja’s excitement in the dojo made it clear they’re a great fit for a creative, engaging learning environment.
+It was truly a pleasure meeting you and ${childRef} today. Hearing about your family and seeing your Ninja’s excitement in the dojo made it clear they’re a great fit for a creative, engaging learning environment.
 
 From our conversation and the Pathfinder results, ${programDisplay} lines up with what you want — a balance of structure, hands-on challenge, and a fun way to build real-world coding and problem-solving skills.
 
@@ -984,26 +1285,12 @@ Warmly,
 Code Ninjas ${centerName}`;
 
     const sms = [
-      `Code Ninjas ${centerName}: It was great meeting you and your Ninja yesterday. From what you shared, ${programDisplay} gives them a fun way to build confidence, focus, and real tech skills. If you decide to get started, you can enroll at [ENROLLMENT_LINK] and use code C9J5 to waive the enrollment fee if you enroll within the next few days. We’re happy to answer any questions.`,
-      `Thanks again for stopping by Code Ninjas ${centerName}. Your Ninja’s interests and energy really matched what we do, and ${programDisplay} is a natural next step for their growth. If and when it feels right, you can enroll using [ENROLLMENT_LINK] — just enter code C9J5 at checkout to waive the enrollment fee if you enroll within the next few days.`,
-      `We loved having you and your Ninja at Code Ninjas ${centerName}. ${programDisplay} is a great fit for the mix of creativity and structure you’re looking for. If you’d like to keep that momentum going, you can enroll at [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee when you enroll within the next few days. No pressure at all — we’re here if you want to talk more.`
+      `Code Ninjas ${centerName}: It was great meeting you and ${childRef} yesterday. From what you shared, ${programDisplay} gives them a fun way to build confidence, focus, and real tech skills. Sign up here: [ENROLLMENT_LINK] (offer ends in a few days).`,
+      `We loved having you and ${childRef} at Code Ninjas ${centerName}. ${programDisplay} is a great fit for the mix of creativity and structure you’re looking for. You can enroll at [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee within 48 hours.`
     ];
 
     return { email, sms };
   }
-
-  function syncStartState(){
-    parentFirst    = (inputsPre.parentFirst.value || '').trim();
-    parentLast     = (inputsPre.parentLast.value  || '').trim();
-    centerLocation = (inputsPre.location.value    || '').trim();
-    startBtn.disabled = !(parentFirst && parentLast && centerLocation);
-  }
-  Object.values(inputsPre).forEach(el => {
-    el.addEventListener('input', syncStartState);
-    el.addEventListener('change', syncStartState);
-  });
-
-  // ---------- TEACHER INPUT LOGIC REMOVED (Handled by Step now) ----------
 
   // ---------- WIZARD STATE ----------
   const wizard = $('#wizard');
@@ -1017,6 +1304,10 @@ Code Ninjas ${centerName}`;
   const loadingTitle = $('#loadingTitle');
   const loadingSub = $('#loadingSub');
   const allSteps = $$('.step');
+  const childContextBanner = $('#childContextBanner');
+  const nextChildBtn = $('#nextChildBtn');
+  const retakeBtn = $('#retakeBtn'); // Now "Back To Home"
+
   let visibleSteps = [];
   let idx = 0;
   let isSubmitting = false;
@@ -1060,6 +1351,8 @@ Code Ninjas ${centerName}`;
   }
 
   function getValue(name){
+    if (name === 'age') return currentChildAge; // Use dynamic age
+
     const radios = $$('input[type=radio][name="'+name+'"]');
     if(radios.length){
       const checked = radios.find(r => r.checked);
@@ -1070,6 +1363,19 @@ Code Ninjas ${centerName}`;
       return checks.map(c => c.value);
     }
     return '';
+  }
+  
+  // Helper to clear values for next child
+  function clearFormValues() {
+     // Select inputs inside wizard only
+     const allInputs = $$('input, textarea, select', wizard);
+     allInputs.forEach(inp => {
+        // SKIP marketing inputs so we persist attribution across children
+        if(inp.closest('.marketing-step')) return;
+
+        if(inp.type === 'radio' || inp.type === 'checkbox') inp.checked = false;
+        else inp.value = '';
+     });
   }
 
   function conditionMatches(cond){
@@ -1084,6 +1390,12 @@ Code Ninjas ${centerName}`;
 
   function recomputeVisibleSteps(){
     visibleSteps = allSteps.filter(step => {
+      // Skip Q1 (Age) as it's pre-selected now
+      if(step.dataset.stepId === 'q1') return false;
+
+      // Logic to hide marketing questions for 2nd+ child
+      if(currentChildIndex > 0 && step.classList.contains('marketing-step')) return false;
+
       const cond = step.getAttribute('data-show-if');
       if(!cond) return true;
       return conditionMatches(cond);
@@ -1139,15 +1451,43 @@ Code Ninjas ${centerName}`;
   startBtn.addEventListener('click', () => {
     syncStartState();
     if(!(parentFirst && parentLast && centerLocation)) return;
+    
     prestart.classList.add('hidden');
-    wizard.classList.remove('hidden');
-    idx = 0;
-    recomputeVisibleSteps();
-    const ageLegend = $('#ageLegend');
-    if(ageLegend){
-      ageLegend.textContent = `Hi ${parentFirst}! How old is your child?`;
-    }
+    childSetup.classList.remove('hidden'); // Show child setup first
+    // Force update incase default radio is checked
+    updateChildInputs();
   });
+  
+  confirmChildrenBtn.addEventListener('click', () => {
+     // This is the real start of the wizard
+     childSetup.classList.add('hidden');
+     wizard.classList.remove('hidden');
+     
+     currentChildIndex = 0;
+     startChildQuiz();
+  });
+
+  function startChildQuiz() {
+     idx = 0;
+     clearFormValues();
+     
+     // Set current child data context
+     const activeChild = childNames[currentChildIndex];
+     currentChildAge = activeChild.age;
+     
+     // Show context banner if multi-child
+     if(numChildren > 1) {
+        childContextBanner.textContent = `Now answering for: ${activeChild.name}`;
+        childContextBanner.classList.remove('hidden');
+        $('#genderLegend').textContent = `${activeChild.name} is a...`;
+     } else {
+        childContextBanner.classList.add('hidden');
+        $('#genderLegend').textContent = `My child is a...`;
+     }
+     
+     recomputeVisibleSteps();
+     updateUI();
+  }
 
   // ---------- NAV ----------
   backBtn.addEventListener('click', () => {
@@ -1170,6 +1510,17 @@ Code Ninjas ${centerName}`;
         isSubmitting = false;
       }
     }
+  });
+
+  // ---------- MULTI-CHILD LOGIC ----------
+  nextChildBtn.addEventListener('click', () => {
+     // Go to next child
+     currentChildIndex++;
+     if(currentChildIndex < numChildren) {
+        result.style.display = 'none';
+        wizard.classList.remove('hidden');
+        startChildQuiz();
+     }
   });
 
   // ---------- LABEL HELPERS ----------
@@ -1240,26 +1591,128 @@ Code Ninjas ${centerName}`;
     return { label:'2x/Week', type:'2x' };
   }
 
-  function personaBlurbByBundle(ageKey, bundleType){
-    if(ageKey === 'JR'){
-      return "Your Ninja thrives when learning feels like play. In Code Ninjas JR we channel big imagination into bite-sized wins—story-driven activities, hands-on tinkering, and gentle challenges that grow confidence without overwhelm. As they build patterns, sequences, and early problem-solving habits, mentors cheer them on so trying again feels natural and fun. It’s the perfect launchpad for curiosity to become capability.";
+  // Persona determination logic based on updated requirements
+  function determinePersona() {
+    const age = getValue('age');
+    const tech8 = getValue('tech8');
+    const tech11 = getValue('tech11');
+    const tech14 = getValue('tech14');
+    const learn8 = getValue('learn8');
+    const school11 = getValue('school11');
+    const interest14 = checkboxLabels('interest14');
+    const traits8 = checkboxLabels('traits8');
+    const traits11 = checkboxLabels('traits11');
+    const traits5 = checkboxLabels('traits5');
+    const play5 = checkboxLabels('play5'); // Changed to checkboxes in prev step
+    const grit5 = getValue('grit5');
+    const challenge11 = getValue('challenge11');
+    const tried8 = checkboxLabels('tried8'); // Changed to checkboxes
+    const goals = checkboxLabels('goals');
+    const interestMentor = interest14.includes('Mentor');
+    
+    const matches = [];
+
+    // 1. Digital Explorer
+    if (tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
+      matches.push({
+        title: "The Digital Explorer",
+        blurb: "Your child is self-driven and needs accelerated, complex content. The CREATE belt system allows them to progress at their pace, and our Academies offer the advanced topics (like AI and real code) they crave."
+      });
     }
-    if(ageKey === 'ACADEMY'){
-      return "Your Ninja is hungry for real challenges and real outcomes. In Academy, they’ll take on portfolio-ready projects, explore AI and modern development tools, and learn to plan, iterate, and ship—just like pros do. With mentors who coach mindsets as much as mechanics, they’ll build independence, leadership, and the kind of confidence that shows up in school, interviews, and beyond. It’s serious growth without losing the joy.";
+
+    // 2. Structured Learner
+    if (learn8.includes('Step-by-step') || school11.includes('Motivated')) {
+      matches.push({
+        title: "The Structured Learner",
+        blurb: "They excel with clear goals and defined milestones. The CREATE belt system, with its clear curriculum path and defined Belts, perfectly matches their need for order and measurable progress."
+      });
     }
-    if(bundleType === '2x'){
-      return "Your Ninja is ready to lock in focused momentum. With CREATE 2x, we double down on coding only—steady weekly rhythm, clear milestones, and mentor feedback that compounds. This path builds real fluency: reading code, fixing bugs, and finishing games that actually work. The consistency keeps motivation high while the belt system turns progress into something they can see and be proud of.";
+
+    // 3. Hands-On Engineer
+    if (interest14.includes('Robotics') || traits11.includes('Analytical') || (age === '8-10' && learn8.includes('Hands-on'))) {
+      matches.push({
+        title: "The Hands-On Engineer",
+        blurb: "This child connects best with physical outcomes. They're an excellent candidate for the Robotics Academy bundle, blending coding logic with tangible engineering projects."
+      });
     }
-    if(bundleType === '1+1_AI'){
-      return "Your Ninja loves building—and they’re curious about the smart tools shaping the world. The CREATE 1+1 (CREATE + AI Academy) bundle blends solid coding foundations with age-appropriate AI concepts, from problem-solving with intelligent helpers to designing projects that feel a little bit magical. Mentors keep it safe, understandable, and exciting, so curiosity becomes capability and big ideas feel within reach.";
+
+    // 4. Game Designer
+    if (interest14.includes('Game dev') || tried8.includes('Roblox/Minecraft')) {
+      matches.push({
+        title: "The Game Designer",
+        blurb: "Their passion is creation through play. The CREATE belt system, which is fundamentally structured around building and publishing video games, harnesses this core interest immediately."
+      });
     }
-    if(bundleType === '1+1_Robotics'){
-      return "Your Ninja wants to see code come to life. The CREATE 1+1 (CREATE + Robotics Academy) bundle pairs core coding progress with hands-on engineering—sensors, motion, and builds they can hold. They’ll learn to plan, test, and iterate while celebrating every wobbly prototype that gets a little better. It’s a confidence-boosting mix of logic and making that turns tinkering into real skills.";
+
+    // 5. Debugging Master
+    if (grit5 === 'Keeps trying' || challenge11 === 'Persist' || challenge11 === 'Research') {
+      matches.push({
+        title: "The Debugging Master",
+        blurb: "This child has the grit and resilience necessary to overcome complex coding challenges. They will thrive in the self-paced CREATE dojo, where errors are viewed as learning opportunities."
+      });
     }
-    if(bundleType === '1+1+1'){
-      return "Your Ninja thrives on variety and momentum. The CREATE 1+1+1 bundle layers coding with rotating academy and club experiences, so each week feels fresh while skills stack up. They’ll deepen fundamentals, sample AI and robotics, and plug into a community that celebrates progress. It’s the all-around path for kids who want to explore widely, grow steadily, and stay excited all year long.";
+
+    // 6. Collaborative Coder
+    if (traits8.includes('Social') || traits11.includes('Team-player') || interestMentor) {
+      matches.push({
+        title: "The Collaborative Coder",
+        blurb: "They're motivated by peer interaction. The open dojo setting and group collaboration opportunities (Clubs, ACADEMY) fuel their desire to work with others while learning to code."
+      });
     }
-    return "Your Ninja likes to build, tinker, and see progress fast. In CREATE, mentors guide them through projects that make coding feel rewarding, not intimidating—so they keep going even when challenges pop up. They’ll level up through our belt system, learn to debug with confidence, and finish creations they’re proud to share. It’s structured, fun, and designed for real growth.";
+
+    // 7. Digital Innovator
+    if (goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
+      matches.push({
+        title: "The Digital Innovator",
+        blurb: "This profile is seeking cutting-edge knowledge. They are a prime fit for CREATE Bundles (AI Academy) or the ACADEMY track, focusing on modern tools and career readiness."
+      });
+    }
+
+    // 8. The Storyteller
+    if (age === '5-7' && play5.includes('Imaginative')) {
+      matches.push({
+        title: "The Storyteller",
+        blurb: "This child responds best to narrative learning. The JR program uses story-driven, hands-on activities to introduce the logic and sequencing required for early coding concepts."
+      });
+    }
+
+    // 9. Hands-On Architect
+    if (age === '5-7' && play5.includes('Building')) {
+      matches.push({
+        title: "The Hands-On Architect",
+        blurb: "This child understands physical structure and assembly. The JR program uses tactile, hands-on materials to build sequences, leveraging their existing strength in 3D construction to teach abstract logic."
+      });
+    }
+
+    // 10. Curious Novice
+    if (age === '5-7' || tech8 === 'Beginner' || tech11 === 'Beginner' || tech14 === 'Beginner') {
+      matches.push({
+        title: "The Curious Novice",
+        blurb: "This profile needs a gentle, low-pressure introduction to technology. The program must prioritize confidence-building and foundational concepts over complex skills initially."
+      });
+    }
+
+    if (matches.length > 0) {
+      return matches[0]; // Return the first match found (priority order)
+    }
+
+    // Defaults (Randomized if no match)
+    const defaults = [
+      {
+        title: "The Code Ninja in Training",
+        blurb: "Your child shows a balanced mix of curiosity and potential. Our program adapts to their pace, helping them discover their specific passions—whether that’s building games, controlling robots, or writing code."
+      },
+      {
+        title: "The Future Tech Leader",
+        blurb: "With a solid foundation and the right guidance, your child is ready to step into the world of technology. We focus on building not just coding skills, but the confidence and logic they need for the future."
+      },
+      {
+        title: "The Creative Thinker",
+        blurb: "Your child approaches problems with a unique perspective. Our creative curriculum allows them to express that imagination through digital building, turning their ideas into playable reality."
+      }
+    ];
+    
+    return defaults[Math.floor(Math.random() * defaults.length)];
   }
 
   function buildProgramUI(age){
@@ -1412,10 +1865,11 @@ Code Ninjas ${centerName}`;
   // ---------- Q&A SUMMARY ----------
   function buildQASummary(){
     const fields = [
-      ['age','radio'],
-      ['traits5','checkbox'],['play5','radio'],['grit5','radio'],
-      ['traits8','checkbox'],['learn8','radio'],['school8','radio'],['reengage8','radio'],['tech8','radio'],['tried8','radio'],
-      ['traits11','checkbox'],['challenge11','radio'],['school11','radio'],['enjoy11','radio'],['tech11','radio'],['leader11','radio'],
+      ['gender', 'radio'], // Add Gender to summary
+      ['age','radio'], // This will now fetch pre-set age
+      ['traits5','checkbox'],['play5','checkbox'],['grit5','radio'],
+      ['traits8','checkbox'],['learn8','checkbox'],['school8','checkbox'],['reengage8','radio'],['tech8','radio'],['tried8','checkbox'],
+      ['traits11','checkbox'],['challenge11','radio'],['school11','checkbox'],['enjoy11','checkbox'],['tech11','radio'],['leader11','radio'],
       ['motivate14','radio'],['interest14','checkbox'],['tech14','radio'],['career14','radio'],['growth14','radio'],
       ['goals','checkbox'],['futurefocus','radio'],['ai','radio'],
       ['hearAbout','radio'],
@@ -1426,7 +1880,9 @@ Code Ninjas ${centerName}`;
       ['teacherNameInput','text'],
       ['socialPlatform','radio'],
       ['searchTopics','checkbox'],
-      ['searchClickWhy','checkbox']
+      ['searchClickWhy','checkbox'],
+      ['eventDetails','text'],
+      ['otherDetails','text']
     ];
     const lines = [];
     fields.forEach(([name,type]) => {
@@ -1439,9 +1895,19 @@ Code Ninjas ${centerName}`;
            if(name === 'friendName') label = 'Friend/Parent Name';
            else if(name === 'schoolNameInput') label = 'School Name';
            else if(name === 'teacherNameInput') label = 'Teacher Name';
+           else if(name === 'eventDetails') label = 'Event/Location';
+           else if(name === 'otherDetails') label = 'Other Details';
            lines.push(`${label} → ${val}`);
         }
         return;
+      }
+      
+      // AGE SPECIAL HANDLING: If age question was skipped in wizard, we still need to log it
+      if(name === 'age'){
+         if(currentChildAge){
+            lines.push(`Age Group → ${currentChildAge}`);
+         }
+         return;
       }
 
       const legend = getLegendForInputName(name);
@@ -1481,23 +1947,23 @@ Code Ninjas ${centerName}`;
   // ---------- MAIN RESULTS ----------
   async function computeResultsAndSubmit(){
     const ageVal = getValue('age') || '';
+    const gender = getValue('gender') || '';
     const baseKey = baseProgramKey(ageVal);
     const programUI = buildProgramUI(ageVal);
+    const bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
+    
+    // Use new Persona Logic
+    const personaData = determinePersona();
+    const persona = personaData.title;
+    const personaBlurb = personaData.blurb;
 
-    const goals = checkboxLabels('goals');
     const allTraits = []
       .concat(checkboxLabels('traits5'))
       .concat(checkboxLabels('traits8'))
       .concat(checkboxLabels('traits11'))
       .concat(checkboxLabels('interest14'));
-    let persona = 'The Curious Creator Ninja';
-    if(goals.includes('Confidence')) persona = 'The Confidence-Boosting Ninja';
-    else if(goals.includes('Future skills')) persona = 'The Future-Ready Ninja';
-    else if(allTraits.some(t => /Game/i.test(t))) persona = 'The Game Maker Ninja';
-    else if(allTraits.some(t => /Robotics|Engineering/i.test(t))) persona = 'The Builder Ninja';
-
-    const bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
-    const personaBlurb = personaBlurbByBundle(baseKey, bundleType);
+      
+    const goals = checkboxLabels('goals');
 
     // Marketing attribution
     const hearCode = getValue('hearAbout');
@@ -1551,7 +2017,11 @@ Code Ninjas ${centerName}`;
         }
         case 'Event': {
           marketingSource = 'Event / Fair / Camp';
-          marketingSubsource = `Primary source: ${hearLabel}`;
+          const evt = textValue('eventDetails');
+          marketingSubsource = [
+            `Primary source: ${hearLabel}`,
+            evt ? `Event/Loc: ${evt}` : ''
+          ].filter(Boolean).join('\n');
           break;
         }
         case 'Returning': {
@@ -1561,14 +2031,22 @@ Code Ninjas ${centerName}`;
         }
         case 'Other': {
           marketingSource = 'Other';
-          marketingSubsource = `Primary source: ${hearLabel}`;
+          const oth = textValue('otherDetails');
+          marketingSubsource = [
+            `Primary source: ${hearLabel}`,
+            oth ? `Details: ${oth}` : ''
+          ].filter(Boolean).join('\n');
           break;
         }
       }
     }
 
     // UI
-    $('#personaTitle').textContent = `Your Ninja Profile: ${persona}`;
+    const currentChildName = (numChildren > 1 && childNames[currentChildIndex]) 
+         ? childNames[currentChildIndex].name
+         : "Your Child"; // Used for UI display, not for prompt
+
+    $('#personaTitle').textContent = `${currentChildName}'s Profile: ${persona}`;
     $('#personaBlurb').textContent = personaBlurb;
 
     $('#recTitle').textContent = programUI.uiTitle;
@@ -1579,7 +2057,7 @@ Code Ninjas ${centerName}`;
 
     // Fun fact (only for on-screen)
     const signals = [].concat(allTraits, goals, [
-      radioLabel('play5'), radioLabel('tried8'), radioLabel('futurefocus'), radioLabel('ai')
+      checkboxLabels('play5').join(' '), checkboxLabels('tried8').join(' '), radioLabel('futurefocus'), radioLabel('ai')
     ].filter(Boolean));
     const funFact = funFactText(baseKey, signals, bundleType); 
 
@@ -1619,7 +2097,9 @@ Code Ninjas ${centerName}`;
         bundleType,
         marketingSource,
         marketingSubsource,
-        qaSummaryLines: qaSummary
+        qaSummaryLines: qaSummary,
+        currentChildName: (numChildren > 1) ? currentChildName : null,
+        gender: gender // Pass gender to AI
       });
       if(comms){
         emailBody = comms.email;
@@ -1631,17 +2111,20 @@ Code Ninjas ${centerName}`;
 
     // Fallback if Gemini fails
     if(!emailBody || smsOptions.length === 0){
-      const fallback = buildFallbackComms(programDisplay);
+      const fallback = buildFallbackComms(programDisplay, (numChildren > 1) ? currentChildName : null);
       emailBody = fallback.email;
       smsOptions = fallback.sms;
     }
 
     const timestamp = new Date().toLocaleString();
 
+    // Conditional Child line - ONLY if more than one child
+    const childLine = (numChildren > 1) ? `Child: ${currentChildName}\n` : '';
+
     const message =
 `Location: Code Ninjas ${centerLocation}
 Submitted: ${timestamp}
-
+${childLine}
 --------------------
 Internal Notes:
 Persona Label: ${persona}
@@ -1659,11 +2142,11 @@ ${emailBody}
 
 --------------------
 AI-Generated SMS Options (choose one to text the parent):
-1) ${smsOptions[0] || ''}
+SMS 1 (Send Day After):
+${smsOptions[0] || ''}
 
-2) ${smsOptions[1] || ''}
-
-3) ${smsOptions[2] || ''}`;
+SMS 2 (Send 3 Days Later):
+${smsOptions[1] || ''}`;
 
     submitToWeb3Forms(message);
 
@@ -1671,10 +2154,21 @@ AI-Generated SMS Options (choose one to text the parent):
     stopLoading();
     wizard.classList.add('hidden');
     result.style.display = 'block';
+    
+    // Logic for Next Child button
+    if (numChildren > 1 && currentChildIndex < numChildren - 1) {
+       nextChildBtn.style.display = 'block';
+       nextChildBtn.textContent = `Start Quiz for ${childNames[currentChildIndex + 1].name} ▶`;
+       retakeBtn.style.display = 'none'; // Hide home button until done
+    } else {
+       nextChildBtn.style.display = 'none';
+       retakeBtn.style.display = 'block'; // Show home button
+    }
+
     window.scrollTo({ top:0, behavior:'smooth' });
   }
 
-  // ---------- RETAKE ----------
+  // ---------- BACK TO HOME ----------
   $('#retakeBtn').addEventListener('click', () => { window.location.reload(); });
 })();
 </script>
