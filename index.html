@@ -260,6 +260,7 @@
       100% { opacity:0; transform:translateY(-3px); }
     }
   </style>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body>
 <div class="wrap">
@@ -613,20 +614,8 @@
         </div>
       </fieldset>
     </div>
-
-    <div class="step" data-step-id="q17">
-      <fieldset>
-        <legend>Which traits would you most like to see grow this year? <span class="hint">Choose up to 2</span></legend>
-        <div class="opts">
-          <label class="opt"><input type="checkbox" name="traitsGrow" value="Confidence"> Confidence</label>
-          <label class="opt"><input type="checkbox" name="traitsGrow" value="Focus"> Focus</label>
-          <label class="opt"><input type="checkbox" name="traitsGrow" value="Creativity"> Creativity</label>
-          <label class="opt"><input type="checkbox" name="traitsGrow" value="Leadership"> Leadership</label>
-          <label class="opt"><input type="checkbox" name="traitsGrow" value="Collaboration"> Collaboration</label>
-          <label class="opt"><input type="checkbox" name="traitsGrow" value="Resilience"> Resilience</label>
-        </div>
-      </fieldset>
-    </div>
+    
+    <!-- Q17 REMOVED AS REQUESTED -->
 
     <!-- MARKETING ATTRIBUTION SECTION -->
     <div class="step" data-step-id="q18">
@@ -673,9 +662,18 @@
           <label class="opt"><input type="checkbox" name="schoolShare" value="School newsletter"> School newsletter</label>
           <label class="opt"><input type="checkbox" name="schoolShare" value="In-school visit or demo"> In-school visit or demo</label>
           <label class="opt"><input type="checkbox" name="schoolShare" value="Teacher recommendation"> Teacher recommendation</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="School event"> School event</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="School social media"> School social media</label>
         </div>
         <input type="text" id="schoolNameInput" name="schoolNameInput" placeholder="School Name" class="step-input">
-        <input type="text" id="teacherNameInput" name="teacherNameInput" placeholder="Teacher Name" class="step-input hidden">
+      </fieldset>
+    </div>
+
+    <!-- Teacher specific follow-up (Only if Teacher recommendation selected) -->
+    <div class="step" data-step-id="q18B-1" data-show-if="schoolShare=Teacher recommendation">
+      <fieldset>
+        <legend>What is the teacher's name?</legend>
+        <input type="text" id="teacherNameInput" name="teacherNameInput" placeholder="Teacher Name" class="step-input">
       </fieldset>
     </div>
 
@@ -998,21 +996,7 @@ Code Ninjas ${centerName}`;
     el.addEventListener('change', syncStartState);
   });
 
-  // ---------- TEACHER INPUT TOGGLE ----------
-  function initTeacherToggle(){
-    const teacherInput = $('#teacherNameInput');
-    const schoolShareChecks = $$('input[name="schoolShare"]');
-    if(!teacherInput) return;
-    
-    const checkHandler = () => {
-      const isTeacher = schoolShareChecks.some(c => c.checked && c.value === "Teacher recommendation");
-      if(isTeacher) teacherInput.classList.remove('hidden');
-      else teacherInput.classList.add('hidden');
-    };
-
-    schoolShareChecks.forEach(cb => cb.addEventListener('change', checkHandler));
-  }
-  initTeacherToggle();
+  // ---------- TEACHER INPUT LOGIC REMOVED (Handled by Step now) ----------
 
   // ---------- WIZARD STATE ----------
   const wizard = $('#wizard');
@@ -1426,7 +1410,7 @@ Code Ninjas ${centerName}`;
       ['traits8','checkbox'],['learn8','radio'],['school8','radio'],['reengage8','radio'],['tech8','radio'],['tried8','radio'],
       ['traits11','checkbox'],['challenge11','radio'],['school11','radio'],['enjoy11','radio'],['tech11','radio'],['leader11','radio'],
       ['motivate14','radio'],['interest14','checkbox'],['tech14','radio'],['career14','radio'],['growth14','radio'],
-      ['goals','checkbox'],['futurefocus','radio'],['ai','radio'],['traitsGrow','checkbox'],
+      ['goals','checkbox'],['futurefocus','radio'],['ai','radio'],
       ['hearAbout','radio'],
       ['hearFriendShare','checkbox'],
       ['friendName','text'],
@@ -1687,5 +1671,6 @@ AI-Generated SMS Options (choose one to text the parent):
   $('#retakeBtn').addEventListener('click', () => { window.location.reload(); });
 })();
 </script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
