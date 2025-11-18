@@ -1039,7 +1039,9 @@ Code Ninjas ${centerName}`;
 
     const active = visibleSteps[idx];
     let disableNext = false;
+
     if(active){
+      // Require at least one radio per group on this step
       const radios = $$('input[type=radio]', active);
       if(radios.length){
         const names = [...new Set(radios.map(r => r.name))];
@@ -1050,7 +1052,17 @@ Code Ninjas ${centerName}`;
           }
         });
       }
+
+      // NEW: Require at least one checkbox checked on any step that has checkboxes
+      const checkboxes = $$('input[type=checkbox]', active);
+      if(checkboxes.length){
+        const anyChecked = checkboxes.some(c => c.checked);
+        if(!anyChecked){
+          disableNext = true;
+        }
+      }
     }
+
     nextBtn.textContent = (idx === visibleSteps.length - 1) ? 'See Results ▶' : 'Next ▶';
     nextBtn.disabled = disableNext;
   }
