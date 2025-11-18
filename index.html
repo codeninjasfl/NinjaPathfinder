@@ -40,7 +40,7 @@
 
     .prestart-grid {
       display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
       gap:10px;
       align-items:center;
       margin-top:6px;
@@ -53,6 +53,21 @@
       font-size:15px;
       width:100%;
     }
+    /* New class for inputs inside wizard steps */
+    .step-input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      font-size: 15px;
+      margin-top: 8px;
+      font-family: inherit;
+    }
+    .step-input:focus {
+      outline: 2px solid var(--brand);
+      border-color: var(--brand);
+    }
+
     .prestart-label { font-size:12px; color:#64748b; }
     #startQuizBtn { white-space:nowrap; }
 
@@ -206,6 +221,7 @@
     <div class="prestart-grid">
       <input id="parentFirst" placeholder="Parent first name" autocomplete="given-name">
       <input id="parentLast" placeholder="Parent last name" autocomplete="family-name">
+      <!-- Email removed as requested -->
       <select id="location" aria-label="Location">
         <option value="">Select location</option>
         <option value="Aventura">Aventura</option>
@@ -528,19 +544,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q15">
-      <fieldset>
-        <legend>What inspired you to visit Code Ninjas today?</legend>
-        <div class="opts">
-          <label class="opt"><input type="radio" name="visit" value="Referral"> Friend or school referral</label>
-          <label class="opt"><input type="radio" name="visit" value="Online"> Social media / online</label>
-          <label class="opt"><input type="radio" name="visit" value="After-school"> Exploring after-school options</label>
-          <label class="opt"><input type="radio" name="visit" value="Camps"> Interested in camps</label>
-          <label class="opt"><input type="radio" name="visit" value="Coding/AI"> Curious about coding/AI</label>
-          <label class="opt"><input type="radio" name="visit" value="Other"> Other</label>
-        </div>
-      </fieldset>
-    </div>
+    <!-- Q15 DELETED AS REQUESTED -->
 
     <div class="step" data-step-id="q16">
       <fieldset>
@@ -600,6 +604,7 @@
           <label class="opt"><input type="checkbox" name="hearFriendShare" value="They said their child was doing better in school after joining"> They said their child was doing better in school after joining</label>
           <label class="opt"><input type="checkbox" name="hearFriendShare" value="They showed something their child built"> They showed something their child built</label>
         </div>
+        <input type="text" id="friendName" name="friendName" placeholder="Name of friend/parent (Optional)" class="step-input">
       </fieldset>
     </div>
 
@@ -613,6 +618,8 @@
           <label class="opt"><input type="checkbox" name="schoolShare" value="In-school visit or demo"> In-school visit or demo</label>
           <label class="opt"><input type="checkbox" name="schoolShare" value="Teacher recommendation"> Teacher recommendation</label>
         </div>
+        <input type="text" id="schoolNameInput" name="schoolNameInput" placeholder="School Name" class="step-input">
+        <input type="text" id="teacherNameInput" name="teacherNameInput" placeholder="Teacher Name" class="step-input hidden">
       </fieldset>
     </div>
 
@@ -644,7 +651,7 @@
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset style="margin-top:12px;">
         <legend>What made you click on Code Ninjas?</legend>
         <div class="opts">
           <label class="opt"><input type="checkbox" name="searchClickWhy" value="The program description or curriculum"> The program description or curriculum</label>
@@ -696,15 +703,14 @@
 </div>
 
 <!-- Web3Forms form (hidden; includes required fields) -->
-<form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" novalidate>
+<!-- Target a hidden iframe to avoid redirection/reload on file:// -->
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+<form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" target="hidden_iframe">
   <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
-
-  <!-- Keep name (center uses it); avoid duplicate by NOT adding it again in message body -->
-  <input type="hidden" id="wf_name"   name="name"  value="">
-  <textarea name="message" id="wf_message" style="display:none;"></textarea>
-
-  <!-- Optional helpers for the center -->
-  <input type="hidden" id="wf_subject" name="subject" value="New Ninja Path Finder Lead">
+  <input type="hidden" name="name" id="wf_name" required>
+  <!-- Email removed as requested -->
+  <textarea name="message" id="wf_message" style="display:none;" required></textarea>
+  <input type="hidden" name="subject" id="wf_subject" value="New Ninja Path Finder Lead">
   <input type="hidden" name="from_name" value="Code Ninjas Program Finder">
 </form>
 
@@ -720,6 +726,7 @@
   const inputsPre = {
     parentFirst: $('#parentFirst'),
     parentLast:  $('#parentLast'),
+    // Email input removed
     location:    $('#location')
   };
   let parentFirst = '', parentLast = '', centerLocation = '';
@@ -727,7 +734,6 @@
   // ---------- GEMINI CONFIG (Pathfinder) ----------
   const GEMINI_API_KEY = "AIzaSyBsLtykpP5kAuEE4LVJiTx-HwxwQtg7GFA";
   const GEMINI_MODEL_CANDIDATES = [
-    "gemini-3.0-flash",
     "gemini-2.5-flash"
   ];
 
@@ -805,7 +811,7 @@
 You must produce a SHORT email (friendly recap) and THREE SMS options.
 
 Audience:
-- Parent or guardian of a child who just visited Code Ninjas ${centerName}.
+- Parent or guardian of a child who just visited Code Ninjas ${centerName} and completed the program finder questionnaire.
 
 EMAIL GOALS AND ORDER:
 1) Open warmly and talk about their child first — their excitement, interests, and personality traits (based on what the parent shared AND what you observed in the dojo).
@@ -815,32 +821,18 @@ EMAIL GOALS AND ORDER:
 
 TONE:
 - Warm, human, encouraging, conversational.
-- Sound like a real person who just spent time with their family, not a corporate marketing email.
+- Sound like a real person, not a corporate marketing email.
 - Use natural, everyday language and contractions (we're, they're, you'll, etc.).
 - No emojis. No markdown. No bullet points in the email.
 - 3 short paragraphs max, plus a closing line.
 - 160 words or fewer total.
 
-VISIT CONTEXT (VERY IMPORTANT):
-- Most families are visiting for a free game-building session in the dojo.
-- However, if the Program family (see context below) is "Code Ninjas JR", you should describe what the child did as "JR activities", "hands-on JR activities", or "JR learning activities" instead of calling it a free game-building session.
-- When you reference what you saw in the dojo, pick wording that matches the program:
-  - For CREATE or Academy: it’s fine to say things like "during the free game-building session" or "while they were building their game".
-  - For Code Ninjas JR: use language like "during the JR activities" or "while they were working through our hands-on JR activities", not "game-building session".
-
 EMAIL REQUIREMENTS:
 - Start with: "Dear ${greetingName},"
 - Talk clearly about the child and what matters to this family before describing the program.
-- When you mention traits like "creative", "focused", "curious", etc., connect them to BOTH:
-  1) what the parent shared, and
-  2) what you noticed during the visit.
-  Use natural phrases such as:
-  "You mentioned they’re very creative, and we definitely saw that while they were in the dojo today."
-  or
-  "You talked about how focused they can be, and we really noticed that as they were working with us."
 - Must clearly mention the recommended path as: "${programDisplay}".
 - MUST include this exact sentence somewhere in the body (use the placeholder as written):
-"As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll within 72 hours."
+"As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days."
 - In that sentence, keep the placeholder [ENROLLMENT_LINK] exactly as written (do not replace it with a URL).
 - End with a warm, conversational signoff and center name, for example:
 "Warmly,
@@ -849,15 +841,16 @@ Code Ninjas ${centerName}"
 
 SMS REQUIREMENTS:
 - Provide THREE distinct SMS options.
+- Context: These texts will be sent the NEXT DAY to follow up.
 - Each SMS: conversational and warm, 2–3 short sentences, up to about 280 characters.
 - Each SMS must:
-  - Feel personal and relational, as if you remember their Ninja and the visit (not like an advertisement).
+  - Feel personal and relational.
   - Briefly reference their child’s excitement, interests, or goals before mentioning logistics.
   - Mention "Code Ninjas ${centerName}".
   - Mention "${programDisplay}".
   - Include the phrase "code C9J5".
   - Refer to the enrollment link using the placeholder [ENROLLMENT_LINK] exactly as written (do not invent a real URL).
-  - Clearly say they can enroll using [ENROLLMENT_LINK] and that code C9J5 waives the enrollment fee if they enroll within 72 hours.
+  - Clearly say they can enroll using [ENROLLMENT_LINK] and that code C9J5 waives the enrollment fee if they enroll within the next few days.
 - You may gently invite them to reply with questions or to talk more, but keep it friendly and low-pressure.
 - No greetings like "Hi, this is...". Just the message body.
 - No markdown or numbering inside the SMS messages themselves.
@@ -914,16 +907,16 @@ It was truly a pleasure meeting you and your child today. Hearing about your fam
 
 From our conversation and the Pathfinder results, ${programDisplay} lines up with what you want — a balance of structure, hands-on challenge, and a fun way to build real-world coding and problem-solving skills.
 
-As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll within 72 hours.
+As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days.
 
 Warmly,
 [Center Director Name]
 Code Ninjas ${centerName}`;
 
     const sms = [
-      `Code Ninjas ${centerName}: It was great meeting you and your Ninja today. From what you shared, ${programDisplay} gives them a fun way to build confidence, focus, and real tech skills. If you decide to get started, you can enroll at [ENROLLMENT_LINK] and use code C9J5 to waive the enrollment fee if you enroll within 72 hours. We’re happy to answer any questions.`,
-      `Thanks again for stopping by Code Ninjas ${centerName}. Your Ninja’s interests and energy really matched what we do, and ${programDisplay} is a natural next step for their growth. If and when it feels right, you can enroll using [ENROLLMENT_LINK] — just enter code C9J5 at checkout to waive the enrollment fee if you enroll within 72 hours.`,
-      `We loved having you and your Ninja at Code Ninjas ${centerName} today. ${programDisplay} is a great fit for the mix of creativity and structure you’re looking for. If you’d like to keep that momentum going, you can enroll at [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee when you enroll within 72 hours. No pressure at all — we’re here if you want to talk more.`
+      `Code Ninjas ${centerName}: It was great meeting you and your Ninja yesterday. From what you shared, ${programDisplay} gives them a fun way to build confidence, focus, and real tech skills. If you decide to get started, you can enroll at [ENROLLMENT_LINK] and use code C9J5 to waive the enrollment fee if you enroll within the next few days. We’re happy to answer any questions.`,
+      `Thanks again for stopping by Code Ninjas ${centerName}. Your Ninja’s interests and energy really matched what we do, and ${programDisplay} is a natural next step for their growth. If and when it feels right, you can enroll using [ENROLLMENT_LINK] — just enter code C9J5 at checkout to waive the enrollment fee if you enroll within the next few days.`,
+      `We loved having you and your Ninja at Code Ninjas ${centerName}. ${programDisplay} is a great fit for the mix of creativity and structure you’re looking for. If you’d like to keep that momentum going, you can enroll at [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee when you enroll within the next few days. No pressure at all — we’re here if you want to talk more.`
     ];
 
     return { email, sms };
@@ -939,6 +932,22 @@ Code Ninjas ${centerName}`;
     el.addEventListener('input', syncStartState);
     el.addEventListener('change', syncStartState);
   });
+
+  // ---------- TEACHER INPUT TOGGLE ----------
+  function initTeacherToggle(){
+    const teacherInput = $('#teacherNameInput');
+    const schoolShareChecks = $$('input[name="schoolShare"]');
+    if(!teacherInput) return;
+    
+    const checkHandler = () => {
+      const isTeacher = schoolShareChecks.some(c => c.checked && c.value === "Teacher recommendation");
+      if(isTeacher) teacherInput.classList.remove('hidden');
+      else teacherInput.classList.add('hidden');
+    };
+
+    schoolShareChecks.forEach(cb => cb.addEventListener('change', checkHandler));
+  }
+  initTeacherToggle();
 
   // ---------- WIZARD STATE ----------
   const wizard = $('#wizard');
@@ -1322,7 +1331,15 @@ Code Ninjas ${centerName}`;
   }
 
   // ---------- FUN FACT ----------
-  function funFactText(programKey, signals){
+  function funFactText(programKey, signals, bundleType){
+    // Prioritize bundle type for fun fact consistency
+    if(bundleType === '1+1_AI'){
+      return 'Students who engage early with coding and AI concepts gain confidence navigating technologies that are shaping the fastest-growing careers.';
+    }
+    if(bundleType === '1+1_Robotics'){
+      return 'Building and programming robots helps kids connect coding to the real world, which research links to higher engagement in STEM over time.';
+    }
+
     const txt = signals.join(' ').toLowerCase();
     if(/game|roblox|minecraft/.test(txt)){
       return 'Designing and coding their own games strengthens logic, creativity, and persistence—the same problem-solving muscles used by professional developers.';
@@ -1344,16 +1361,33 @@ Code Ninjas ${centerName}`;
       ['traits8','checkbox'],['learn8','radio'],['school8','radio'],['reengage8','radio'],['tech8','radio'],['tried8','radio'],
       ['traits11','checkbox'],['challenge11','radio'],['school11','radio'],['enjoy11','radio'],['tech11','radio'],['leader11','radio'],
       ['motivate14','radio'],['interest14','checkbox'],['tech14','radio'],['career14','radio'],['growth14','radio'],
-      ['goals','checkbox'],['futurefocus','radio'],['visit','radio'],['ai','radio'],['traitsGrow','checkbox'],
+      ['goals','checkbox'],['futurefocus','radio'],['ai','radio'],['traitsGrow','checkbox'],
       ['hearAbout','radio'],
       ['hearFriendShare','checkbox'],
+      ['friendName','text'],
       ['schoolShare','checkbox'],
+      ['schoolNameInput','text'],
+      ['teacherNameInput','text'],
       ['socialPlatform','radio'],
       ['searchTopics','checkbox'],
       ['searchClickWhy','checkbox']
     ];
     const lines = [];
     fields.forEach(([name,type]) => {
+      // Special handling for text inputs without legends, or custom label display
+      if(type === 'text'){
+        const val = textValue(name);
+        if(val) {
+           // Map ID to readable label
+           let label = name;
+           if(name === 'friendName') label = 'Friend/Parent Name';
+           else if(name === 'schoolNameInput') label = 'School Name';
+           else if(name === 'teacherNameInput') label = 'Teacher Name';
+           lines.push(`${label} → ${val}`);
+        }
+        return;
+      }
+
       const legend = getLegendForInputName(name);
       if(!legend) return;
       let ans = '';
@@ -1361,8 +1395,6 @@ Code Ninjas ${centerName}`;
         ans = radioLabel(name);
       } else if(type === 'checkbox'){
         ans = checkboxLabels(name).join(', ');
-      } else if(type === 'text'){
-        ans = textValue(name);
       }
       if(ans) lines.push(legend + ' → ' + ans);
     });
@@ -1372,21 +1404,22 @@ Code Ninjas ${centerName}`;
   // ---------- API SUBMIT ----------
   function submitToWeb3Forms(message){
     if(window.API_Access === false){ console.log('API submission skipped'); return; }
+    
     const form = $('#web3Form');
     const msgField = $('#wf_message');
     const subjField = $('#wf_subject');
     const nameField = $('#wf_name');
+    // wf_email is set in HTML with a dummy value since user removed input
+
     if(!form || !msgField || !subjField || !nameField) return;
 
     subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
     nameField.value = `${parentFirst} ${parentLast}`.trim();
     msgField.value = message;
 
-    const fd = new FormData(form);
-    fetch(form.action, { method:'POST', body:fd })
-      .then(r => r.json())
-      .then(d => console.log('Web3Forms success', d))
-      .catch(err => console.warn('Web3Forms error', err));
+    // Submit via standard form POST to hidden iframe to bypass CORS on file://
+    form.submit();
+    console.log('Web3Forms submission triggered via hidden frame');
   }
 
   // ---------- MAIN RESULTS ----------
@@ -1420,14 +1453,22 @@ Code Ninjas ${centerName}`;
       switch(hearCode){
         case 'Friend': {
           marketingSource = 'Friend / Parent Referral';
-          marketingSubsource = `Primary source: ${hearLabel}`;
+          const fName = textValue('friendName');
+          marketingSubsource = [
+            `Primary source: ${hearLabel}`,
+            fName ? `Referred by: ${fName}` : ''
+          ].filter(Boolean).join('\n');
           break;
         }
         case 'School': {
           marketingSource = 'School / Teacher';
           const schoolShare = checkboxLabels('schoolShare');
+          const sName = textValue('schoolNameInput');
+          const tName = textValue('teacherNameInput');
           marketingSubsource = [
             `Primary source: ${hearLabel}`,
+            sName ? `School: ${sName}` : '',
+            tName ? `Teacher: ${tName}` : '',
             schoolShare.length ? `How school shared: ${schoolShare.join(', ')}` : ''
           ].filter(Boolean).join('\n');
           break;
@@ -1484,7 +1525,7 @@ Code Ninjas ${centerName}`;
     const signals = [].concat(allTraits, goals, [
       radioLabel('play5'), radioLabel('tried8'), radioLabel('futurefocus'), radioLabel('ai')
     ].filter(Boolean));
-    const funFact = funFactText(baseKey, signals);
+    const funFact = funFactText(baseKey, signals, bundleType); 
 
     if(funFact){
       $('#funFactText').textContent = funFact;
