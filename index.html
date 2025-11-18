@@ -824,7 +824,7 @@ EMAIL REQUIREMENTS:
 - Talk clearly about the child and what matters to this family before describing the program.
 - Must clearly mention the recommended path as: "${programDisplay}".
 - MUST include this exact sentence somewhere in the body (use the placeholder as written):
-"As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days."
+"As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll within 72 hours."
 - In that sentence, keep the placeholder [ENROLLMENT_LINK] exactly as written (do not replace it with a URL).
 - End with a warm signoff and center name, e.g.:
 "Warmly,
@@ -835,11 +835,14 @@ SMS REQUIREMENTS:
 - Provide THREE distinct SMS options.
 - Each SMS: conversational and warm, 2–3 short sentences, up to about 280 characters.
 - Each SMS must:
+  - Feel personal and relational, as if you remember their Ninja and the visit (not like an advertisement).
+  - Briefly reference their child’s excitement, interests, or goals before mentioning logistics.
   - Mention "Code Ninjas ${centerName}".
   - Mention "${programDisplay}".
   - Include the phrase "code C9J5".
   - Refer to the enrollment link using the placeholder [ENROLLMENT_LINK] exactly as written (do not invent a real URL).
-  - Clearly say they can enroll using [ENROLLMENT_LINK] and that code C9J5 waives the enrollment fee if they enroll in the next few days.
+  - Clearly say they can enroll using [ENROLLMENT_LINK] and that code C9J5 waives the enrollment fee if they enroll within 72 hours.
+- You may gently invite them to reply with questions or to talk more, but keep it friendly and low-pressure.
 - No greetings like "Hi, this is...". Just the message body.
 - No markdown or numbering inside the SMS messages themselves.
 
@@ -895,16 +898,16 @@ It was truly a pleasure meeting you and your child today. Hearing about your fam
 
 From our conversation and the Pathfinder results, ${programDisplay} lines up with what you want — a balance of structure, hands-on challenge, and a fun way to build real-world coding and problem-solving skills.
 
-As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days.
+As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll within 72 hours.
 
 Warmly,
 [Center Director Name]
 Code Ninjas ${centerName}`;
 
     const sms = [
-      `Code Ninjas ${centerName}: We loved meeting your family today! Based on your visit, ${programDisplay} is a great fit for your Ninja’s interests and goals. When you’re ready, enroll here: [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days.`,
-      `Thanks for stopping by Code Ninjas ${centerName}! From what you shared, ${programDisplay} gives your child a fun mix of structure, creativity, and real skills. You can enroll using this link: [ENROLLMENT_LINK] — just enter code C9J5 at checkout to waive the enrollment fee when you enroll in the next few days.`,
-      `It was awesome having you at Code Ninjas ${centerName}. ${programDisplay} will help your Ninja grow confidence, focus, and tech skills in a fun way. If you’d like to get started, enroll at [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee over the next few days.`
+      `Code Ninjas ${centerName}: It was great meeting you and your Ninja today. From what you shared, ${programDisplay} gives them a fun way to build confidence, focus, and real tech skills. If you decide to get started, you can enroll at [ENROLLMENT_LINK] and use code C9J5 to waive the enrollment fee if you enroll within 72 hours. We’re happy to answer any questions.`,
+      `Thanks again for stopping by Code Ninjas ${centerName}. Your Ninja’s interests and energy really matched what we do, and ${programDisplay} is a natural next step for their growth. If and when it feels right, you can enroll using [ENROLLMENT_LINK] — just enter code C9J5 at checkout to waive the enrollment fee if you enroll within 72 hours.`,
+      `We loved having you and your Ninja at Code Ninjas ${centerName} today. ${programDisplay} is a great fit for the mix of creativity and structure you’re looking for. If you’d like to keep that momentum going, you can enroll at [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee when you enroll within 72 hours. No pressure at all — we’re here if you want to talk more.`
     ];
 
     return { email, sms };
@@ -1389,11 +1392,8 @@ Code Ninjas ${centerName}`;
       switch(hearCode){
         case 'Friend': {
           marketingSource = 'Friend / Parent Referral';
-          const friendReasons = checkboxLabels('hearFriendShare');
-          marketingSubsource = [
-            `Primary source: ${hearLabel}`,
-            friendReasons.length ? `What they shared: ${friendReasons.join(', ')}` : ''
-          ].filter(Boolean).join('\n');
+          // User requested we not include a "What they shared:" line in the internal notes.
+          marketingSubsource = `Primary source: ${hearLabel}`;
           break;
         }
         case 'School': {
@@ -1523,7 +1523,6 @@ Internal Notes:
 Persona Label: ${persona}
 Recommended Program: ${programDisplay}
 Marketing Source: ${marketingSource || 'N/A'}
-Marketing Details:
 ${marketingSubsource || 'N/A'}
 
 --------------------
