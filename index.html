@@ -575,7 +575,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q4C-1" data-show-if="school11=Bored,Disengaged">
+    <div class="step" data-step-id="q4C-1" data-show-if="school11=Bored,Disengaged,Struggles">
       <fieldset>
         <legend>What would help them enjoy learning more? <span class="hint">Select all that apply</span></legend>
         <div class="opts grid-4">
@@ -686,27 +686,23 @@
 
     <div class="step" data-step-id="qFuture" data-show-if="age=8-10,11-13">
       <fieldset>
-        <legend>If we focused your Ninja’s time on future-ready skills, which feels most important this year?</legend>
+        <legend>What future skill matters most to you for your child right now?</legend>
         <div class="opts">
           <label class="opt">
             <input type="radio" name="futurefocus" value="Coding core">
-            A strong foundation in coding first (consistency & mastery).
+            A strong foundation in coding
           </label>
           <label class="opt">
             <input type="radio" name="futurefocus" value="Coding + AI">
-            Coding plus early exposure to AI and smart tools.
+            Coding plus early exposure to AI.
           </label>
           <label class="opt">
             <input type="radio" name="futurefocus" value="Coding + Robotics">
-            Coding plus hands-on robotics & engineering challenges.
+            Coding plus hands-on robotics
           </label>
           <label class="opt">
             <input type="radio" name="futurefocus" value="All three">
-            A blend of coding, AI, and robotics throughout the year.
-          </label>
-          <label class="opt">
-            <input type="radio" name="futurefocus" value="Not sure">
-            I’m not sure yet — I mostly want them excited, confident, and moving forward.
+            Coding, AI, and robotics
           </label>
         </div>
       </fieldset>
@@ -1100,6 +1096,47 @@ When explaining the fit, mention that this bundle gives them the best of both wo
     else if(gender === 'Girl') pronounHint = `IMPORTANT: The child is a Girl. Use she/her/her pronouns when referring to ${childRef}.`;
     else pronounHint = `Use they/them pronouns or the child's name when referring to ${childRef}.`;
 
+    // BUNDLE / ACADEMY INSTRUCTIONS
+    // Force AI to recommend either a Bundle or CREATE, never *just* Academy
+    let programInstruction = "";
+    
+    if(apiProgramName === 'Code Ninjas Academy') {
+        // Even if they hit the Academy logic, we sell it as a 1+1 Bundle or 1+1+1 Bundle primarily
+        programInstruction = `
+🔥 PROGRAM INSTRUCTION:
+The system recommended "Code Ninjas Academy" based on age/advanced skills.
+HOWEVER, you must position this as the "CREATE 1+1 Bundle" (CREATE + Academy).
+Explain that they get the best of both worlds:
+1) "Code Ninjas CREATE" for their core coding belt progression.
+2) "Academy" for the advanced, project-based skills (AI, Robotics, etc.) they are ready for.
+Do NOT offer Academy as a standalone option. It is a bundle.
+`;
+    } else if(bundleType === '1+1_AI'){
+       programInstruction = `
+🔥 SPECIAL BUNDLE INSTRUCTION:
+The recommended program is the "CREATE 1+1 Bundle".
+You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
+This bundle combines "Code Ninjas CREATE" (their core belt progression) with "AI Academy" (their specific interest).
+When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + exciting AI skills.
+`;
+    } else if(bundleType === '1+1_Robotics'){
+       programInstruction = `
+🔥 SPECIAL BUNDLE INSTRUCTION:
+The recommended program is the "CREATE 1+1 Bundle" (Robotics).
+You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
+This bundle combines "Code Ninjas CREATE" (their core belt progression) with "Robotics Academy" (their specific interest).
+When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + hands-on engineering skills.
+`;
+    } else if(bundleType === '1+1+1'){
+       programInstruction = `
+🔥 SPECIAL BUNDLE INSTRUCTION:
+The recommended program is the "CREATE 1+1+1 Bundle".
+You must refer to it specifically as "CREATE 1+1+1 Bundle" in both the Email and SMS.
+This bundle combines "Code Ninjas CREATE", "Academy", and "Clubs".
+When explaining the fit, mention that this bundle gives them the ultimate experience: coding, advanced skills (AI/Robotics), and social clubs.
+`;
+    }
+
 
     const prompt =
 `You are an enrollment advisor at Code Ninjas.
@@ -1115,7 +1152,7 @@ You must translate traits into real-world observations that a parent finds belie
 
 ${pronounHint}
 
-${bundleInstruction}
+${programInstruction}
 
 🔥 SECTION 1 — USING SURVEY ANSWERS (CRITICAL)
 You must use the survey responses as emotional insight, not literal text.
