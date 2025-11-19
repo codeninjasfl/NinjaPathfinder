@@ -1400,7 +1400,7 @@ Code Ninjas ${centerName}`;
       if(!cond) return true;
       return conditionMatches(cond);
     });
-    visibleSteps.forEach(s => s.classList.remove('active'));
+    allSteps.forEach(s => s.classList.remove('active'));
     if(idx >= visibleSteps.length) idx = visibleSteps.length - 1;
     if(idx < 0) idx = 0;
     updateUI();
