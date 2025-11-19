@@ -414,7 +414,6 @@
         <div class="opts">
           <label class="opt"><input type="radio" name="gender" value="Boy"> Boy</label>
           <label class="opt"><input type="radio" name="gender" value="Girl"> Girl</label>
-          <label class="opt"><input type="radio" name="gender" value="Other"> Other</label>
         </div>
       </fieldset>
     </div>
@@ -611,7 +610,7 @@
     </div>
 
     <!-- PATH 4: 14+ -->
-    <div class="step" data-step-id="q2D" data-show-if="age=14+">
+    <div class="step" data-step-id="q2D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
       <fieldset>
         <legend>What best describes what motivates your teen?</legend>
         <div class="opts grid-4">
@@ -623,7 +622,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q3D" data-show-if="age=14+">
+    <div class="step" data-step-id="q3D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
       <fieldset>
         <legend>Which areas are they most interested in? <span class="hint">Choose up to 2</span></legend>
         <div class="opts">
@@ -636,7 +635,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q4D" data-show-if="age=14+">
+    <div class="step" data-step-id="q4D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
       <fieldset>
         <legend>How confident are they with technology?</legend>
         <div class="opts">
@@ -647,7 +646,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q4D-1" data-show-if="tech14=Advanced">
+    <div class="step" data-step-id="q4D-1" data-show-if="tech14=Advanced,tech8=Advanced,tech11=Advanced">
       <fieldset>
         <legend>Are they interested in tech certifications or careers?</legend>
         <div class="opts">
@@ -658,7 +657,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q5D" data-show-if="age=14+">
+    <div class="step" data-step-id="q5D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
       <fieldset>
         <legend>Which growth area is most important this year?</legend>
         <div class="opts grid-4">
@@ -740,12 +739,12 @@
         <legend>How did you first hear about Code Ninjas?</legend>
         <div class="hint">Choose one that best fits</div>
         <div class="opts">
-          <label class="opt"><input type="radio" name="hearAbout" value="Friend"> A friend or another parent told us about you</label>
-          <label class="opt"><input type="radio" name="hearAbout" value="School"> Through our child’s school or teacher</label>
-          <label class="opt"><input type="radio" name="hearAbout" value="Social"> On social media (Facebook, Instagram, etc.)</label>
-          <label class="opt"><input type="radio" name="hearAbout" value="Search"> Google or another online search</label>
-          <label class="opt"><input type="radio" name="hearAbout" value="Event"> At a local event or community fair</label>
-          <label class="opt"><input type="radio" name="hearAbout" value="Returning"> We’ve been here before (returning family)</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Friend"> Friend</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="School"> School</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Social"> Social media</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Search"> Google</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Event"> Local event</label>
+          <label class="opt"><input type="radio" name="hearAbout" value="Returning"> Returning family</label>
           <label class="opt"><input type="radio" name="hearAbout" value="Other"> Other (please specify)</label>
         </div>
       </fieldset>
@@ -756,30 +755,26 @@
       <fieldset>
         <legend>What did they share that made you want to check us out?</legend>
         <div class="opts grid-4">
-          <label class="opt"><input type="checkbox" name="hearFriendShare" value="Their child loved coming here"> Their child loved coming here</label>
-          <label class="opt"><input type="checkbox" name="hearFriendShare" value="They mentioned better focus and confidence"> They mentioned better focus and confidence</label>
-          <label class="opt"><input type="checkbox" name="hearFriendShare" value="They said their child was doing better in school after joining"> They said their child was doing better in school after joining</label>
-          <label class="opt"><input type="checkbox" name="hearFriendShare" value="They showed something their child built"> They showed something their child built</label>
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="Their child loved us"> Their child loved us</label>
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="Improved focus and confidence"> Improved focus and confidence</label>
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="Better performance in school"> Better performance in school</label>
+          <label class="opt"><input type="checkbox" name="hearFriendShare" value="Something their child built"> Something their child built</label>
         </div>
-        <input type="text" id="friendName" name="friendName" placeholder="Name of friend/parent (Optional)" class="step-input">
       </fieldset>
     </div>
 
     <!-- School / teacher follow-up -->
     <div class="step marketing-step" data-step-id="q18B" data-show-if="hearAbout=School">
       <fieldset>
-        <legend>How did the school share Code Ninjas? <span class="hint">Select all that apply</span></legend>
-        <div class="opts">
-          <label class="opt"><input type="checkbox" name="schoolShare" value="Flyer or email"> Flyer or email</label>
-          <label class="opt"><input type="checkbox" name="schoolShare" value="School newsletter"> School newsletter</label>
-          <label class="opt"><input type="checkbox" name="schoolShare" value="In-school visit or demo"> In-school visit or demo</label>
-          <label class="opt"><input type="checkbox" name="schoolShare" value="Teacher recommendation"> Teacher recommendation</label>
-          <label class="opt"><input type="checkbox" name="schoolShare" value="School event"> School event</label>
-          <label class="opt"><input type="checkbox" name="schoolShare" value="School social media"> School social media</label>
+        <legend>How did the school share Code Ninjas?</legend>
+        <div class="prestart-grid" style="margin-bottom:10px; display:block;">
+            <input type="text" id="schoolNameInput" name="schoolNameInput" placeholder="School Name" class="step-input">
         </div>
-        <div class="prestart-grid" style="margin-top:10px; display:block;">
-            <input type="text" id="schoolNameInput" name="schoolNameInput" placeholder="School Name" class="step-input" style="margin-bottom:10px;">
-            <input type="text" id="teacherNameInput" name="teacherNameInput" placeholder="Teacher Name (Optional)" class="step-input">
+        <div class="opts">
+          <label class="opt"><input type="checkbox" name="schoolShare" value="Printed Flyer"> Printed Flyer</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="School newsletter/email"> School newsletter/email</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="In-school visit"> In-school visit</label>
+          <label class="opt"><input type="checkbox" name="schoolShare" value="Teacher recommendation"> Teacher recommendation</label>
         </div>
       </fieldset>
     </div>
@@ -800,7 +795,7 @@
     <!-- Google / online search follow-up -->
     <div class="step marketing-step" data-step-id="q18D" data-show-if="hearAbout=Search">
       <fieldset>
-        <legend>What were you searching for when you found us? <span class="hint">Select all that apply</span></legend>
+        <legend>What were you searching for when you found us?</legend>
         <div class="opts">
           <label class="opt"><input type="checkbox" name="searchTopics" value="Coding classes"> Coding classes</label>
           <label class="opt"><input type="checkbox" name="searchTopics" value="Robotics classes"> Robotics classes</label>
@@ -808,20 +803,22 @@
           <label class="opt"><input type="checkbox" name="searchTopics" value="STEM classes or camps"> STEM classes or camps</label>
           <label class="opt"><input type="checkbox" name="searchTopics" value="After-school programs"> After-school programs</label>
           <label class="opt"><input type="checkbox" name="searchTopics" value="Summer camps"> Summer camps</label>
-          <label class="opt"><input type="checkbox" name="searchTopics" value="Other / something else"> Other / something else</label>
+          <label class="opt"><input type="checkbox" name="searchTopics" value="Other"> Other</label>
         </div>
+        <input type="text" name="searchOtherDetails" placeholder="If Other, please specify" class="step-input" style="margin-top:8px;">
       </fieldset>
 
       <fieldset style="margin-top:12px;">
-        <legend>What made you click on Code Ninjas? <span class="hint">Select all that apply</span></legend>
+        <legend>What made you click on Code Ninjas?</legend>
         <div class="opts">
-          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The program description or curriculum"> The program description or curriculum</label>
-          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Positive reviews from other parents"> Positive reviews from other parents</label>
-          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The convenient location"> The convenient location</label>
-          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The special offer or free session"> The special offer or free session</label>
-          <label class="opt"><input type="checkbox" name="searchClickWhy" value="The visuals (photos, videos, or ad design)"> The visuals (photos, videos, or ad design)</label>
-          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Other / something else"> Other / something else</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Program description"> Program description</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Positive reviews"> Positive reviews</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Convenient location"> Convenient location</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Special offer"> Special offer</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Free session"> Free session</label>
+          <label class="opt"><input type="checkbox" name="searchClickWhy" value="Other"> Other</label>
         </div>
+        <input type="text" name="clickOtherDetails" placeholder="If Other, please specify" class="step-input" style="margin-top:8px;">
       </fieldset>
     </div>
 
@@ -836,7 +833,7 @@
     <!-- Other follow-up -->
     <div class="step marketing-step" data-step-id="q18F" data-show-if="hearAbout=Other">
       <fieldset>
-        <legend>Please specify</legend>
+        <legend>Please tell us how you heard about us:</legend>
         <input type="text" name="otherDetails" placeholder="Details" class="step-input">
       </fieldset>
     </div>
@@ -1593,9 +1590,19 @@ Code Ninjas ${centerName}`;
 
   // ---------- PROGRAM SELECTION ----------
   function baseProgramKey(age){
+    // NEW: Check for advanced status to recommend ACADEMY even for 8-13
+    const tech8 = getValue('tech8');
+    const tech11 = getValue('tech11');
+
     if(age === '5-7') return 'JR';
-    if(age === '8-10' || age === '11-13') return 'CREATE';
     if(age === '14+') return 'ACADEMY';
+    
+    // If 8-13 but Advanced, push to ACADEMY logic (which may offer bundles or academy track)
+    if((age === '8-10' && tech8 === 'Advanced') || (age === '11-13' && tech11 === 'Advanced')){
+        return 'ACADEMY';
+    }
+
+    if(age === '8-10' || age === '11-13') return 'CREATE';
     return 'CREATE';
   }
 
@@ -1919,6 +1926,8 @@ Code Ninjas ${centerName}`;
       ['socialPlatform','radio'],
       ['searchTopics','checkbox'],
       ['searchClickWhy','checkbox'],
+      ['searchOtherDetails','text'],
+      ['clickOtherDetails','text'],
       ['eventDetails','text'],
       ['otherDetails','text']
     ];
@@ -1935,6 +1944,8 @@ Code Ninjas ${centerName}`;
            else if(name === 'teacherNameInput') label = 'Teacher Name';
            else if(name === 'eventDetails') label = 'Event/Location';
            else if(name === 'otherDetails') label = 'Other Details';
+           else if(name === 'searchOtherDetails') label = 'Search Other Details';
+           else if(name === 'clickOtherDetails') label = 'Click Reason Other Details';
            lines.push(`${label} → ${val}`);
         }
         return;
@@ -2046,10 +2057,15 @@ Code Ninjas ${centerName}`;
           marketingSource = 'Google / Online Search';
           const searchTopics = checkboxLabels('searchTopics');
           const clickReasons = checkboxLabels('searchClickWhy');
+          const searchOther = textValue('searchOtherDetails');
+          const clickOther = textValue('clickOtherDetails');
+          
           marketingSubsource = [
             `Primary source: ${hearLabel}`,
             searchTopics.length ? `What they were searching for: ${searchTopics.join(', ')}` : '',
-            clickReasons.length ? `What made them click: ${clickReasons.join(', ')}` : ''
+            searchOther ? `Search Other: ${searchOther}` : '',
+            clickReasons.length ? `What made them click: ${clickReasons.join(', ')}` : '',
+            clickOther ? `Click Other: ${clickOther}` : ''
           ].filter(Boolean).join('\n');
           break;
         }
