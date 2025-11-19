@@ -118,6 +118,7 @@
       .card { padding:24px 20px 80px; } /* Extra bottom padding for sticky actions */
       .wrap { padding: 12px; justify-content: flex-start; }
       header { margin-top: 10px; }
+      .current-child-banner { margin: -24px -20px 24px; border-radius: 20px 20px 0 0; }
     }
 
     .topbar { display:flex; align-items:center; gap:12px; margin:0 0 24px; }
@@ -125,10 +126,27 @@
     .bar { height:100%; width:0; background:var(--brand); transition:width .4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 999px; }
     .count { font-size:13px; font-weight:700; color:var(--muted); min-width:90px; text-align:right; }
     .current-child-banner {
-      background: var(--highlight); color: var(--brand);
-      padding: 8px 12px; border-radius: 8px; font-weight: 700;
-      text-align: center; margin-bottom: 16px; font-size: 14px;
-      border: 1px solid #bfdbfe;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #eff6ff;
+      color: var(--brand);
+      padding: 12px 16px;
+      font-weight: 800;
+      text-align: center;
+      margin: -32px -32px 24px; /* Flush with card edges */
+      border-bottom: 1px solid #bfdbfe;
+      border-radius: 20px 20px 0 0; /* Match card radius */
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .current-child-banner::before {
+      content: '👤'; /* Simple icon */
+      font-size: 18px;
     }
 
     .step { display:none; }
@@ -1063,6 +1081,17 @@
     // Get Gender from Q0
     const gender = options.gender || '';
 
+    let bundleInstruction = "";
+    if(bundleType === '1+1_AI'){
+       bundleInstruction = `
+🔥 SPECIAL BUNDLE INSTRUCTION:
+The recommended program is the "CREATE 1+1 Bundle".
+You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
+This bundle combines "Code Ninjas CREATE" (their core belt progression) with "AI Academy" (their specific interest).
+When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + exciting AI skills.
+`;
+    }
+
     const greetingName = parentFirst || "there";
     const centerName = centerLocation || "your local center";
     // Incorporate specific child name if multi-child
@@ -1088,6 +1117,8 @@ You must not sound like a robot, and you must never mirror the questionnaire lit
 You must translate traits into real-world observations that a parent finds believable, reassuring, and compelling.
 
 ${pronounHint}
+
+${bundleInstruction}
 
 🔥 SECTION 1 — USING SURVEY ANSWERS (CRITICAL)
 You must use the survey responses as emotional insight, not literal text.
@@ -1441,7 +1472,13 @@ Code Ninjas ${centerName}`;
       }
     }
 
-    nextBtn.textContent = (idx === visibleSteps.length - 1) ? 'See Results ▶' : 'Next ▶';
+    const currentName = (numChildren > 1 && childNames[currentChildIndex]) ? childNames[currentChildIndex].name : '';
+    if (idx === visibleSteps.length - 1) {
+       nextBtn.textContent = currentName ? `See Results for ${currentName} ▶` : 'See Results ▶';
+    } else {
+       nextBtn.textContent = 'Next ▶';
+    }
+    
     nextBtn.disabled = disableNext;
   }
 
@@ -1478,7 +1515,7 @@ Code Ninjas ${centerName}`;
      
      // Show context banner if multi-child
      if(numChildren > 1) {
-        childContextBanner.textContent = `Now answering for: ${activeChild.name}`;
+        childContextBanner.textContent = `Questionnaire for ${activeChild.name}`;
         childContextBanner.classList.remove('hidden');
         $('#genderLegend').textContent = `${activeChild.name} is a...`;
      } else {
@@ -1787,7 +1824,7 @@ Code Ninjas ${centerName}`;
         'Perfect when you want depth and mastery in one powerful track'
       ];
     } else if(bundle.type === '1+1_AI'){
-      variantLine = ' Code Ninjas CREATE (1+1 Bundle: CREATE + AI Academy)';
+      variantLine = ' CREATE 1+1 Bundle';
       stats[2] = ['2–3 hrs / week', 'Recommended time'];
       bulletsExtra = [
         'One CREATE session + one AI Academy session each week',
@@ -2077,7 +2114,7 @@ Code Ninjas ${centerName}`;
     const apiProgramName = programUI.apiProgram;
     let programDisplay = apiProgramName;
     if(apiProgramName === 'Code Ninjas CREATE'){
-      if(bundleType === '1+1_AI') programDisplay += ' (1+1 Bundle: CREATE + AI Academy)';
+      if(bundleType === '1+1_AI') programDisplay = 'CREATE 1+1 Bundle';
       else if(bundleType === '1+1_Robotics') programDisplay += ' (1+1 Bundle: CREATE + Robotics Academy)';
       else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
       else if(bundleType === '2x') programDisplay += ' (2x/Week)';
