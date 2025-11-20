@@ -729,7 +729,7 @@
       <p style="font-size:15px; margin:0 0 10px; line-height: 1.5; color: var(--ink);">
         <strong style="color: var(--brand);">You’re almost done!</strong><br>
         Thanks for sharing about your Ninja — just one last quick question before we wrap up.<br>
-        As a thank-you for your time, you’ll receive a temporary code to waive the $99 enrollment fee once you submit your answers below.
+        <!-- DISCOUNT REMOVED FROM FORM VIEW PER INSTRUCTION -->
       </p>
       <fieldset>
         <legend>How did you first hear about Code Ninjas?</legend>
@@ -999,7 +999,7 @@
   });
 
   // ---------- GEMINI CONFIG (Pathfinder) ----------
-  const GEMINI_API_KEY = "AIzaSyBsLtykpP5kAuEE4LVJiTx-HwxwQtg7GFA";
+  const GEMINI_API_KEY = "";
   const GEMINI_MODEL_CANDIDATES = [
     "gemini-2.5-flash-lite",
     "gemini-2.5-flash", 
@@ -1007,7 +1007,9 @@
   ];
 
   async function callGemini(promptText){
-    if(!GEMINI_API_KEY){
+    const runtimeKey = GEMINI_API_KEY; 
+    
+    if(!runtimeKey && typeof GEMINI_API_KEY === 'undefined'){
       console.warn("Gemini API key is missing.");
       return null;
     }
@@ -1015,12 +1017,11 @@
     for(const model of GEMINI_MODEL_CANDIDATES){
       try {
         const res = await fetch(
-          "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
+          "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + (runtimeKey || GEMINI_API_KEY),
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              "x-goog-api-key": GEMINI_API_KEY
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({
               contents: [
@@ -1034,7 +1035,6 @@
         );
 
         if(!res.ok){
-          // silently continue to next model
           continue;
         }
 
@@ -1051,9 +1051,8 @@
     return null;
   }
 
-  // Parse EMAIL + 3 SMS options from Gemini
   function extractSection(text, label){
-    const re = new RegExp(`---${label}---([\\s\\S]*?)(?=---[A-Z0-9]+---|$)`, 'i');
+    const re = new RegExp(`---${label}---([\\s\\S]*?)(?=---[A-Z0-9_]+---|$)`, 'i');
     const m = text.match(re);
     return m ? m[1].trim() : '';
   }
@@ -1068,275 +1067,117 @@
       marketingSource,
       marketingSubsource,
       qaSummaryLines,
-      currentChildName // Added context
+      currentChildName,
+      gender
     } = options;
     
-    // Get Gender from Q0
-    const gender = options.gender || '';
 
     let bundleInstruction = "";
     if(bundleType === '1+1_AI'){
-       bundleInstruction = `
-🔥 SPECIAL BUNDLE INSTRUCTION:
-The recommended program is the "CREATE 1+1 Bundle".
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE" (their core belt progression) with "AI Academy" (their specific interest).
-When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + exciting AI skills.
-`;
+       bundleInstruction = `Recommended: "CREATE 1+1 Bundle" (Code Ninjas CREATE + AI Academy). Mention best of both worlds: coding + AI.`;
     }
 
     const greetingName = parentFirst || "there";
     const centerName = centerLocation || "your local center";
-    // Incorporate specific child name if multi-child
     const childRef = currentChildName ? currentChildName : "your child";
     
-    // Construct pronoun hint based on gender
     let pronounHint = "";
-    if(gender === 'Boy') pronounHint = `IMPORTANT: The child is a Boy. Use he/him/his pronouns when referring to ${childRef}.`;
-    else if(gender === 'Girl') pronounHint = `IMPORTANT: The child is a Girl. Use she/her/her pronouns when referring to ${childRef}.`;
-    else pronounHint = `Use they/them pronouns or the child's name when referring to ${childRef}.`;
+    if(gender === 'Boy') pronounHint = `IMPORTANT: Child is a Boy (he/him/his).`;
+    else if(gender === 'Girl') pronounHint = `IMPORTANT: Child is a Girl (she/her/hers).`;
+    else pronounHint = `Use child's name or they/them.`;
 
-    // BUNDLE / ACADEMY INSTRUCTIONS
-    // Force AI to recommend either a Bundle or CREATE, never *just* Academy
+    // BUNDLE INSTRUCTIONS
     let programInstruction = "";
-    
     if(apiProgramName === 'Code Ninjas Academy') {
-        // Even if they hit the Academy logic, we sell it as a 1+1 Bundle or 1+1+1 Bundle primarily
-        programInstruction = `
-🔥 PROGRAM INSTRUCTION:
-The system recommended "CREATE 1+1 Bundle" (because they are Academy-ready).
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE" (their core belt progression) with an "Academy" of their choice (AI or Robotics).
-When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + specialized advanced projects.
-Do NOT offer Academy as a standalone option. It is a bundle.
-`;
-    } else if(bundleType === '1+1_Academy'){
-        // This handles the case where buildProgramUI explicitly set bundleType='1+1_Academy'
-        programInstruction = `
-🔥 PROGRAM INSTRUCTION:
-The recommended program is the "CREATE 1+1 Bundle".
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE" (their core belt progression) with an "Academy" of their choice (AI or Robotics).
-When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + specialized advanced projects.
-`;
+        programInstruction = `Recommended: "CREATE 1+1 Bundle" (Core + Academy). Do NOT offer standalone Academy.`;
     } else if(bundleType === '1+1_AI'){
-       programInstruction = `
-🔥 SPECIAL BUNDLE INSTRUCTION:
-The recommended program is the "CREATE 1+1 Bundle".
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE" (their core belt progression) with "AI Academy" (their specific interest).
-When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + exciting AI skills.
-`;
-    } else if(bundleType === '1+1_Robotics'){
-       programInstruction = `
-🔥 SPECIAL BUNDLE INSTRUCTION:
-The recommended program is the "CREATE 1+1 Bundle" (Robotics).
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE" (their core belt progression) with "Robotics Academy" (their specific interest).
-When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + hands-on engineering skills.
-`;
-    } else if(bundleType === '1+1+1'){
-       programInstruction = `
-🔥 SPECIAL BUNDLE INSTRUCTION:
-The recommended program is the "CREATE 1+1+1 Bundle".
-You must refer to it specifically as "CREATE 1+1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE", "Academy", and "Clubs".
-When explaining the fit, mention that this bundle gives them the ultimate experience: coding, advanced skills (AI/Robotics), and social clubs.
-`;
+       programInstruction = `Recommended: "CREATE 1+1 Bundle" (Core + AI Academy).`;
     }
 
-
     const prompt =
-`You are an enrollment advisor at Code Ninjas.
-A parent just completed an in-center tour and filled out the Pathfinder questionnaire.
-Your task is to produce:
-1) A short, natural enrollment email
-2) A next-day SMS
-3) A 3-day follow-up SMS with urgency
-The goal:
-Use the survey insights (translated into human observation), the in-center experience, the recommended program path, and the parent's goals to create emotionally persuasive, human messaging.
-You must not sound like a robot, and you must never mirror the questionnaire literally.
-You must translate traits into real-world observations that a parent finds believable, reassuring, and compelling.
+`You are an expert Enrollment Advisor at Code Ninjas.
+A parent just completed a tour and questionnaire.
+Your goal: Generate a structured sales briefing and follow-up scripts for the Center Director (CD).
 
-${pronounHint}
+KEY RULES:
+1. NEVER reference the form directly (e.g., "Because you selected...", "Based on your answers..."). Use natural observation.
+2. NO DISCOUNT in the Primary Script or Form. Discount only appears in Backup Script and Email/SMS.
+3. Tone: Warm Mentor, Calm Guide, or Energetic Coach depending on child data.
 
-${programInstruction}
-
-🔥 SECTION 1 — USING SURVEY ANSWERS (CRITICAL)
-You must use the survey responses as emotional insight, not literal text.
-❌ Do NOT:
-Repeat traits word-for-word (“curious,” “competitive,” “shy”)
-Reference the form (“you selected…”, “you shared in the questionnaire…”)
-✅ DO translate traits into natural observations:
-Examples you may use or vary:
-Curious → “They asked thoughtful questions once they got into the activity.”
-Creative → “They liked putting their own spin on things.”
-Competitive → “They really leaned into the challenge once they realized they could level up.”
-Shy → “They opened up nicely once they felt comfortable.”
-Energetic → “They were happiest when they could move between steps and keep momentum.”
-Easily distracted → “They stayed engaged much longer once they had something hands-on to work with.”
-Bored easily → “They lit up when learning felt fast-paced and interactive.”
-Use these insights subtly; parents must feel seen and understood.
-
-🔥 SECTION 2 — VISIT CONTEXT RULES (MANDATORY)
-You must reference the child’s experience:
-JR (Ages 5–7)
-“hands-on STEM activities”
-“little engineering challenges”
-“creative building activities”
-CREATE (Ages 8–13)
-“their game-building session”
-“experimenting with game logic”
-“designing their first playable game element”
-ACADEMY (Ages 14+)
-“their game-building/tech session”
-“diving into the more advanced tools”
-“approaching the work with maturity / real focus”
-Use believable, specific-sounding lines like:
-“They really locked in once they realized they could make something move.”
-“They warmed up quickly after seeing how the game-building tools worked.”
-“They were proud when they got that first piece working.”
-
-🔥 SECTION 3 — PROGRAM-SPECIFIC PERSUASION
-You must include logic tied to why the recommended program ${programDisplay} fits.
-Use the matching persuasion style:
-JR PROGRAM (Ages 5–7)
-Focus on:
-confidence
-early problem-solving
-structure without pressure
-creativity & hands-on fun
-independence at their pace
-Suggested phrasing:
-“JR gives them the right balance of structure and playful exploration.”
-“Kids this age grow fast when learning feels like building, creating, and discovering.”
-CREATE PROGRAM (Ages 8–13)
-Focus on:
-focus/engagement
-small wins
-creativity and logic together
-mastery & belt progression
-consistency leading to skills
-Suggested phrasing:
-“CREATE keeps kids engaged because they get to build real games and see instant results.”
-“The structured belts help kids who need steady progress and kids who crave challenge.”
-ACADEMY / TEENS (14+)
-Focus on:
-future skills
-responsibility
-project ownership
-leadership or mentoring
-portfolio building
-AI, robotics, or advanced coding
-Suggested phrasing:
-“ACADEMY gives teens real-world skills that matter on resumes, in high school, and beyond.”
-“It channels their interests into meaningful projects they can feel proud of.”
-
-🔥 SECTION 4 — TONE MODES
-(Your system must detect and use the appropriate tone based on the child’s path and the parent’s stated goals.)
-Your writing must seamlessly choose the best tone based on cues:
-Soft/Nurturing Tone
-Use when the child is:
-shy
-anxious
-easily frustrated
-younger
-or parent prioritizes confidence/comfort
-Key phrases:
-“at their own pace”
-“feel comfortable and supported”
-“gently build confidence”
-High-Conversion / Confident Tone
-Use when:
-parent expresses academic goals
-child is competitive / advanced
-family values future skills
-parent is already leaning toward joining
-Key phrases:
-“This is the ideal next step.”
-“They’re ready for something more challenging.”
-“This path will move them forward quickly.”
-
-🔥 SECTION 5 — EMAIL REQUIREMENTS
-Your email must:
-Start with: “Dear ${greetingName},”
-Open with something warm about the child (translated observation + their session type)
-Explain why ${programDisplay} is the right fit
-Invite enrollment
-Include this exact sentence:
-"As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days."
-Close with:
-"Warmly,
-[Center Director Name]
-Code Ninjas ${centerName}"
-Email length limits:
-3 short paragraphs
-160 words max
-No emojis
-No corporate or robotic tone
-
-🔥 SECTION 6 — SMS MESSAGES
-Return exactly two SMS options.
-    SMS #1 — Next-Day Emotional Nudge
-    1–2 sentences
-    Human, warm, conversational
-    Use translated observation
-    Mention hands-on activity or game-building
-    Tie to a parent goal
-    Include [ENROLLMENT_LINK]
-    Mention urgency: offer expires "within the next few days" (do NOT say 48 hours)
-    No emojis
-    Example ideas:
-    “They really lit up once they started building their game. Don't forget to enroll: [ENROLLMENT_LINK] (expires in a few days).”
-    “Yesterday showed how quickly they engage when learning feels creative. Save their spot here: [ENROLLMENT_LINK] (offer ends in a few days).”
-SMS #2 — Sent 3 Days After, With 48-Hour Expiration
-Requirements:
-1–2 sentences max
-Reference a positive observation
-Mention code C9J5
-State it expires in 48 hours
-Include [ENROLLMENT_LINK]
-Warm, respectful urgency
-Example ideas:
-“Since you mentioned wanting more confidence/focus/skills for them, I didn’t want you to miss this.”
-“Given how engaged they were during their session, I wanted to remind you the code expires soon.”
-
-🔥 SECTION 7 — OUTPUT FORMAT
-Return your final answer in this exact structure, using these separators:
----EMAIL---
-<email content>
----SMS1---
-<SMS 1 text>
----SMS2---
-<SMS 2 text>
-
-DATA CONTEXT:
-- Parent Name: ${greetingName}
-- Child Name: ${childRef}
-- Child Gender: ${gender}
-- Center Location: ${centerName}
+INPUT DATA:
+- Parent: ${greetingName}
+- Child: ${childRef} (${gender})
+- Center: ${centerName}
 - Persona: ${personaLabel}
-- Recommended Program: ${programDisplay}
-- Program Family: ${apiProgramName}
-- Bundle Type: ${bundleType || "Standard"}
-- Marketing Source: ${marketingSource || "N/A"}
-- Marketing Notes: ${marketingSubsource || "N/A"}
-- Fun Fact Shared: ${funFact || "N/A"}
-- Survey Answers:
-${(qaSummaryLines || []).map(l => "  - " + l).join("\n")}`;
+- Program: ${programDisplay}
+- Insights: ${qaSummaryLines.join(" | ")}
+
+MANDATORY OUTPUT SECTIONS (Strict Format):
+
+---INSIGHTS---
+(2-3 bullet points summarizing key child traits and parent goals. Conversational style.)
+
+---PRIMARY_SCRIPT---
+(Verbal Script for CD. VALUE ONLY. Short. NO DISCOUNT. Tie child's traits to the program benefits. No objections.)
+
+---SOFT_CLOSE---
+Would you like to get them started today?
+
+---BACKUP_SCRIPT---
+(Verbal Script for CD. Used only if they hesitate. Reinforce value briefly, THEN introduce the waived enrollment fee.)
+
+---OBJECTIONS---
+(List these 4 exact headers and scripts. Do not merge them.)
+
+1. Talk to spouse
+(Response: Respectful, gentle agreement. No aggression.)
+
+2. Schedule
+(Response: Explain flexible gym-model drop-in hours.)
+
+3. Engagement concern
+(Response: Use this EXACT philosophy: "I completely understand that concern — and it’s actually one of the most common questions we get. Here’s the honest truth: coding, robotics, and AI development aren’t always easy. Even adults get frustrated when code doesn’t work the first time. As fun as we make it, there will be moments where your child hits a wall or feels stuck — and that’s not a bad thing. That’s where the real growth happens. Our mentors are trained to guide kids through those moments without giving them the answer, because that's how real confidence is built. We always tell parents: this isn’t just another after-school activity. This is an investment in how they think. And when those tough days do come, we’ll be here supporting them. We just need you in our corner, helping us keep them consistent. The curriculum we use was built in partnership with Microsoft, and kids advance at their own pace. Once they get past those early challenges and see their game actually work, that’s when they fall in love with it. We build resilience, confidence, and real problem-solving.")
+
+4. Need more time
+(Response: Gentle reassurance + mention that the code will arrive in the email.)
+
+---SALES_TIPS---
+(2 short bullet points on closing this specific persona.)
+
+---TONE_INSTRUCTION---
+(One phrase describing the suggested emotional tone, e.g., "Warm Mentor")
+
+---EMAIL_TO_PARENT---
+(Subject: Great meeting you and ${childRef}!)
+Dear ${greetingName},
+(Warm opening about child's specific engagement in the session).
+(Value proposition for ${programDisplay}).
+As a thank-you for visiting, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days.
+Warmly,
+[Center Director Name]
+
+---SMS1---
+(Next Day. 1-2 sentences. Warm, specific observation. Mention link. Offer expires in a few days.)
+
+---SMS2---
+(3 Days Later. 48-hour warning. Gentle urgency. Mention code C9J5.)
+`;
 
     const raw = await callGemini(prompt);
     if(!raw) return null;
 
-    const email = extractSection(raw, 'EMAIL');
-    const sms1  = extractSection(raw, 'SMS1');
-    const sms2  = extractSection(raw, 'SMS2');
-    // SMS3 removed from prompt
-    const sms = [sms1, sms2].filter(Boolean).map(s => s.replace(/\s+/g,' ').trim());
-
-    if(!email || sms.length === 0) return null;
-
-    return { email: email.trim(), sms };
+    return {
+        insights: extractSection(raw, 'INSIGHTS'),
+        primary: extractSection(raw, 'PRIMARY_SCRIPT'),
+        softClose: extractSection(raw, 'SOFT_CLOSE'),
+        backup: extractSection(raw, 'BACKUP_SCRIPT'),
+        objections: extractSection(raw, 'OBJECTIONS'),
+        tips: extractSection(raw, 'SALES_TIPS'),
+        tone: extractSection(raw, 'TONE_INSTRUCTION'),
+        email: extractSection(raw, 'EMAIL_TO_PARENT'),
+        sms1: extractSection(raw, 'SMS1'),
+        sms2: extractSection(raw, 'SMS2')
+    };
   }
 
   // Fallback if Gemini fails
@@ -1345,25 +1186,18 @@ ${(qaSummaryLines || []).map(l => "  - " + l).join("\n")}`;
     const centerName = centerLocation || 'your local center';
     const childRef = childName || 'your child';
 
-    const email =
-`Dear ${greetingName},
-
-It was truly a pleasure meeting you and ${childRef} today. Hearing about your family and seeing your Ninja’s excitement in the dojo made it clear they’re a great fit for a creative, engaging learning environment.
-
-From our conversation and the Pathfinder results, ${programDisplay} lines up with what you want — a balance of structure, hands-on challenge, and a fun way to build real-world coding and problem-solving skills.
-
-As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days.
-
-Warmly,
-[Center Director Name]
-Code Ninjas ${centerName}`;
-
-    const sms = [
-      `Code Ninjas ${centerName}: It was great meeting you and ${childRef} yesterday. From what you shared, ${programDisplay} gives them a fun way to build confidence, focus, and real tech skills. Sign up here: [ENROLLMENT_LINK] (offer ends in a few days).`,
-      `We loved having you and ${childRef} at Code Ninjas ${centerName}. ${programDisplay} is a great fit for the mix of creativity and structure you’re looking for. You can enroll at [ENROLLMENT_LINK] and use code C9J5 at checkout to waive the enrollment fee within 48 hours.`
-    ];
-
-    return { email, sms };
+    return {
+        insights: "Child is interested in gaming/coding. Parent wants confidence.",
+        primary: `I loved seeing ${childRef} build today. Based on their focus, ${programDisplay} is the perfect environment to turn that curiosity into real skills. We'd love to welcome them to the Dojo.`,
+        softClose: "Would you like to get them started today?",
+        backup: `I understand. We really think ${childRef} would thrive here. If you join today, I can waive the $99 enrollment fee to make it easier to get started.`,
+        objections: `1. Talk to spouse: "Of course. Discuss it and let us know."\n2. Schedule: "Drop in anytime during our hours."\n3. Engagement: "It builds resilience. We guide them through frustration."\n4. Time: "No problem, check your email for the code."`,
+        tips: "Focus on their excitement.",
+        tone: "Warm and Encouraging",
+        email: `Dear ${greetingName},\n\nIt was truly a pleasure meeting you and ${childRef} today. From our conversation, ${programDisplay} lines up with what you want — a balance of structure and fun.\n\nYou can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days.\n\nWarmly,\n[Center Director Name]`,
+        sms1: `Code Ninjas ${centerName}: Great meeting you! ${childRef} did great. Enroll here: [ENROLLMENT_LINK] (offer ends soon).`,
+        sms2: `Code Ninjas ${centerName}: Just a reminder that the enrollment waiver for ${childRef} expires in 48 hours. Use code C9J5 here: [ENROLLMENT_LINK]`
+    };
   }
 
   // ---------- WIZARD STATE ----------
@@ -1439,12 +1273,9 @@ Code Ninjas ${centerName}`;
     return '';
   }
   
-  // Helper to clear values for next child
   function clearFormValues() {
-     // Select inputs inside wizard only
      const allInputs = $$('input, textarea, select', wizard);
      allInputs.forEach(inp => {
-        // SKIP marketing inputs so we persist attribution across children
         if(inp.closest('.marketing-step')) return;
 
         if(inp.type === 'radio' || inp.type === 'checkbox') inp.checked = false;
@@ -1464,33 +1295,33 @@ Code Ninjas ${centerName}`;
 
   function recomputeVisibleSteps(){
     visibleSteps = allSteps.filter(step => {
-      // Skip Q1 (Age) as it's pre-selected now
       if(step.dataset.stepId === 'q1') return false;
 
-      // Logic to hide marketing questions for 2nd+ child
       if(currentChildIndex > 0 && step.classList.contains('marketing-step')) return false;
 
       const cond = step.getAttribute('data-show-if');
       if(!cond) return true;
       
-      // Advanced logic override: If child is 8-13 but Advanced...
       const t8 = getValue('tech8');
       const t11 = getValue('tech11');
       const isAdvancedChild = (t8 === 'Advanced' || t11 === 'Advanced');
 
-      // 1. HIDE standard path questions if they are now on the Advanced track
-      // These are questions specific to 8-10 or 11-13 that come AFTER the tech confidence question
-      // standard questions: q5B-1 (tried8), q5C-1 (leader11), qFuture
-      // note: q5B and q5C are where they select 'Advanced', so we must keep those visible.
       if (isAdvancedChild) {
+         // Hide standard 'beginner' follow ups
          if (['q5B-1', 'q5C-1'].includes(step.dataset.stepId)) return false;
       }
 
-      // 2. SHOW 14+ questions for Advanced kids
+      // Special handling for 14+ questions being injected into Advanced 8-13 path
       if (['q2D', 'q3D', 'q4D', 'q5D', 'q4D-1'].includes(step.dataset.stepId)) {
-         // If this step is for 14+, but we have an advanced younger child, SHOW IT
+         // If child is ACTUALLY 14+, logic is handled by 'data-show-if' and conditionMatches below.
+         // But if child is < 14 and Advanced, we only want specific questions.
+         
          if (isAdvancedChild) {
-             return true;
+             // ONLY show q3D (Interests) to guide them to Academy.
+             // DO NOT show q2D (Teen motivation), q4D (Redundant tech), q5D/q4D-1 (Career/Growth)
+             if (step.dataset.stepId === 'q3D') return true;
+             
+             return false; // Block other teen questions for 8-13 year olds
          }
       }
 
@@ -1514,7 +1345,6 @@ Code Ninjas ${centerName}`;
     let disableNext = false;
 
     if(active){
-      // Require at least one radio per group on this step
       const radios = $$('input[type=radio]', active);
       if(radios.length){
         const names = [...new Set(radios.map(r => r.name))];
@@ -1526,7 +1356,6 @@ Code Ninjas ${centerName}`;
         });
       }
 
-      // NEW: Require at least one checkbox checked on any step that has checkboxes
       const checkboxes = $$('input[type=checkbox]', active);
       if(checkboxes.length){
         const anyChecked = checkboxes.some(c => c.checked);
@@ -1549,19 +1378,16 @@ Code Ninjas ${centerName}`;
   wizard.addEventListener('change', recomputeVisibleSteps);
   visibleSteps = allSteps; updateUI();
 
-  // ---------- START QUIZ ----------
   startBtn.addEventListener('click', () => {
     syncStartState();
     if(!(parentFirst && parentLast && centerLocation)) return;
     
     prestart.classList.add('hidden');
-    childSetup.classList.remove('hidden'); // Show child setup first
-    // Force update incase default radio is checked
+    childSetup.classList.remove('hidden'); 
     updateChildInputs();
   });
   
   confirmChildrenBtn.addEventListener('click', () => {
-     // This is the real start of the wizard
      childSetup.classList.add('hidden');
      wizard.classList.remove('hidden');
      
@@ -1573,11 +1399,9 @@ Code Ninjas ${centerName}`;
      idx = 0;
      clearFormValues();
      
-     // Set current child data context
      const activeChild = childNames[currentChildIndex];
      currentChildAge = activeChild.age;
      
-     // Show context banner if multi-child
      if(numChildren > 1) {
         childContextBanner.textContent = `Questionnaire for ${activeChild.name}`;
         childContextBanner.classList.remove('hidden');
@@ -1591,7 +1415,6 @@ Code Ninjas ${centerName}`;
      updateUI();
   }
 
-  // ---------- NAV ----------
   backBtn.addEventListener('click', () => {
     if(isSubmitting) return;
     if(idx>0){ idx--; updateUI(); }
@@ -1614,9 +1437,7 @@ Code Ninjas ${centerName}`;
     }
   });
 
-  // ---------- MULTI-CHILD LOGIC ----------
   nextChildBtn.addEventListener('click', () => {
-     // Go to next child
      currentChildIndex++;
      if(currentChildIndex < numChildren) {
         result.style.display = 'none';
@@ -1625,7 +1446,6 @@ Code Ninjas ${centerName}`;
      }
   });
 
-  // ---------- LABEL HELPERS ----------
   function radioLabel(name){
     const el = document.querySelector('input[name="'+name+'"]:checked');
     if(!el) return '';
@@ -1655,16 +1475,13 @@ Code Ninjas ${centerName}`;
     return clone.textContent.trim();
   }
 
-  // ---------- PROGRAM SELECTION ----------
   function baseProgramKey(age){
-    // NEW: Check for advanced status to recommend ACADEMY even for 8-13
     const tech8 = getValue('tech8');
     const tech11 = getValue('tech11');
 
     if(age === '5-7') return 'JR';
     if(age === '14+') return 'ACADEMY';
     
-    // If 8-13 but Advanced, push to ACADEMY logic (which may offer bundles or academy track)
     if((age === '8-10' && tech8 === 'Advanced') || (age === '11-13' && tech11 === 'Advanced')){
         return 'ACADEMY';
     }
@@ -1703,7 +1520,6 @@ Code Ninjas ${centerName}`;
     return { label:'2x/Week', type:'2x' };
   }
 
-  // Persona determination logic based on updated requirements
   function determinePersona() {
     const age = getValue('age');
     const tech8 = getValue('tech8');
@@ -1714,93 +1530,69 @@ Code Ninjas ${centerName}`;
     const interest14 = checkboxLabels('interest14');
     const traits8 = checkboxLabels('traits8');
     const traits11 = checkboxLabels('traits11');
-    const traits5 = checkboxLabels('traits5');
-    const play5 = checkboxLabels('play5'); // Changed to checkboxes in prev step
+    const play5 = checkboxLabels('play5'); 
     const grit5 = getValue('grit5');
     const challenge11 = getValue('challenge11');
-    const tried8 = checkboxLabels('tried8'); // Changed to checkboxes
+    const tried8 = checkboxLabels('tried8');
     const goals = checkboxLabels('goals');
     const interestMentor = interest14.includes('Mentor');
     
     const matches = [];
 
-    // 1. Digital Explorer
     if (tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
-      // Add logic to show 14+ questions if they haven't been seen yet
-      // NOTE: The UI logic (recomputeVisibleSteps) handles showing the questions.
-      // This logic is just for Persona selection.
-      
       matches.push({
         title: "The Digital Explorer",
         blurb: "Your child is self-driven and needs accelerated, complex content. The CREATE belt system allows them to progress at their pace, and our Academies offer the advanced topics (like AI and real code) they crave."
       });
     }
-
-    // 2. Structured Learner
     if (learn8.includes('Step-by-step') || school11.includes('Motivated')) {
       matches.push({
         title: "The Structured Learner",
         blurb: "They excel with clear goals and defined milestones. The CREATE belt system, with its clear curriculum path and defined Belts, perfectly matches their need for order and measurable progress."
       });
     }
-
-    // 3. Hands-On Engineer
     if (interest14.includes('Robotics') || traits11.includes('Analytical') || (age === '8-10' && learn8.includes('Hands-on'))) {
       matches.push({
         title: "The Hands-On Engineer",
         blurb: "This child connects best with physical outcomes. They're an excellent candidate for the Robotics Academy bundle, blending coding logic with tangible engineering projects."
       });
     }
-
-    // 4. Game Designer
     if (interest14.includes('Game dev') || tried8.includes('Roblox/Minecraft')) {
       matches.push({
         title: "The Game Designer",
         blurb: "Their passion is creation through play. The CREATE belt system, which is fundamentally structured around building and publishing video games, harnesses this core interest immediately."
       });
     }
-
-    // 5. Debugging Master
     if (grit5 === 'Keeps trying' || challenge11 === 'Persist' || challenge11 === 'Research') {
       matches.push({
         title: "The Debugging Master",
         blurb: "This child has the grit and resilience necessary to overcome complex coding challenges. They will thrive in the self-paced CREATE dojo, where errors are viewed as learning opportunities."
       });
     }
-
-    // 6. Collaborative Coder
     if (traits8.includes('Social') || traits11.includes('Team-player') || interestMentor) {
       matches.push({
         title: "The Collaborative Coder",
         blurb: "They're motivated by peer interaction. The open dojo setting and group collaboration opportunities (Clubs, ACADEMY) fuel their desire to work with others while learning to code."
       });
     }
-
-    // 7. Digital Innovator
     if (goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
       matches.push({
         title: "The Digital Innovator",
         blurb: "This profile is seeking cutting-edge knowledge. They are a prime fit for CREATE Bundles (AI Academy) or the ACADEMY track, focusing on modern tools and career readiness."
       });
     }
-
-    // 8. The Storyteller
     if (age === '5-7' && play5.includes('Imaginative')) {
       matches.push({
         title: "The Storyteller",
         blurb: "This child responds best to narrative learning. The JR program uses story-driven, hands-on activities to introduce the logic and sequencing required for early coding concepts."
       });
     }
-
-    // 9. Hands-On Architect
     if (age === '5-7' && play5.includes('Building')) {
       matches.push({
         title: "The Hands-On Architect",
         blurb: "This child understands physical structure and assembly. The JR program uses tactile, hands-on materials to build sequences, leveraging their existing strength in 3D construction to teach abstract logic."
       });
     }
-
-    // 10. Curious Novice
     if (age === '5-7' || tech8 === 'Beginner' || tech11 === 'Beginner' || tech14 === 'Beginner') {
       matches.push({
         title: "The Curious Novice",
@@ -1808,11 +1600,8 @@ Code Ninjas ${centerName}`;
       });
     }
 
-    if (matches.length > 0) {
-      return matches[0]; // Return the first match found (priority order)
-    }
+    if (matches.length > 0) return matches[0];
 
-    // Defaults (Randomized if no match)
     const defaults = [
       {
         title: "The Code Ninja in Training",
@@ -1873,11 +1662,10 @@ Code Ninjas ${centerName}`;
           ['Future-focused', 'College & career skills']
         ],
         apiProgram: 'Code Ninjas Academy',
-        bundleType: '1+1_Academy' // Mark as generic bundle for AI prompt
+        bundleType: '1+1_Academy' 
       };
     }
 
-    // CREATE with bundles
     const bundle = chooseCreateBundle();
 
     let stats = [
@@ -1954,9 +1742,7 @@ Code Ninjas ${centerName}`;
     };
   }
 
-  // ---------- FUN FACT ----------
   function funFactText(programKey, signals, bundleType){
-    // Prioritize bundle type for fun fact consistency
     if(bundleType === '1+1_AI'){
       return 'Students who engage early with coding and AI concepts gain confidence navigating technologies that are shaping the fastest-growing careers.';
     }
@@ -1977,11 +1763,10 @@ Code Ninjas ${centerName}`;
     return 'Learning to code builds problem-solving, creativity, and resilience—skills that support success in math, science, writing, and beyond.';
   }
 
-  // ---------- Q&A SUMMARY ----------
   function buildQASummary(){
     const fields = [
-      ['gender', 'radio'], // Add Gender to summary
-      ['age','radio'], // This will now fetch pre-set age
+      ['gender', 'radio'],
+      ['age','radio'],
       ['traits5','checkbox'],['play5','checkbox'],['grit5','radio'],
       ['traits8','checkbox'],['learn8','checkbox'],['school8','checkbox'],['reengage8','radio'],['tech8','radio'],['tried8','checkbox'],
       ['traits11','checkbox'],['challenge11','radio'],['school11','checkbox'],['enjoy11','checkbox'],['tech11','radio'],['leader11','radio'],
@@ -2003,11 +1788,9 @@ Code Ninjas ${centerName}`;
     ];
     const lines = [];
     fields.forEach(([name,type]) => {
-      // Special handling for text inputs without legends, or custom label display
       if(type === 'text'){
         const val = textValue(name);
         if(val) {
-           // Map ID to readable label
            let label = name;
            if(name === 'friendName') label = 'Friend/Parent Name';
            else if(name === 'schoolNameInput') label = 'School Name';
@@ -2021,7 +1804,6 @@ Code Ninjas ${centerName}`;
         return;
       }
       
-      // AGE SPECIAL HANDLING: If age question was skipped in wizard, we still need to log it
       if(name === 'age'){
          if(currentChildAge){
             lines.push(`Age Group → ${currentChildAge}`);
@@ -2042,7 +1824,6 @@ Code Ninjas ${centerName}`;
     return lines;
   }
 
-  // ---------- API SUBMIT ----------
   function submitToWeb3Forms(message){
     if(window.API_Access === false){ console.log('API submission skipped'); return; }
     
@@ -2050,20 +1831,15 @@ Code Ninjas ${centerName}`;
     const msgField = $('#wf_message');
     const subjField = $('#wf_subject');
     const nameField = $('#wf_name');
-    // wf_email is set in HTML with a dummy value since user removed input
 
     if(!form || !msgField || !subjField || !nameField) return;
 
     subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
     nameField.value = `${parentFirst} ${parentLast}`.trim();
     msgField.value = message;
-
-    // Submit via standard form POST to hidden iframe to bypass CORS on file://
     form.submit();
-    console.log('Web3Forms submission triggered via hidden frame');
   }
 
-  // ---------- MAIN RESULTS ----------
   async function computeResultsAndSubmit(){
     const ageVal = getValue('age') || '';
     const gender = getValue('gender') || '';
@@ -2071,7 +1847,6 @@ Code Ninjas ${centerName}`;
     const programUI = buildProgramUI(ageVal);
     const bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
     
-    // Use new Persona Logic
     const personaData = determinePersona();
     const persona = personaData.title;
     const personaBlurb = personaData.blurb;
@@ -2084,7 +1859,6 @@ Code Ninjas ${centerName}`;
       
     const goals = checkboxLabels('goals');
 
-    // Marketing attribution
     const hearCode = getValue('hearAbout');
     let marketingSource = '';
     let marketingSubsource = '';
@@ -2165,10 +1939,9 @@ Code Ninjas ${centerName}`;
       }
     }
 
-    // UI
     const currentChildName = (numChildren > 1 && childNames[currentChildIndex]) 
          ? childNames[currentChildIndex].name
-         : "Your Child"; // Used for UI display, not for prompt
+         : "Your Child";
 
     $('#personaTitle').textContent = `${currentChildName}'s Profile: ${persona}`;
     $('#personaBlurb').textContent = personaBlurb;
@@ -2179,7 +1952,6 @@ Code Ninjas ${centerName}`;
 
     $('#stats').innerHTML = programUI.stats.map(([v,l]) => `<div class="stat"><h3>${v}</h3><p>${l}</p></div>`).join('');
 
-    // Fun fact (only for on-screen)
     const signals = [].concat(allTraits, goals, [
       checkboxLabels('play5').join(' '), checkboxLabels('tried8').join(' '), radioLabel('futurefocus'), radioLabel('ai')
     ].filter(Boolean));
@@ -2192,11 +1964,9 @@ Code Ninjas ${centerName}`;
       $('#funFact').classList.add('hidden');
     }
 
-    // Center note
     $('#centerNote').textContent =
       `Before you head out today, stop by the front desk at Code Ninjas ${centerLocation} so we can walk you through this path and help you enroll. A summary of your results has been shared with the center.`;
 
-    // Bundle-aware program display
     const apiProgramName = programUI.apiProgram;
     let programDisplay = apiProgramName;
     if(apiProgramName === 'Code Ninjas CREATE'){
@@ -2205,19 +1975,14 @@ Code Ninjas ${centerName}`;
       else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
       else if(bundleType === '2x') programDisplay += ' (2x/Week)';
     } else if(apiProgramName === 'Code Ninjas Academy'){
-        // FORCE DISPLAY NAME TO BUNDLE FOR ACADEMY PATH
-        // This ensures the internal context and AI prompt both see "CREATE 1+1 Bundle"
         programDisplay = 'CREATE 1+1 Bundle';
     }
 
-    // Build Q&A summary once
     const qaSummary = buildQASummary();
 
-    // Prepare AI-generated email + SMS (short, child-first)
-    let emailBody = '';
-    let smsOptions = [];
+    let comms = null;
     try {
-      const comms = await generateAiComms({
+      comms = await generateAiComms({
         programDisplay,
         apiProgramName,
         personaLabel: persona,
@@ -2227,26 +1992,17 @@ Code Ninjas ${centerName}`;
         marketingSubsource,
         qaSummaryLines: qaSummary,
         currentChildName: (numChildren > 1) ? currentChildName : null,
-        gender: gender // Pass gender to AI
+        gender: gender
       });
-      if(comms){
-        emailBody = comms.email;
-        smsOptions = comms.sms;
-      }
     } catch(e) {
       console.warn("Error while generating AI comms:", e);
     }
 
-    // Fallback if Gemini fails
-    if(!emailBody || smsOptions.length === 0){
-      const fallback = buildFallbackComms(programDisplay, (numChildren > 1) ? currentChildName : null);
-      emailBody = fallback.email;
-      smsOptions = fallback.sms;
+    if(!comms || !comms.email){
+      comms = buildFallbackComms(programDisplay, (numChildren > 1) ? currentChildName : null);
     }
 
     const timestamp = new Date().toLocaleString();
-
-    // Conditional Child line - ONLY if more than one child
     const childLine = (numChildren > 1) ? `Child: ${currentChildName}\n` : '';
 
     const message =
@@ -2261,42 +2017,69 @@ Marketing Source: ${marketingSource || 'N/A'}
 ${marketingSubsource || 'N/A'}
 
 --------------------
-Q&A Summary (question → answer):
+Q&A Summary:
 ${qaSummary.map(l => '• ' + l).join('\n')}
 
 --------------------
-AI-Generated Parent Email:
-${emailBody}
+>>> CD SALES SCRIPTING & FOLLOW-UP <<<
+
+Insight Summary:
+${comms.insights || 'N/A'}
+
+Primary Script (Value-Only):
+${comms.primary || 'N/A'}
+
+Soft Close:
+${comms.softClose || "Would you like to get them started today?"}
+
+Backup Script (If needed - Discount):
+${comms.backup || 'N/A'}
+
+Objection Responses:
+${comms.objections || 'N/A'}
+
+Sales Tips:
+${comms.tips || 'N/A'}
+
+Recommended Tone:
+${comms.tone || 'N/A'}
 
 --------------------
-AI-Generated SMS Options (choose one to text the parent):
-SMS 1 (Send Day After):
-${smsOptions[0] || ''}
+Same-Day Email Template:
+${comms.email}
 
-SMS 2 (Send 3 Days Later):
-${smsOptions[1] || ''}`;
+--------------------
+Text #1 Template (Next Day):
+${comms.sms1}
+
+Text #2 Template (48-hour Reminder):
+${comms.sms2}
+
+--------------------
+Follow-Up Timing Summary:
+1. Verbal Pitch (Now)
+2. Email (Immediately)
+3. SMS 1 (Tomorrow)
+4. SMS 2 (Day 4 - Urgent)`;
 
     submitToWeb3Forms(message);
 
-    // Show result to parent after Gemini & submit complete
     stopLoading();
     wizard.classList.add('hidden');
     result.style.display = 'block';
     
-    // Logic for Next Child button
     if (numChildren > 1 && currentChildIndex < numChildren - 1) {
        nextChildBtn.style.display = 'block';
        nextChildBtn.textContent = `Start Quiz for ${childNames[currentChildIndex + 1].name} ▶`;
-       retakeBtn.style.display = 'none'; // Hide home button until done
+       retakeBtn.style.display = 'none';
     } else {
        nextChildBtn.style.display = 'none';
-       retakeBtn.style.display = 'block'; // Show home button
+       retakeBtn.style.display = 'block';
     }
 
     window.scrollTo({ top:0, behavior:'smooth' });
   }
 
-  // ---------- BACK TO HOME ----------
   $('#retakeBtn').addEventListener('click', () => { window.location.reload(); });
 })();
 </script>
@@ -2314,3 +2097,5 @@ ${smsOptions[1] || ''}`;
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
+
+
