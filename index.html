@@ -610,7 +610,7 @@
     </div>
 
     <!-- PATH 4: 14+ -->
-    <div class="step" data-step-id="q2D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
+    <div class="step" data-step-id="q2D" data-show-if="age=14+">
       <fieldset>
         <legend>What best describes what motivates your teen?</legend>
         <div class="opts grid-4">
@@ -622,7 +622,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q3D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
+    <div class="step" data-step-id="q3D" data-show-if="age=14+">
       <fieldset>
         <legend>Which areas are they most interested in? <span class="hint">Choose up to 2</span></legend>
         <div class="opts">
@@ -635,7 +635,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q4D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
+    <div class="step" data-step-id="q4D" data-show-if="age=14+">
       <fieldset>
         <legend>How confident are they with technology?</legend>
         <div class="opts">
@@ -657,7 +657,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q5D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
+    <div class="step" data-step-id="q5D" data-show-if="age=14+">
       <fieldset>
         <legend>Which growth area is most important this year?</legend>
         <div class="opts grid-4">
@@ -1464,6 +1464,28 @@ Code Ninjas ${centerName}`;
 
       const cond = step.getAttribute('data-show-if');
       if(!cond) return true;
+      
+      // Advanced logic override: If child is 8-13 but Advanced...
+      const t8 = getValue('tech8');
+      const t11 = getValue('tech11');
+      const isAdvancedChild = (t8 === 'Advanced' || t11 === 'Advanced');
+
+      // 1. HIDE standard path questions if they are now on the Advanced track
+      // These are questions specific to 8-10 or 11-13 that come AFTER the tech confidence question
+      // standard questions: q5B-1 (tried8), q5C-1 (leader11), qFuture
+      // note: q5B and q5C are where they select 'Advanced', so we must keep those visible.
+      if (isAdvancedChild) {
+         if (['q5B-1', 'q5C-1'].includes(step.dataset.stepId)) return false;
+      }
+
+      // 2. SHOW 14+ questions for Advanced kids
+      if (['q2D', 'q3D', 'q4D', 'q5D', 'q4D-1'].includes(step.dataset.stepId)) {
+         // If this step is for 14+, but we have an advanced younger child, SHOW IT
+         if (isAdvancedChild) {
+             return true;
+         }
+      }
+
       return conditionMatches(cond);
     });
     allSteps.forEach(s => s.classList.remove('active'));
@@ -1696,6 +1718,10 @@ Code Ninjas ${centerName}`;
 
     // 1. Digital Explorer
     if (tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
+      // Add logic to show 14+ questions if they haven't been seen yet
+      // NOTE: The UI logic (recomputeVisibleSteps) handles showing the questions.
+      // This logic is just for Persona selection.
+      
       matches.push({
         title: "The Digital Explorer",
         blurb: "Your child is self-driven and needs accelerated, complex content. The CREATE belt system allows them to progress at their pace, and our Academies offer the advanced topics (like AI and real code) they crave."
