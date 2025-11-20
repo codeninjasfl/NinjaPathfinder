@@ -622,7 +622,7 @@
       </fieldset>
     </div>
 
-    <div class="step" data-step-id="q3D" data-show-if="age=14+">
+    <div class="step" data-step-id="q3D" data-show-if="age=14+,tech8=Advanced,tech11=Advanced">
       <fieldset>
         <legend>Which areas are they most interested in? <span class="hint">Choose up to 2</span></legend>
         <div class="opts">
@@ -1065,6 +1065,7 @@
       personaLabel,
       funFact,
       bundleType,
+      academyBundleType, // AI or Robotics for Academy paths
       marketingSource,
       marketingSubsource,
       qaSummaryLines,
@@ -1100,38 +1101,37 @@ When explaining the fit, mention that this bundle gives them the best of both wo
     // Force AI to recommend either a Bundle or CREATE, never *just* Academy
     let programInstruction = "";
     
+    // Determine the specific bundle type for Academy paths
+    let specificBundleType = academyBundleType || '';
+    if(!specificBundleType){
+        if(bundleType === '1+1_Robotics') specificBundleType = 'Robotics';
+        else if(bundleType === '1+1_AI') specificBundleType = 'AI';
+        else if(apiProgramName === 'Code Ninjas Academy') specificBundleType = 'AI'; // Default
+    }
+
     if(apiProgramName === 'Code Ninjas Academy') {
-        // Even if they hit the Academy logic, we sell it as a 1+1 Bundle or 1+1+1 Bundle primarily
+        // Even if they hit the Academy logic, we sell it as a 1+1 Bundle
         programInstruction = `
 🔥 PROGRAM INSTRUCTION:
-The system recommended "CREATE 1+1 Bundle" (because they are Academy-ready).
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE" (their core belt progression) with an "Academy" of their choice (AI or Robotics).
-When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + specialized advanced projects.
+The system recommended "CREATE 1+1 (${specificBundleType}) Bundle" (because they are Academy-ready).
+You must refer to it specifically as "CREATE 1+1 (${specificBundleType}) Bundle" in both the Email and SMS.
+This bundle combines "Code Ninjas CREATE" (their core belt progression) with "${specificBundleType} Academy" (their specific interest).
+When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + ${specificBundleType === 'AI' ? 'exciting AI skills' : 'hands-on engineering skills'}.
 Do NOT offer Academy as a standalone option. It is a bundle.
-`;
-    } else if(bundleType === '1+1_Academy'){
-        // This handles the case where buildProgramUI explicitly set bundleType='1+1_Academy'
-        programInstruction = `
-🔥 PROGRAM INSTRUCTION:
-The recommended program is the "CREATE 1+1 Bundle".
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
-This bundle combines "Code Ninjas CREATE" (their core belt progression) with an "Academy" of their choice (AI or Robotics).
-When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + specialized advanced projects.
 `;
     } else if(bundleType === '1+1_AI'){
        programInstruction = `
 🔥 SPECIAL BUNDLE INSTRUCTION:
-The recommended program is the "CREATE 1+1 Bundle".
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
+The recommended program is the "CREATE 1+1 (AI) Bundle".
+You must refer to it specifically as "CREATE 1+1 (AI) Bundle" in both the Email and SMS.
 This bundle combines "Code Ninjas CREATE" (their core belt progression) with "AI Academy" (their specific interest).
 When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + exciting AI skills.
 `;
     } else if(bundleType === '1+1_Robotics'){
        programInstruction = `
 🔥 SPECIAL BUNDLE INSTRUCTION:
-The recommended program is the "CREATE 1+1 Bundle" (Robotics).
-You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
+The recommended program is the "CREATE 1+1 (Robotics) Bundle".
+You must refer to it specifically as "CREATE 1+1 (Robotics) Bundle" in both the Email and SMS.
 This bundle combines "Code Ninjas CREATE" (their core belt progression) with "Robotics Academy" (their specific interest).
 When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + hands-on engineering skills.
 `;
@@ -1477,19 +1477,27 @@ Code Ninjas ${centerName}`;
       const t8 = getValue('tech8');
       const t11 = getValue('tech11');
       const isAdvancedChild = (t8 === 'Advanced' || t11 === 'Advanced');
+      const isActually14Plus = (currentChildAge === '14+');
 
       // 1. HIDE standard path questions if they are now on the Advanced track
       // These are questions specific to 8-10 or 11-13 that come AFTER the tech confidence question
-      // standard questions: q5B-1 (tried8), q5C-1 (leader11), qFuture
+      // standard questions: q5B-1 (tried8), q5C-1 (leader11)
       // note: q5B and q5C are where they select 'Advanced', so we must keep those visible.
-      if (isAdvancedChild) {
+      if (isAdvancedChild && !isActually14Plus) {
          if (['q5B-1', 'q5C-1'].includes(step.dataset.stepId)) return false;
       }
 
-      // 2. SHOW 14+ questions for Advanced kids
-      if (['q2D', 'q3D', 'q4D', 'q5D', 'q4D-1'].includes(step.dataset.stepId)) {
-         // If this step is for 14+, but we have an advanced younger child, SHOW IT
-         if (isAdvancedChild) {
+      // 2. For Advanced 8-13 year olds, ONLY show age-appropriate Academy questions
+      // Skip questions that say "teen" or are redundant
+      if (isAdvancedChild && !isActually14Plus) {
+         // q2D says "motivates your teen" - SKIP for younger kids
+         if (step.dataset.stepId === 'q2D') return false;
+         // q4D asks tech confidence again - SKIP (redundant, they already answered)
+         if (step.dataset.stepId === 'q4D') return false;
+         // q5D (growth area) - could work but let's skip to keep it simple
+         if (step.dataset.stepId === 'q5D') return false;
+         // q3D (interests) and q4D-1 (certifications) - SHOW these (age-appropriate)
+         if (['q3D', 'q4D-1'].includes(step.dataset.stepId)) {
              return true;
          }
       }
@@ -2063,13 +2071,44 @@ Code Ninjas ${centerName}`;
     console.log('Web3Forms submission triggered via hidden frame');
   }
 
+  // Helper to determine Academy bundle type (AI vs Robotics) based on interests
+  function determineAcademyBundleType(){
+    const interest14 = checkboxLabels('interest14');
+    const future = getValue('futurefocus');
+    
+    // Check explicit interests
+    if(interest14.includes('Robotics')) return 'Robotics';
+    if(interest14.includes('AI')) return 'AI';
+    
+    // Check future focus preference
+    if(future === 'Coding + Robotics') return 'Robotics';
+    if(future === 'Coding + AI') return 'AI';
+    
+    // Default to AI if no clear preference
+    return 'AI';
+  }
+
   // ---------- MAIN RESULTS ----------
   async function computeResultsAndSubmit(){
     const ageVal = getValue('age') || '';
     const gender = getValue('gender') || '';
     const baseKey = baseProgramKey(ageVal);
     const programUI = buildProgramUI(ageVal);
-    const bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
+    let bundleType = programUI.bundleType || (baseKey === 'CREATE' ? (chooseCreateBundle().type) : null);
+    
+    // If Academy path, determine if it should be AI or Robotics bundle
+    let academyBundleType = null;
+    if(baseKey === 'ACADEMY'){
+      if(bundleType === '1+1_Academy' || !bundleType){
+        // Determine specific type (AI or Robotics) based on interests
+        academyBundleType = determineAcademyBundleType();
+        bundleType = academyBundleType === 'Robotics' ? '1+1_Robotics' : '1+1_AI';
+      } else if(bundleType === '1+1_AI'){
+        academyBundleType = 'AI';
+      } else if(bundleType === '1+1_Robotics'){
+        academyBundleType = 'Robotics';
+      }
+    }
     
     // Use new Persona Logic
     const personaData = determinePersona();
@@ -2199,15 +2238,22 @@ Code Ninjas ${centerName}`;
     // Bundle-aware program display
     const apiProgramName = programUI.apiProgram;
     let programDisplay = apiProgramName;
-    if(apiProgramName === 'Code Ninjas CREATE'){
-      if(bundleType === '1+1_AI') programDisplay = 'CREATE 1+1 Bundle';
-      else if(bundleType === '1+1_Robotics') programDisplay += ' (1+1 Bundle: CREATE + Robotics Academy)';
-      else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
+    
+    // Use the already-determined academyBundleType
+    let finalAcademyType = academyBundleType;
+    if(apiProgramName === 'Code Ninjas Academy'){
+        // Use the determined type, or default to AI
+        finalAcademyType = academyBundleType || 'AI';
+        programDisplay = finalAcademyType === 'Robotics' ? 'CREATE 1+1 (Robotics) Bundle' : 'CREATE 1+1 (AI) Bundle';
+    } else if(apiProgramName === 'Code Ninjas CREATE'){
+      if(bundleType === '1+1_AI') {
+        programDisplay = 'CREATE 1+1 (AI) Bundle';
+        finalAcademyType = 'AI';
+      } else if(bundleType === '1+1_Robotics') {
+        programDisplay = 'CREATE 1+1 (Robotics) Bundle';
+        finalAcademyType = 'Robotics';
+      } else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
       else if(bundleType === '2x') programDisplay += ' (2x/Week)';
-    } else if(apiProgramName === 'Code Ninjas Academy'){
-        // FORCE DISPLAY NAME TO BUNDLE FOR ACADEMY PATH
-        // This ensures the internal context and AI prompt both see "CREATE 1+1 Bundle"
-        programDisplay = 'CREATE 1+1 Bundle';
     }
 
     // Build Q&A summary once
@@ -2223,6 +2269,7 @@ Code Ninjas ${centerName}`;
         personaLabel: persona,
         funFact,
         bundleType,
+        academyBundleType: finalAcademyType, // Pass the specific type (AI or Robotics)
         marketingSource,
         marketingSubsource,
         qaSummaryLines: qaSummary,
