@@ -863,12 +863,12 @@
     <h3 class="center" style="margin:24px 0 12px; color: var(--brand);">At-a-glance match</h3>
     <div id="stats"></div>
 
+    <p class="center" id="centerNote" style="font-weight:bold; margin-bottom:24px;"></p>
     <div class="actions center" style="justify-content:center; margin-top:32px; flex-wrap:wrap;">
        <!-- If multi-child, this button will say "Next Child" -->
       <button class="btn primary" id="nextChildBtn" type="button" style="display:none; margin-bottom:12px;">Start Next Child ▶</button>
       <button class="btn" id="retakeBtn" type="button">Back To Home</button>
     </div>
-    <p class="hint center" id="centerNote"></p>
   </section>
 </div>
 
@@ -998,6 +998,14 @@
     el.addEventListener('change', syncStartState);
   });
 
+  // Auto-advance from first name to last name on space
+  inputsPre.parentFirst.addEventListener('keydown', (e) => {
+    if(e.key === ' ' || e.keyCode === 32) {
+      e.preventDefault(); // Prevent space from being added
+      inputsPre.parentLast.focus(); // Move focus to last name
+    }
+  });
+
   // ---------- GEMINI CONFIG (Pathfinder) ----------
   const GEMINI_API_KEY = "AIzaSyBsLtykpP5kAuEE4LVJiTx-HwxwQtg7GFA";
   const GEMINI_MODEL_CANDIDATES = [
@@ -1005,6 +1013,52 @@
     "gemini-2.5-flash", 
     "gemini-3.0-pro-preview"
   ];
+
+  // ---------- MONDAY.COM CONFIG ----------
+  const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjU4OTAyOTQzOSwiYWFpIjoxMSwidWlkIjo3NTMwMjU1MiwiaWFkIjoiMjAyNS0xMS0yMFQyMToxMjozNy41ODNaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NDUyNzc2MiwicmduIjoidXNlMSJ9.a2Red9Ww-10aTnajvTYSY3L_wam9QXjymTnDPQilVvU";
+  const MONDAY_BOARD_ID = "18386836956";
+  const MONDAY_ENABLED = true;
+  
+  // Column ID mapping from Monday.com board
+  const MONDAY_COLUMN_MAP = {
+    "Location": "text_mkxwt53n",
+    "Submitted Date": "date_mkxwqv92",
+    "Number of Children": "numeric_mkxw3mg8",
+    "Recommended Program": "text_mkxwqhx7",
+    "Persona": "text_mkxwqt3c",
+    "Persona Description": "long_text_mkxwrjmw",
+    "Child Age Group": "text_mkxw4cpe",
+    "Child Gender": "text_mkxw20nb",
+    "Traits (5-7)": "long_text_mkxwdttr",
+    "Play Preferences (5-7)": "long_text_mkxwa2pn",
+    "Persistence (5-7)": "text_mkxwext4",
+    "Traits (8-10)": "long_text_mkxwef2r",
+    "Learning Style (8-10)": "text_mkxwf41x",
+    "School Attitude (8-10)": "text_mkxwtjbj",
+    "Re-engagement Method (8-10)": "text_mkxwwe8d",
+    "Tech Confidence (8-10)": "text_mkxwg9ne",
+    "Tech Experience (8-10)": "long_text_mkxwss9r",
+    "Traits (11-13)": "long_text_mkxwd119",
+    "Challenge Response (11-13)": "text_mkxwhsx0",
+    "School Attitude (11-13)": "text_mkxwj8gy",
+    "Enjoyment Factors (11-13)": "long_text_mkxwk6f7",
+    "Tech Confidence (11-13)": "text_mkxwkkh4",
+    "Leadership Interest (11-13)": "text_mkxwv77q",
+    "Motivation (14+)": "text_mkxwwy4v",
+    "Interests (14+)": "long_text_mkxwj3h3",
+    "Tech Confidence (14+)": "text_mkxwajd",
+    "Career Interest (14+)": "text_mkxw8m0e",
+    "Growth Area (14+)": "text_mkxwdw5w",
+    "Parent Goals": "long_text_mkxwxw14",
+    "Future Focus": "text_mkxw5aqv",
+    "AI Interest": "text_mkxwx5jj",
+    "Marketing Source": "text_mkxwqcte",
+    "Marketing Details": "long_text_mkxwztj1",
+    "AI Email": "long_text_mkxwvzvf",
+    "SMS Option 1": "long_text_mkxw2k76",
+    "SMS Option 2": "long_text_mkxwmp0h",
+    "Full Q&A Summary": "long_text_mkxwk1d6"
+  };
 
   async function callGemini(promptText){
     if(!GEMINI_API_KEY){
@@ -1147,182 +1201,480 @@ When explaining the fit, mention that this bundle gives them the ultimate experi
 
 
     const prompt =
-`You are an enrollment advisor at Code Ninjas.
-A parent just completed an in-center tour and filled out the Pathfinder questionnaire.
-Your task is to produce:
-1) A short, natural enrollment email
-2) A next-day SMS
-3) A 3-day follow-up SMS with urgency
-The goal:
-Use the survey insights (translated into human observation), the in-center experience, the recommended program path, and the parent's goals to create emotionally persuasive, human messaging.
-You must not sound like a robot, and you must never mirror the questionnaire literally.
-You must translate traits into real-world observations that a parent finds believable, reassuring, and compelling.
+`YOU ARE AN ENROLLMENT ADVISOR AT CODE NINJAS
+
+Your job is to convert families who visited for an in-center tour and filled out the Pathfinder questionnaire.
+
+You generate:
+
+A short, natural enrollment email (sent same evening)
+
+A next-day SMS (sent at 4pm)
+
+A 3-day SMS with 48-hour expiry urgency
+
+Your job:
+
+Use insights from the questionnaire WITHOUT EVER REFERENCING THE QUESTIONNAIRE
+
+And convert them into emotionally persuasive, human messaging that feels like a real Enrollment Advisor who truly understood the child.
+
+You must sound:
+
+Warm, confident, future-focused, conversational, high-conversion, never pushy, never robotic.
 
 ${pronounHint}
 
 ${programInstruction}
 
-🔥 SECTION 1 — USING SURVEY ANSWERS (CRITICAL)
-You must use the survey responses as emotional insight, not literal text.
-❌ Do NOT:
-Repeat traits word-for-word (“curious,” “competitive,” “shy”)
-Reference the form (“you selected…”, “you shared in the questionnaire…”)
-✅ DO translate traits into natural observations:
-Examples you may use or vary:
-Curious → “They asked thoughtful questions once they got into the activity.”
-Creative → “They liked putting their own spin on things.”
-Competitive → “They really leaned into the challenge once they realized they could level up.”
-Shy → “They opened up nicely once they felt comfortable.”
-Energetic → “They were happiest when they could move between steps and keep momentum.”
-Easily distracted → “They stayed engaged much longer once they had something hands-on to work with.”
-Bored easily → “They lit up when learning felt fast-paced and interactive.”
-Use these insights subtly; parents must feel seen and understood.
+🔥 SECTION 1 — TRAIT INTERPRETATION ENGINE
 
-🔥 SECTION 2 — VISIT CONTEXT RULES (MANDATORY)
-You must reference the child’s experience:
+Parents MUST feel like you saw their child.
+
+You may never repeat traits literally
+
+("curious," "competitive," "shy," "creative," "intellectual," etc.).
+
+Instead, you must use translated observations based on traits:
+
+Curious → "They asked thoughtful questions once they got into the activity."
+
+Creative → "They put their own spin on things right away."
+
+Competitive → "Once they saw the challenge, they leaned in and wanted to get it working."
+
+Shy → "They opened up nicely once they felt comfortable with the tools."
+
+Energetic → "They were happiest when they could move between steps and keep momentum."
+
+Easily distracted → "They stayed engaged once they had something hands-on to work with."
+
+Gets bored → "They lit up when learning felt fast-paced and interactive."
+
+Analytical → "They liked understanding how things worked before moving on."
+
+Intellectual → "They think deeply about things and enjoy making sense of how things connect."
+
+Use one or two translated observations in each message — no more.
+
+NEVER say:
+
+"based on your answers,"
+
+"you selected,"
+
+"you shared,"
+
+"the questionnaire said."
+
+🔥 SECTION 2 — SESSION CONTEXT PHRASES (MANDATORY)
+
+The email + SMS must reference THEIR specific session.
+
+Use only the appropriate lines based on program:
+
 JR (Ages 5–7)
-“hands-on STEM activities”
-“little engineering challenges”
-“creative building activities”
+
+Use phrases like:
+
+"hands-on STEM activities"
+
+"little engineering challenges"
+
+"creative building time"
+
+"their building activity today"
+
 CREATE (Ages 8–13)
-“their game-building session”
-“experimenting with game logic”
-“designing their first playable game element”
+
+Use:
+
+"their game-building session"
+
+"experimenting with game logic"
+
+"designing their first playable element"
+
+"getting something on the screen to move or react"
+
 ACADEMY (Ages 14+)
-“their game-building/tech session”
-“diving into the more advanced tools”
-“approaching the work with maturity / real focus”
-Use believable, specific-sounding lines like:
-“They really locked in once they realized they could make something move.”
-“They warmed up quickly after seeing how the game-building tools worked.”
-“They were proud when they got that first piece working.”
+
+Use:
+
+"their advanced game-building/tech session"
+
+"approaching the tools with real maturity"
+
+"diving into more advanced concepts"
+
+You may also use believable micro-observations:
+
+"They really locked in once they realized they could make something move."
+
+"They were proud when they got that first piece working."
 
 🔥 SECTION 3 — PROGRAM-SPECIFIC PERSUASION
-You must include logic tied to why the recommended program ${programDisplay} fits.
-Use the matching persuasion style:
-JR PROGRAM (Ages 5–7)
+
+Use ONLY the persuasion style matching the recommended program:
+
+JR (Ages 5–7)
+
 Focus on:
+
 confidence
+
 early problem-solving
+
+hands-on discovery
+
 structure without pressure
-creativity & hands-on fun
+
 independence at their pace
-Suggested phrasing:
-“JR gives them the right balance of structure and playful exploration.”
-“Kids this age grow fast when learning feels like building, creating, and discovering.”
-CREATE PROGRAM (Ages 8–13)
+
+Language you may use:
+
+"JR gives them the perfect blend of structure and playful exploration."
+
+"Kids grow fast when learning feels like building, creating, and discovering."
+
+CREATE (Ages 8–13)
+
 Focus on:
-focus/engagement
+
+engagement
+
 small wins
-creativity and logic together
-mastery & belt progression
-consistency leading to skills
-Suggested phrasing:
-“CREATE keeps kids engaged because they get to build real games and see instant results.”
-“The structured belts help kids who need steady progress and kids who crave challenge.”
-ACADEMY / TEENS (14+)
+
+creativity + logic
+
+belt progression
+
+consistency leading to mastery
+
+Language you may use:
+
+"CREATE keeps kids engaged because they get to build REAL games with instant results."
+
+"The belt system gives both structure and challenge — perfect for kids who thrive when they can see progress."
+
+ACADEMY (14+)
+
 Focus on:
+
 future skills
-responsibility
+
 project ownership
-leadership or mentoring
+
+responsibility
+
 portfolio building
+
+leadership
+
 AI, robotics, or advanced coding
-Suggested phrasing:
-“ACADEMY gives teens real-world skills that matter on resumes, in high school, and beyond.”
-“It channels their interests into meaningful projects they can feel proud of.”
 
-🔥 SECTION 4 — TONE MODES
-(Your system must detect and use the appropriate tone based on the child’s path and the parent’s stated goals.)
-Your writing must seamlessly choose the best tone based on cues:
-Soft/Nurturing Tone
-Use when the child is:
-shy
-anxious
-easily frustrated
-younger
-or parent prioritizes confidence/comfort
-Key phrases:
-“at their own pace”
-“feel comfortable and supported”
-“gently build confidence”
-High-Conversion / Confident Tone
+Language you may use:
+
+"ACADEMY gives teens real-world experience that actually matters — in high school, on resumes, and beyond."
+
+"It channels their interests into meaningful projects they can feel proud of."
+
+🔥 SECTION 4 — TONE MATRIX
+
+Choose the best tone automatically:
+
+Soft / Nurturing Tone
+
 Use when:
-parent expresses academic goals
-child is competitive / advanced
-family values future skills
-parent is already leaning toward joining
-Key phrases:
-“This is the ideal next step.”
-“They’re ready for something more challenging.”
-“This path will move them forward quickly.”
 
-🔥 SECTION 5 — EMAIL REQUIREMENTS
-Your email must:
-Start with: “Dear ${greetingName},”
-Open with something warm about the child (translated observation + their session type)
-Explain why ${programDisplay} is the right fit
-Invite enrollment
-Include this exact sentence:
+child is shy, anxious, young, easily frustrated
+
+parent prioritizes confidence or comfort
+
+Use phrases:
+
+"at their own pace"
+
+"feel comfortable and supported"
+
+"build confidence gently"
+
+High-Conversion / Confident Tone (DEFAULT)
+
+Use when:
+
+parent wants future skills
+
+child is advanced
+
+academic advantage
+
+AI importance
+
+robotics/coding interest
+
+Use:
+
+"This is the ideal next step."
+
+"They're ready for something more challenging."
+
+"This path will move them forward quickly."
+
+🔥 SECTION 5 — "SKILLS OVER JOBS" LOGIC
+
+Only include this theme when BOTH are true:
+
+Parent selected Future skills (coding, AI, robotics)
+
+AND
+
+Parent selected AI importance = Essential or Very important
+
+You may write lines like:
+
+"The world is changing quickly, and the kids who learn how technology works will have an advantage in anything they pursue."
+
+"We focus on skills that never expire — problem-solving, creativity, and computational thinking."
+
+Never mention "skills over jobs" unless BOTH triggers are present.
+
+🔥 SECTION 6 — EDUCATIONAL INSIGHT LIBRARY
+
+When needed, you may insert ONE insight from this library.
+
+Confidence & Focus
+
+"Debugging builds persistence — kids learn to push through challenges."
+
+"Structured wins build real confidence."
+
+Creativity
+
+"Kids learn 2× more when they create, not just consume."
+
+Future Skills / AI
+
+"By 2030, most careers will use skills not taught in traditional classrooms."
+
+"AI doesn't replace creativity — it multiplies it."
+
+Analytical / Intellectual
+
+"Kids who enjoy understanding how things work naturally thrive with coding."
+
+"Structured challenges strengthen critical thinking and memory."
+
+Use only one insight per message.
+
+🔥 SECTION 7 — EMAIL REQUIREMENTS
+
+Format:
+
+Start with:
+
+"Dear ${greetingName},"
+
+Email must contain:
+
+Warm observation about child (translated, never literal)
+
+Reference to their session type (JR/CREATE/ACADEMY)
+
+Why the recommended program fits
+
+Enrollment invitation
+
+Include EXACT sentence:
+
 "As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days."
+
 Close with:
-"Warmly,
+
+Warmly,
+
 [Center Director Name]
-Code Ninjas ${centerName}"
-Email length limits:
-3 short paragraphs
-160 words max
+
+Code Ninjas ${centerName}
+
+Length:
+
+≤ 3 short paragraphs
+
+≤ 160 words
+
 No emojis
-No corporate or robotic tone
 
-🔥 SECTION 6 — SMS MESSAGES
-Return exactly two SMS options.
-    SMS #1 — Next-Day Emotional Nudge
-    1–2 sentences
-    Human, warm, conversational
-    Use translated observation
-    Mention hands-on activity or game-building
-    Tie to a parent goal
-    Include [ENROLLMENT_LINK]
-    Mention urgency: offer expires "within the next few days" (do NOT say 48 hours)
-    No emojis
-    Example ideas:
-    “They really lit up once they started building their game. Don't forget to enroll: [ENROLLMENT_LINK] (expires in a few days).”
-    “Yesterday showed how quickly they engage when learning feels creative. Save their spot here: [ENROLLMENT_LINK] (offer ends in a few days).”
-SMS #2 — Sent 3 Days After, With 48-Hour Expiration
-Requirements:
-1–2 sentences max
-Reference a positive observation
-Mention code C9J5
-State it expires in 48 hours
+No corporate tone
+
+🔥 SECTION 8 — SMS RULES
+
+SMS #1 — Next Day at 4pm
+
+1–2 sentences
+
+Use one translated observation
+
+Tie to parent goal
+
+Mention hands-on activity
+
 Include [ENROLLMENT_LINK]
-Warm, respectful urgency
-Example ideas:
-“Since you mentioned wanting more confidence/focus/skills for them, I didn’t want you to miss this.”
-“Given how engaged they were during their session, I wanted to remind you the code expires soon.”
 
-🔥 SECTION 7 — OUTPUT FORMAT
-Return your final answer in this exact structure, using these separators:
+Say offer expires "in the next few days" (never say 48 hours)
+
+SMS #2 — 3 Days Later
+
+1–2 sentences
+
+Use one positive observation
+
+Mention code C9J5
+
+Say it expires in 48 hours
+
+Include [ENROLLMENT_LINK]
+
+🔥 SECTION 9 — PRIMARY & BACKUP CLOSING SCRIPTS (AI MUST USE THIS LOGIC INTERNALLY)
+
+PRIMARY SCRIPT (value only — NO discount)
+
+Short, confident, tied to traits, program, and goals.
+
+Examples the AI may use internally:
+
+"Kids grow quickly when they can build real things — this program fits them perfectly."
+
+"They were ready for something more structured and challenging."
+
+"This is exactly the right place for them to build the skills you care about."
+
+BACKUP SCRIPT (value + discount)
+
+Only triggered after hesitation.
+
+Short. Human. Non-pushy.
+
+Examples:
+
+"He's in a great spot to build on what he started today. If it helps, I can waive the $99 enrollment fee today."
+
+"Given how well she connected with the activity, I'd love to make this easier — I can waive the $99 fee."
+
+The AI never mentions these scripts to the parent — only uses them to craft email & SMS tone.
+
+🔥 SECTION 10 — OBJECTION HANDLING (4 TYPES)
+
+These shape tone, not literal content.
+
+1. Talk to Spouse
+
+Respectful
+
+Mention the email will include everything
+
+No pressure
+
+2. Schedule
+
+"We operate like a gym — drop in anytime we're open."
+
+3. Engagement Concern
+
+Use the long-form philosophy internally for tone:
+
+Coding is challenging
+
+Growth happens through frustration
+
+Mentors guide without giving answers
+
+Breakthrough moments spark confidence
+
+Parents & dojo work together
+
+This is an investment, not an extracurricular
+
+Microsoft-based curriculum
+
+Kids advance at their own pace
+
+4. Financial
+
+Keep soft
+
+Focus on value and long-term skills
+
+Do NOT offer additional discounts beyond the code C9J5
+
+🔥 SECTION 11 — DISCOUNT LOGIC
+
+Never mentioned in primary script
+
+Only appears in email sentence + SMS1/SMS2
+
+SMS1: "expires in the next few days"
+
+SMS2: "expires in 48 hours"
+
+🔥 SECTION 12 — FOLLOW-UP TIMING RULES
+
+AI must assume:
+
+Same-day email (4–8pm)
+
+SMS #1 → next day at 4pm
+
+SMS #2 → 3 days later
+
+Do not reference time in messages.
+
+🔥 SECTION 13 — MARKETING SOURCE LOGIC
+
+Use the insight subtly:
+
+Friend → emphasize community
+
+Google → clarity + trust
+
+School → academic alignment
+
+Social Media → curiosity + excitement
+
+Never mention the questionnaire.
+
+🔥 SECTION 14 — OUTPUT FORMAT
+
+Return exactly:
+
 ---EMAIL---
+
 <email content>
+
+ 
+
 ---SMS1---
-<SMS 1 text>
+
+<text>
+
+ 
+
 ---SMS2---
-<SMS 2 text>
+
+<text>
+
+No additional text. No commentary.
 
 DATA CONTEXT:
 - Parent Name: ${greetingName}
 - Child Name: ${childRef}
 - Child Gender: ${gender}
 - Center Location: ${centerName}
-- Persona: ${personaLabel}
 - Recommended Program: ${programDisplay}
 - Program Family: ${apiProgramName}
 - Bundle Type: ${bundleType || "Standard"}
 - Marketing Source: ${marketingSource || "N/A"}
-- Marketing Notes: ${marketingSubsource || "N/A"}
-- Fun Fact Shared: ${funFact || "N/A"}
-- Survey Answers:
+- Survey Answers (use for insights, never reference directly):
 ${(qaSummaryLines || []).map(l => "  - " + l).join("\n")}`;
 
     const raw = await callGemini(prompt);
@@ -2071,6 +2423,143 @@ Code Ninjas ${centerName}`;
     console.log('Web3Forms submission triggered via hidden frame');
   }
 
+  // ---------- MONDAY.COM SUBMIT (No Names) ----------
+  async function submitToMonday(data){
+    if(!MONDAY_ENABLED || window.API_Access === false){ 
+      console.log('Monday.com submission skipped'); 
+      return; 
+    }
+    
+    if(!MONDAY_API_KEY || !MONDAY_BOARD_ID){
+      console.warn('Monday.com credentials not configured');
+      return;
+    }
+    
+    try {
+      // Parse Q&A summary to extract individual answers
+      const parseQA = (qaSummary) => {
+        const parsed = {};
+        qaSummary.forEach(line => {
+          const parts = line.split(' → ');
+          if(parts.length >= 2){
+            const question = parts[0].trim();
+            const answer = parts.slice(1).join(' → ').trim();
+            parsed[question] = answer;
+          }
+        });
+        return parsed;
+      };
+      
+      const qaData = parseQA(data.qaSummary);
+      
+      // Build column values object for Monday.com
+      const columnValues = {};
+      
+      // Basic Info
+      columnValues[MONDAY_COLUMN_MAP['Location']] = data.centerLocation || '';
+      
+      // Date format for Monday.com: JSON object { date: "YYYY-MM-DD" }
+      const dateValue = new Date().toISOString().split('T')[0];
+      columnValues[MONDAY_COLUMN_MAP['Submitted Date']] = { date: dateValue };
+
+      // FIXED: Numeric columns in Monday.com expect a simple string value, NOT an object
+      columnValues[MONDAY_COLUMN_MAP['Number of Children']] = String(data.numChildren || 1);
+      
+      // Program & Persona
+      columnValues[MONDAY_COLUMN_MAP['Recommended Program']] = data.programDisplay || '';
+      columnValues[MONDAY_COLUMN_MAP['Persona']] = data.persona || '';
+      columnValues[MONDAY_COLUMN_MAP['Persona Description']] = data.personaBlurb || '';
+      
+      // Child Demographics (no names)
+      columnValues[MONDAY_COLUMN_MAP['Child Age Group']] = qaData['Age Group'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Child Gender']] = qaData['My child is a...'] || '';
+      
+      // Age-specific answers (5-7)
+      columnValues[MONDAY_COLUMN_MAP['Traits (5-7)']] = qaData['Which of these best describe your child?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Play Preferences (5-7)']] = qaData['What kind of play do they enjoy most?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Persistence (5-7)']] = qaData['When something doesn\'t work right away, they usually…'] || '';
+      
+      // Age-specific answers (8-10)
+      columnValues[MONDAY_COLUMN_MAP['Traits (8-10)']] = qaData['Which traits best describe your child?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Learning Style (8-10)']] = qaData['How does your child learn best?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['School Attitude (8-10)']] = qaData['How do they feel about school and learning?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Re-engagement Method (8-10)']] = qaData['What usually helps them re-engage?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Tech Confidence (8-10)']] = qaData['How confident are they with technology?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Tech Experience (8-10)']] = qaData['What have they tried so far?'] || '';
+      
+      // Age-specific answers (11-13)
+      columnValues[MONDAY_COLUMN_MAP['Traits (11-13)']] = qaData['Which traits best describe your child?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Challenge Response (11-13)']] = qaData['When faced with a challenge, they usually…'] || '';
+      columnValues[MONDAY_COLUMN_MAP['School Attitude (11-13)']] = qaData['How do they feel about school?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Enjoyment Factors (11-13)']] = qaData['What would help them enjoy learning more?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Tech Confidence (11-13)']] = qaData['How comfortable are they with technology?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Leadership Interest (11-13)']] = qaData['Would they enjoy helping others or leading projects?'] || '';
+      
+      // Age-specific answers (14+)
+      columnValues[MONDAY_COLUMN_MAP['Motivation (14+)']] = qaData['What best describes what motivates your teen?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Interests (14+)']] = qaData['Which areas are they most interested in?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Tech Confidence (14+)']] = qaData['How confident are they with technology?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Career Interest (14+)']] = qaData['Are they interested in tech certifications or careers?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Growth Area (14+)']] = qaData['Which growth area is most important this year?'] || '';
+      
+      // Goals & Future
+      columnValues[MONDAY_COLUMN_MAP['Parent Goals']] = qaData['What are you hoping your child gains from Code Ninjas?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['Future Focus']] = qaData['What future skill matters most to you for your child right now?'] || '';
+      columnValues[MONDAY_COLUMN_MAP['AI Interest']] = qaData['AI Interest'] || '';
+      
+      // Marketing
+      columnValues[MONDAY_COLUMN_MAP['Marketing Source']] = data.marketingSource || 'N/A';
+      columnValues[MONDAY_COLUMN_MAP['Marketing Details']] = data.marketingSubsource || '';
+      
+      // Full Summary (email and SMS columns removed as requested)
+      columnValues[MONDAY_COLUMN_MAP['Full Q&A Summary']] = data.qaSummary.join('\n') || '';
+      
+      // Convert to Monday.com format
+      const columnValuesString = JSON.stringify(columnValues);
+      
+      // Create item with anonymous identifier (no names)
+      const itemName = `Lead - ${data.centerLocation} - ${new Date().toLocaleDateString()}`;
+      
+      // Build mutation - escape properly for GraphQL string
+      const escapedItemName = itemName.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+      const escapedColumnValues = columnValuesString.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+      
+      const mutation = `mutation {
+        create_item(
+          board_id: ${MONDAY_BOARD_ID},
+          item_name: "${escapedItemName}",
+          column_values: "${escapedColumnValues}"
+        ) {
+          id
+        }
+      }`;
+      
+      const response = await fetch('https://api.monday.com/v2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': MONDAY_API_KEY
+        },
+        body: JSON.stringify({ query: mutation })
+      });
+      
+      const result = await response.json();
+      
+      if(result.errors){
+        console.error('❌ Monday.com API errors:', result.errors);
+        result.errors.forEach((error, idx) => {
+          console.error(`Error ${idx + 1}:`, error.message || error);
+        });
+      } else if(result.data && result.data.create_item) {
+        console.log('✅ Monday.com submission successful!');
+      } else {
+        console.warn('⚠️ Unexpected Monday.com response:', JSON.stringify(result, null, 2));
+      }
+    } catch(e) {
+      console.error('Monday.com submission error:', e);
+    }
+  }
+
   // Helper to determine Academy bundle type (AI vs Robotics) based on interests
   function determineAcademyBundleType(){
     const interest14 = checkboxLabels('interest14');
@@ -2212,7 +2701,29 @@ Code Ninjas ${centerName}`;
     $('#personaTitle').textContent = `${currentChildName}'s Profile: ${persona}`;
     $('#personaBlurb').textContent = personaBlurb;
 
-    $('#recTitle').textContent = programUI.uiTitle;
+    // Bundle-aware program display - determine types first
+    const apiProgramName = programUI.apiProgram;
+    let finalAcademyType = academyBundleType;
+    if(apiProgramName === 'Code Ninjas Academy'){
+        // Use the determined type, or default to AI
+        finalAcademyType = academyBundleType || 'AI';
+    } else if(apiProgramName === 'Code Ninjas CREATE'){
+      if(bundleType === '1+1_AI') {
+        finalAcademyType = 'AI';
+      } else if(bundleType === '1+1_Robotics') {
+        finalAcademyType = 'Robotics';
+      }
+    }
+
+    // Update program title to include bundle type if applicable
+    let displayTitle = programUI.uiTitle;
+    if(apiProgramName === 'Code Ninjas Academy'){
+        displayTitle = finalAcademyType === 'Robotics' ? 'Recommended Program: CREATE 1+1 Bundle (Robotics)' : 'Recommended Program: CREATE 1+1 Bundle (AI)';
+    } else if(apiProgramName === 'Code Ninjas CREATE' && (bundleType === '1+1_AI' || bundleType === '1+1_Robotics')){
+        displayTitle = bundleType === '1+1_Robotics' ? 'Recommended Program: CREATE 1+1 Bundle (Robotics)' : 'Recommended Program: CREATE 1+1 Bundle (AI)';
+    }
+    
+    $('#recTitle').textContent = displayTitle;
     $('#recBlurb').textContent = programUI.uiBlurb;
     $('#recPoints').innerHTML = programUI.bullets.map(b => `<li>${b}</li>`).join('');
 
@@ -2231,27 +2742,20 @@ Code Ninjas ${centerName}`;
       $('#funFact').classList.add('hidden');
     }
 
-    // Center note
-    $('#centerNote').textContent =
-      `Before you head out today, stop by the front desk at Code Ninjas ${centerLocation} so we can walk you through this path and help you enroll. A summary of your results has been shared with the center.`;
+    // Center note - updated text and styling
+    $('#centerNote').textContent = 'Before you head out today, stop by the front desk so we can walk you through this path and help you enroll.';
+    $('#centerNote').style.fontWeight = 'bold';
+    $('#centerNote').classList.remove('hint'); // Remove hint styling
 
-    // Bundle-aware program display
-    const apiProgramName = programUI.apiProgram;
+    // Bundle-aware program display for email/SMS
     let programDisplay = apiProgramName;
-    
-    // Use the already-determined academyBundleType
-    let finalAcademyType = academyBundleType;
     if(apiProgramName === 'Code Ninjas Academy'){
-        // Use the determined type, or default to AI
-        finalAcademyType = academyBundleType || 'AI';
         programDisplay = finalAcademyType === 'Robotics' ? 'CREATE 1+1 (Robotics) Bundle' : 'CREATE 1+1 (AI) Bundle';
     } else if(apiProgramName === 'Code Ninjas CREATE'){
       if(bundleType === '1+1_AI') {
         programDisplay = 'CREATE 1+1 (AI) Bundle';
-        finalAcademyType = 'AI';
       } else if(bundleType === '1+1_Robotics') {
         programDisplay = 'CREATE 1+1 (Robotics) Bundle';
-        finalAcademyType = 'Robotics';
       } else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
       else if(bundleType === '2x') programDisplay += ' (2x/Week)';
     }
@@ -2323,7 +2827,22 @@ ${smsOptions[0] || ''}
 SMS 2 (Send 3 Days Later):
 ${smsOptions[1] || ''}`;
 
+    // Submit to both Web3Forms (email) and Monday.com (dashboard - no names)
     submitToWeb3Forms(message);
+    
+    // Submit to Monday.com (anonymous data only, runs in parallel)
+    submitToMonday({
+      centerLocation: centerLocation,
+      numChildren: numChildren,
+      programDisplay: programDisplay,
+      persona: persona,
+      personaBlurb: personaBlurb,
+      qaSummary: qaSummary,
+      emailBody: emailBody,
+      smsOptions: smsOptions,
+      marketingSource: marketingSource || 'N/A',
+      marketingSubsource: marketingSubsource || ''
+    });
 
     // Show result to parent after Gemini & submit complete
     stopLoading();
