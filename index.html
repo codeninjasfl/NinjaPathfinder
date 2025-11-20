@@ -1104,12 +1104,20 @@ When explaining the fit, mention that this bundle gives them the best of both wo
         // Even if they hit the Academy logic, we sell it as a 1+1 Bundle or 1+1+1 Bundle primarily
         programInstruction = `
 🔥 PROGRAM INSTRUCTION:
-The system recommended "Code Ninjas Academy" based on age/advanced skills.
-HOWEVER, you must position this as the "CREATE 1+1 Bundle" (CREATE + Academy).
-Explain that they get the best of both worlds:
-1) "Code Ninjas CREATE" for their core coding belt progression.
-2) "Academy" for the advanced, project-based skills (AI, Robotics, etc.) they are ready for.
+The system recommended "CREATE 1+1 Bundle" (because they are Academy-ready).
+You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
+This bundle combines "Code Ninjas CREATE" (their core belt progression) with an "Academy" of their choice (AI or Robotics).
+When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + specialized advanced projects.
 Do NOT offer Academy as a standalone option. It is a bundle.
+`;
+    } else if(bundleType === '1+1_Academy'){
+        // This handles the case where buildProgramUI explicitly set bundleType='1+1_Academy'
+        programInstruction = `
+🔥 PROGRAM INSTRUCTION:
+The recommended program is the "CREATE 1+1 Bundle".
+You must refer to it specifically as "CREATE 1+1 Bundle" in both the Email and SMS.
+This bundle combines "Code Ninjas CREATE" (their core belt progression) with an "Academy" of their choice (AI or Robotics).
+When explaining the fit, mention that this bundle gives them the best of both worlds: steady coding progress + specialized advanced projects.
 `;
     } else if(bundleType === '1+1_AI'){
        programInstruction = `
@@ -1850,15 +1858,14 @@ Code Ninjas ${centerName}`;
 
     if(key === 'ACADEMY'){
       return {
-        uiTitle: 'Recommended Program: Code Ninjas Academy',
-        uiBlurb: 'A deeper track for motivated teens ready for real-world coding, AI, and engineering projects that look great on future applications.',
+        uiTitle: 'Recommended Program: CREATE 1+1 Bundle',
+        uiBlurb: 'A deeper track for motivated ninjas ready for real-world coding + AI or Engineering projects. Combines Code Ninjas CREATE (core coding) with an Academy of their choice.',
         bullets: [
-          'Project-based learning in coding, AI, and tech',
-          'Portfolio-style outcomes for schools & careers',
+          'Project-based learning in coding, AI, or robotics',
+          'Core belt progression + specialized Academy track',
           'A community of like-minded, driven Ninjas'
         ],
         stats: [
-          ['14+', 'Typical ages'],
           ['Advanced', 'Challenge level'],
           ['2–3 hrs / week', 'Recommended time'],
           ['Real projects', 'Portfolio-ready'],
@@ -1866,7 +1873,7 @@ Code Ninjas ${centerName}`;
           ['Future-focused', 'College & career skills']
         ],
         apiProgram: 'Code Ninjas Academy',
-        bundleType: null
+        bundleType: '1+1_Academy' // Mark as generic bundle for AI prompt
       };
     }
 
@@ -2177,7 +2184,7 @@ Code Ninjas ${centerName}`;
       checkboxLabels('play5').join(' '), checkboxLabels('tried8').join(' '), radioLabel('futurefocus'), radioLabel('ai')
     ].filter(Boolean));
     const funFact = funFactText(baseKey, signals, bundleType); 
-
+    
     if(funFact){
       $('#funFactText').textContent = funFact;
       $('#funFact').classList.remove('hidden');
@@ -2197,6 +2204,10 @@ Code Ninjas ${centerName}`;
       else if(bundleType === '1+1_Robotics') programDisplay += ' (1+1 Bundle: CREATE + Robotics Academy)';
       else if(bundleType === '1+1+1') programDisplay += ' (1+1+1 Bundle: Coding + Academies + Clubs)';
       else if(bundleType === '2x') programDisplay += ' (2x/Week)';
+    } else if(apiProgramName === 'Code Ninjas Academy'){
+        // FORCE DISPLAY NAME TO BUNDLE FOR ACADEMY PATH
+        // This ensures the internal context and AI prompt both see "CREATE 1+1 Bundle"
+        programDisplay = 'CREATE 1+1 Bundle';
     }
 
     // Build Q&A summary once
