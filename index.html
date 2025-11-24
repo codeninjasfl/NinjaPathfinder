@@ -767,8 +767,9 @@
             });
 
             // ---------- GEMINI CONFIG (Pathfinder) ----------
-            // Project ID: projects/696895610424
-            const GEMINI_API_KEY = "AIzaSyCyqSbjl5V5CgeBVuUePML09cySGGNHS5U";
+            // API key is now stored securely on the backend
+            // Configure your backend endpoint URL here:
+            const BACKEND_API_URL = "/api/gemini-proxy"; // Change this to your deployed backend URL
             const GEMINI_MODEL_CANDIDATES = [
                 "gemini-2.5-flash",
                 "gemini-2.0-flash",
@@ -822,47 +823,42 @@
             };
 
             async function callGemini(promptText) {
-                if (!GEMINI_API_KEY) {
-                    console.warn("Gemini API key is missing.");
+                if (!BACKEND_API_URL) {
+                    console.error("Backend API URL is not configured.");
                     return null;
                 }
 
-                for (const model of GEMINI_MODEL_CANDIDATES) {
-                    try {
-                        const res = await fetch(
-                            "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + encodeURIComponent(GEMINI_API_KEY),
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    contents: [
-                                        {
-                                            role: "user",
-                                            parts: [{ text: promptText }]
-                                        }
-                                    ]
-                                })
-                            }
-                        );
+                try {
+                    const res = await fetch(BACKEND_API_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            prompt: promptText,
+                            models: GEMINI_MODEL_CANDIDATES
+                        })
+                    });
 
-                        if (!res.ok) {
-                            // silently continue to next model
-                            continue;
-                        }
-
-                        const data = await res.json();
-                        const parts = data?.candidates?.[0]?.content?.parts || [];
-                        const text = parts.map(p => p.text || "").join("").trim();
-                        if (text) {
-                            return text;
-                        }
-                    } catch (e) {
-                        console.warn("Gemini request failed for model", model, e);
+                    if (!res.ok) {
+                        const errorText = await res.text();
+                        console.error("Backend API error:", res.status, errorText);
+                        return null;
                     }
+
+                    const data = await res.json();
+
+                    // Backend should return { success: true, text: "..." } or { success: false, error: "..." }
+                    if (data.success && data.text) {
+                        return data.text;
+                    } else {
+                        console.error("Backend returned error:", data.error || "Unknown error");
+                        return null;
+                    }
+                } catch (e) {
+                    console.error("Failed to call backend API:", e);
+                    return null;
                 }
-                return null;
             }
 
             // Parse EMAIL + 3 SMS options from Gemini
@@ -970,14 +966,13 @@ ${programInstruction}
 A parent has just completed an in-center game-building visit and filled out the Pathfinder questionnaire.
 You must generate ALL of the following in one response:
 ---CD_TOOLS---
-(A) Insight Summary
-(B) Primary Closing Script
-(C) Backup Closing Script
-(D) Objection Handling
-(E) Tone Instruction
-(F) Sales Tips for This Family
-(I) Follow-Up Timing Rules
-(J) Offer Logic Reminder
+(A) Primary Closing Script
+(B) Backup Closing Script
+(C) Tone Instruction
+(D) Sales Tips for This Family
+(E) Post-Sale Retention Speech
+(F) Follow-Up Timing Rules
+(G) Offer Logic Reminder
  
 ---EMAIL---
 (parent email)
@@ -1117,173 +1112,125 @@ Use:
 * “real-world relevance,”
 * “consistent growth.”
 
-🔥 SECTION 7 — SCRIPT SELECTION ENGINE
-Use the following mapping to choose one Primary Script and one Backup Script.
+🔥 SECTION 7 — SCRIPT SELECTION ENGINE
+Use the following mapping to choose one Primary Script and one Backup Script.
 You must choose based on a combination of:
-✔ Parent Goal
-✔ Age Path
-✔ Child Traits
-✔ Level of engagement during session
-✔ Future Skills Weighting
-✔ AI Importance
-✔ Program Recommended
-NEVER choose scripts randomly.ALWAYS use this mapping.
+✔ Parent Goal
+✔ Age Path
+✔ Child Traits
+✔ Future Skills Weighting
+✔ AI Importance
+✔ Program Recommended
+NEVER choose scripts randomly. ALWAYS use this mapping.
+CRITICAL: Primary scripts must ONLY reference questionnaire answers. NEVER reference specific events from the session or dojo.
 
-⭐ PRIMARY CLOSING SCRIPTS (VALUE-ONLY) — 20 TOTAL
+⭐ PRIMARY CLOSING SCRIPTS (VALUE-ONLY) — 20 TOTAL
 Choose based on mapping below. Rewrite slightly to match tone and specificity of child.
 
-1. Confidence (JR + CREATE)
-“Kids grow fast when they get to build something real. This program gives them constant small wins that build confidence step by step.”
-2. Confidence (all ages)
-“They already showed they can focus and push through challenges — this is the perfect environment for that to grow.”
-3. Creativity (JR + CREATE)
-“They light up when they get to make things their own — this program gives them endless room to create.”
-4. Creativity (all ages)
-“They love putting their own spin on things. They’ll thrive in a place where creativity drives learning.”
-5. Future Skills (CREATE + ACADEMY)
-“You mentioned wanting future-ready skills — this program gives them the foundation that will matter for everything ahead.”
-6. Future Skills + AI (strong AI importance)
-“This is where kids learn the skills the world is already shifting toward — in a way that feels exciting, not overwhelming.”
-7. Focus / Discipline
-“They stayed focused once they had something meaningful to build. This path gives them the structured challenge they respond to.”
-8. Academic Advantage
-“Coding strengthens problem-solving and memory — exactly what boosts performance in school and beyond.”
-9. Social / Belonging
-“They opened up beautifully once they felt comfortable — they’ll find peers here who love building the same way they do.”
-10. Leadership
-“They’re already showing signs of leadership — this program channels that into real responsibility and ownership.”
-11. Analytical / Intellectual
-“They think deeply and love making sense of things. This program gives them the kind of meaningful challenges they crave.”
-12. Engagement + Momentum
-“You saw how quickly they locked in — this is where we can build on that momentum and turn it into long-term growth.”
-13. Advanced Tech Comfort
-“They’re ready for something with real depth — this gives them tools that match what they’re capable of.”
-14. Teen Career Interest
-“This is the path that turns curiosity into actual skills they can use in high school and future careers.”
-15. JR – Early Exploration
-“At this age, the biggest growth comes from hands-on building. This is the perfect starting point.”
-16. JR – Structure with Fun
-“They need a little structure with room to explore — JR gives exactly that balance.”
-17. CREATE – Belt Progression
-“One of the best things here is the belt system — steady progress, real accomplishment, visible growth.”
-18. CREATE – Engagement
-“They came alive when they realized they could control what happened on screen — that’s where real learning starts.”
-19. ACADEMY – Responsibility
-“They’re ready for bigger projects and more independence — this program gives them that space to grow.”
-20. ACADEMY – Real-World Skills
-“This path helps teens build projects that actually mean something — perfect for where they’re headed.”
+1. Confidence Builder
+“They already showed they can push through challenges — this is the kind of environment where that confidence grows fast.”
+2. Small Wins Path
+“You saw how proud they were when something worked — this program gives them those kinds of wins every week.”
+3. Creative Momentum
+“They light up when they get to make something their own — this path really fuels that creativity.”
+4. Deep Thinker Fit
+“They love understanding how things work — this gives them meaningful problems to solve, not busywork.”
+5. Focus & Structure
+“Once they had a clear goal, they locked in — this program gives them that structure every time they come.”
+6. Future-Skills Path
+“These skills are becoming foundational — this is the perfect place to begin building them now.”
+7. Academic Advantage
+“This strengthens the exact thinking skills that help in school — problem-solving, logic, and persistence.”
+8. Resilient Learner
+“They didn’t quit when things got tricky — here, that resilience becomes one of their superpowers.”
+9. JR – Early Builder
+“They love hands-on building — JR gives them the perfect mix of structure and play to grow.”
+10. JR – Young Explorer
+“At this age, learning through discovery is everything — JR gives them that space in a guided way.”
+11. CREATE – Game Maker Identity
+“They connected so fast with game-building — CREATE turns that curiosity into real skills.”
+12. CREATE – Challenge Response
+“When the challenge went up, their engagement went up — CREATE gives them exactly that level of challenge.”
+13. CREATE – Belt Progress Track
+“They’ll thrive with the steady progress and accomplishment built into the CREATE belt path.”
+14. ACADEMY – Ownership & Independence
+“They’re ready for something with more responsibility — ACADEMY gives them room to own real projects.”
+15. ACADEMY – Future-Focused
+“They’re thinking about the future already — ACADEMY gives them skills they can actually use.”
+16. Social Growth
+“They opened up really nicely in this space — they’ll find peers here who learn the same way.”
+17. Leadership Path
+“They naturally step into leadership moments — this program helps develop that in a structured way.”
+18. Highly Analytical Fit
+“They think three steps ahead — this path challenges them in exactly the right way.”
+19. Creative Problem Solver
+“They’re most alive when solving problems creatively — this program leans into that strength.”
+20. Momentum Builder
+“You saw how quickly they found their rhythm — this is where they can build real momentum.”
 
-⭐ BACKUP CLOSING SCRIPTS (VALUE + DISCOUNT) — 20 TOTAL
-Used ONLY after hesitation.Must feel warm, helpful, and never pushy.
+⭐ BACKUP CLOSING SCRIPTS (VALUE + DISCOUNT) — 20 TOTAL
+Used ONLY after hesitation. Must feel warm, helpful, and never pushy.
 (Always include the $99 waiver as needed.)
 
-1. Confidence
-“I want to support what you’re building for them. If it helps, I can waive the $99 enrollment fee today.”
-2. Creativity
-“They clearly loved creating — I’d love to get them started. I can waive the $99 fee if that makes it easier.”
-3. Future Skills
-“These skills truly matter long-term. If it helps your decision, I can take care of the $99 enrollment fee today.”
-4. AI / Robotics Interest
-“They’re ready for deeper skills — and I’d love to help you get moving. I can waive the $99 fee today.”
-5. Focus / Discipline
-“They really engaged once they had structure. If it helps, I can waive the $99 enrollment fee.”
-6. Academic Advantage
-“This directly supports what they’re doing in school. I can remove the $99 fee to help you start today.”
-7. Social / Belonging
-“They opened up so well here. If it helps, I’m happy to waive the $99 enrollment fee today.”
-8. Leadership
-“They’re ready for more responsibility — and I’d love to help you move forward. I can waive the fee.”
-9. Analytical / Intellectual
-“They love meaningful challenge — and I’d love to make this easy. I can waive the $99 fee.”
-10. Engagement
-“You saw how engaged they were. If you want to keep that momentum alive, I can waive the $99 fee.”
-11. JR – Excitement
-“They had such a good time — if it helps, I can waive the $99 fee today.”
-12. JR – Confidence
-“We can build on that joy right now — I’m happy to remove the enrollment fee.”
-13. CREATE – Belt Progression
-“They’re ready to start earning belts — I can waive the fee to help you get started.”
-14. CREATE – Game Building
-“They really connected with game-building. I can waive the fee if that helps.”
-15. ACADEMY – Career Growth
-“These skills matter. I can remove the fee today to make it easier.”
-16. ACADEMY – Independence
-“They’re ready for bigger challenges — I can waive the fee to help them begin.”
-17. Momentum
-“You saw the spark — and I’d love to keep it going. I can take care of the fee.”
-18. Strong Engagement
-“They were totally locked in. If you’d like to continue that progress, I’ll waive the fee.”
-19. Parent Not Sure
-“I get it — it’s a big step. If it helps you feel good about getting started, I can waive the fee.”
-20. Hesitation / Unclear
-“Totally understandable. If it helps the decision, I can remove the enrollment fee today.”
+1. Confidence Boost
+“If it helps, I can waive the $99 enrollment fee today — I really think they’ll thrive here.”
+2. Creative Spark
+“They clearly loved creating — I can waive the $99 fee to help you get them started.”
+3. Future-Skills Support
+“These skills matter long-term — if it helps, I can remove the $99 fee today.”
+4. AI + Robotics Motivator
+“They’re ready for deeper tech — I’m happy to waive the $99 fee if you want to move forward.”
+5. Focus & Structure
+“They respond so well to structured challenge — I can waive the fee if that helps your decision.”
+6. Academic Alignment
+“This strengthens how they think — I can waive the $99 fee to make it easier to start.”
+7. Social Confidence
+“They really opened up here — I can remove the fee if that helps you.”
+8. Leadership Path
+“They’re ready for more responsibility — I can waive the enrollment fee today.”
+9. Analytical Fit
+“They love meaningful challenge — I’m happy to waive the $99 fee if you’d like to begin.”
+10. Engagement Momentum
+“They were so engaged — I can waive the fee if you want to build on that.”
+11. JR – Early Builder
+“They had such a good time — I can waive the $99 fee to help you start today.”
+12. JR – Young Explorer
+“We can build on that excitement — I can remove the enrollment fee.”
+13. CREATE – Ready for Belts
+“They’re ready to start earning belts — I can waive the fee to help you get going.”
+14. CREATE – Game Builder
+“They connected with game-building — I can waive the fee if it helps.”
+15. ACADEMY – Future Skills
+“These skills matter — happy to remove the fee today.”
+16. ACADEMY – Independence Ready
+“They’re ready for bigger projects — I can waive the fee.”
+17. Momentum Support
+“You saw the spark — I can help by removing the fee.”
+18. Engagement Proof
+“They were fully locked in — I can waive the $99 fee.”
+19. Parent Uncertain
+“I understand — and if it helps, I’m happy to waive the fee.”
+20. Mild Hesitation
+“I get it — if it makes the decision easier, I can remove the enrollment fee today.”
 
-🔥 SECTION 8 — OBJECTION HANDLING ENGINE
-You must generate objection guidance for the CD inside the CD Tools section.
-Objection handling must follow these rules:
-* Never sound scripted.
-* Never pressure the parent.
-* Never argue.
-* Always affirm + redirect toward value.
-* Engagement Concern must be EXACTLY ONE sentence.
-* Post-sale retention philosophy must be EXACTLY ONE sentence.
-Generate responses in a natural, human tone. Keep ALL objections to EXACTLY 1 sentence max.
+🔥 SECTION 8 — POST-SALE RETENTION SPEECH
+This speech must appear in the CD Tools section so CDs know to say it only AFTER the parent hands over the credit card.
+This MUST be the EXACT following text. Do not summarize. Do not shorten.
+“Before you go, I want to share something important that helps every Ninja succeed here. What your Ninja is going to learn — coding, robotics, AI — these are some of the most important skills they’ll ever develop. But they’re also challenging. And that’s a good thing. No skill worth having is easy. There will be moments where the code doesn’t work, or the robot won’t do what you expected. That’s normal. That’s part of the process. And sometimes, your Ninja might feel frustrated or want to quit — every kid hits those moments. When that happens, we don’t fix it for them. We guide them through it. Because that’s what builds real confidence — the kind that lasts. What we’ve learned over the years is that these ‘stuck moments’ are where the biggest growth happens. Kids who learn to push through those moments become incredible problem-solvers — in school, in life, and eventually in their careers. So here’s where we need your help: when those tough days come — and they will — just remember this: you didn’t sign up for an extracurricular activity. You made an investment in your child’s future. And the best thing you can do is encourage them to stick with it. And we’ll be right here with them, guiding them every step of the way. If you help them show up consistently, we’ll help them grow into thinkers, builders, and leaders. That’s the journey you just signed up for.”
 
-⭐ 1. SPOUSE / PARTNER DECISION
-Use when parent expresses need to “talk to spouse” or “decide together.”
-Structure:
-* Validate
-* Support
-* Reduce pressure
-* Anchor future-skills value
-Example style (AI to generate variations based on answers):
-* “I completely understand — it’s a decision families usually make together. I’ll send everything in one clean email so it’s easy to review with them. The nice thing is this path focuses on the skills you said matter most for their future, so you’ll both have everything you need to talk it through.”
-
-⭐ 2. SCHEDULE WORRIES
-Parents often assume a rigid schedule.Reassure + simplify.
-Example style:
-* “Totally understandable — every family’s schedule is unique. The good news is our program works like a gym: you can drop in anytime we’re open, and they’ll get full credit for their time. It stays flexible while still giving them structure and momentum.”
-
-⭐ 3. FINANCIAL HESITATION
-Focus on long-term value.Never shame.Gentle confidence.
-Example style:
-* “I hear you — it’s an important investment. Most families choose this path because it builds skills that matter far beyond the weekly class. It strengthens problem-solving, persistence, and future-ready abilities that last for years. I want you to feel good about any step you take.”
-
-⭐ 4. ENGAGEMENT CONCERN
-This must be short (1 sentence).
-This must incorporate the philosophy you described:
-* coding is hard
-* frustration is part of the learning arc
-* mentors guide but don’t give answers
-* breakthroughs build confidence
-* parents + dojo work together
-* this is an investment, not an extracurricular
-* kids advance at their own pace
-* Microsoft curriculum
-* long-term value
-Use a warm, confidence-building tone.
-Example style (AI will adapt to child traits + parent goals):
-“Totally valid question — and honestly, it’s something every parent wonders at some point. Coding is one of the only activities where kids learn that frustration is part of the process. The code doesn’t care how they feel — it either works or it doesn’t — and pushing through that is where the real growth happens. Our mentors guide them, but they don’t give answers, because that breakthrough moment belongs to the child. And it’s those breakthroughs that build confidence, resilience, and independence. This isn’t like another after-school activity — it’s an investment in how they think and solve problems for the rest of their lives. And because our curriculum was built with Microsoft and kids advance at their own pace, every Ninja gets challenged at the level that keeps them growing. We’ll partner with you the entire way.”
-
-🔥 SECTION 9 — POST-SALE RETENTION SPEECH
-This speech must appear in the CD Tools section so CDs know to say it only AFTER the parent hands over the credit card IF the engagement objection was not previously raised.
-Tone = Warm Mentor + Future-Focused + Honest.
-Example style (AI adapts to parent goals):
-“Before you go, I want to share something we see all the time. These skills are not easy — and that’s why they’re so valuable. There will be moments where they get stuck or frustrated. When that happens, don’t panic — it means they’re learning real problem-solving. Our mentors will guide them, but they won’t give them the answer, because the moment they make it work is what builds resilience, confidence, and real independence. When those dips happen, just remember: this is an investment in their future, not just another activity. Stick with us, and you’ll see incredible growth.”
-
-🔥 SECTION 10 — SALES TIP ENGINE
-Generate 2–3 tailored sales tips inside the CD Tools section.
+🔥 SECTION 9 — SALES TIP ENGINE
+Generate 2–3 tailored sales tips inside the CD Tools section.
 They must be:
 * highly specific to the child
 * emotionally aligned with the parent’s deepest goals
 * easy for a CD to remember
 * persuasive but natural
 * tied to future-skills, confidence, or the child's behavior in the session
-Examples of styles (AI must generate based on data):
+Examples of styles:
 * “Emphasize that they learn best through hands-on building — CREATE is perfect for that.”
 * “Highlight how they stayed engaged once challenged — parent cares about focus and consistency.”
 * “Reinforce future-skills language; parent is thinking long-term.”
-* “Mention steady progress and belt milestones — this family wants structure.”
+* “Mention belt progression — this family wants structure.”
 
 🔥 SECTION 11 — MARKETING SOURCE INFLUENCE
 Use the marketing question to subtly shape your persuasion angle.
@@ -1317,50 +1264,6 @@ Mention “expires in 48 hours.”
 Backup Script
 May include: “I can waive the $99 enrollment fee today if it helps you decide.”
 NEVER mention multiple different discounts.NEVER offer more than one code.NEVER imply price changes.
-
-🔥 SECTION 14 — CD TOOLS ASSEMBLY RULE
-At the top of every AI response, the system must output:
----CD_TOOLS---
-A. Insight Summary
-B. Primary Closing Script
-C. Backup Closing Script
-D. Objection Handling
-E. Tone Instruction
-F. Sales Tips
-I. Follow-Up Timing Rules
-J. Offer Logic Reminder
-CONTENT RULES:
-A. Insight Summary (1 sentence) MUST include:
-* 1–2 translated child observations
-* session type
-* emotional reading of the child
-* parent’s top priority
-* why the recommended program fits emotionally
-B. Primary Script
-Choose one from the 20, based on mapping.
-C. Backup Script
-Choose one from the 20, based on mapping.
-D. Objection Handling
-Provide:
-* spouse (mid-length)
-* schedule (mid-length)
-* financial (mid-length)
-* engagement (1 sentence)
-* post-sale retention philosophy (1 sentence)
-E. Tone Instruction
-Choose from:
-* Soft/Nurturing
-* High-Conversion/Confident
-* Warm Mentor
-* Calm Guide
-F. Sales Tips
-Generate 2–3 custom bullets.
-I. Follow-Up Timing Rules
-Place bullet-format rules.
-J. Offer Logic Reminder
-Two bullets:
-* “Never lead with the discount; offer only after hesitation.”
-* “Use code C9J5 consistently with timing rules.”
 
 🔥 SECTION 15 — PARENT EMAIL RULES
 After the CD Tools section, generate a parent-facing email.
@@ -1444,27 +1347,41 @@ Content Requirements
 Example style:
 “Since you mentioned wanting stronger future-ready skills for them, I didn’t want you to miss this — code C9J5 expires in 48 hours. You can enroll here: [ENROLLMENT_LINK].”
 
-🔥 SECTION 18 — FINAL OUTPUT FORMAT (MANDATORY)
-Your final output must follow this EXACT layout, in this exact order:
+🔥 SECTION 16 — FINAL OUTPUT FORMAT
+Final output must look like this:
+
 ---CD_TOOLS---
-A. Insight Summary
-B. Primary Closing Script
-C. Backup Closing Script
-D. Objection Handling
-E. Tone Instruction
-F. Sales Tips for This Family
-I. Follow-Up Timing Rules
-J. Offer Logic Reminder
- 
+
+A. Primary Closing Script
+
+B. Backup Closing Script
+
+C. Tone Instruction
+
+D. Sales Tips for This Family
+
+E. Post-Sale Retention Speech
+
+F. Follow-Up Timing Rules
+
+G. Offer Logic Reminder
+
 ---EMAIL---
+
 <email content>
- 
+
 ---SMS1---
+
 <sms1 content>
- 
+
 ---SMS2---
+
 <sms2 content>
-No extra text.No explanations.No markdown.No commentary.
+
+Nothing above or below.
+No commentary.
+No explanations.
+No markdown headings.No commentary.
 Only the final formatted output.
 
 🔥 SECTION 19 — ABSOLUTE RULES
@@ -2636,15 +2553,15 @@ Code Ninjas ${centerName}`;
 Submitted: ${timestamp}
 ${childLine}
 --------------------
-INTERNAL SALES GUIDANCE (CD TOOLS):
-${cdTools}
-
---------------------
 Internal Notes:
 Persona Label: ${persona}
 Recommended Program: ${programDisplay}
 Marketing Source: ${marketingSource || 'N/A'}
 ${marketingSubsource || 'N/A'}
+
+--------------------
+INTERNAL SALES GUIDANCE (CD TOOLS):
+${cdTools}
 
 --------------------
 AI-Generated Parent Email:
