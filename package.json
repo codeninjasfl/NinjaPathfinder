@@ -1,0 +1,19 @@
+{
+    "name": "code-ninjas-pathfinder-backend",
+    "version": "1.0.0",
+    "description": "Backend API proxy for Code Ninjas Pathfinder application",
+    "main": "api/gemini-proxy.js",
+    "scripts": {
+        "deploy": "vercel --prod"
+    },
+    "dependencies": {
+        "dotenv": "^16.0.3",
+        "@supabase/supabase-js": "^2.39.0"
+    },
+    "devDependencies": {
+        "vercel": "^33.0.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
