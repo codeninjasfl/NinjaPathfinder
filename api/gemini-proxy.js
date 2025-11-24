@@ -32,13 +32,29 @@ export default async function handler(req, res) {
         if (!process.env.SUPABASE_URL) console.error("Missing SUPABASE_URL");
         if (!process.env.SUPABASE_SERVICE_KEY) console.error("Missing SUPABASE_SERVICE_KEY");
 
-        // Fetch API key from Supabase
+        if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+            return res.status(500).json({
+                success: false,
+                error: 'Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_SERVICE_KEY environment variables.'
+            });
+        }
+
+        // Fetch API key from Supabase with timeout
         console.log("Connecting to Supabase...");
-        const { data, error } = await supabase
+
+        const supabasePromise = supabase
             .from('api_keys')
             .select('api_key')
             .eq('service_name', 'gemini')
             .single();
+
+        // Add 5 second timeout for Supabase query
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Supabase query timeout')), 5000)
+        );
+
+        const { data, error } = await Promise.race([supabasePromise, timeoutPromise])
+            .catch(err => ({ data: null, error: err }));
 
         if (error) {
             console.error('Supabase error:', error);
