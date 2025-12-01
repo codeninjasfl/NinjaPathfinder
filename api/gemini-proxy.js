@@ -32,6 +32,11 @@ export default async function handler(req, res) {
         if (!process.env.SUPABASE_URL) console.error("Missing SUPABASE_URL");
         if (!process.env.SUPABASE_SERVICE_KEY) console.error("Missing SUPABASE_SERVICE_KEY");
 
+        // DEBUG: Log request details
+        console.log("Request Headers:", JSON.stringify(req.headers));
+        console.log("Request Body Type:", typeof req.body);
+        console.log("Request Body:", JSON.stringify(req.body).substring(0, 500)); // Log first 500 chars
+
         if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
             return res.status(500).json({
                 success: false,

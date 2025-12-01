@@ -1299,6 +1299,7 @@ Tone
 * Never salesy
 * Never mention questionnaire
 * Never mention “your answers”, “you selected”, “based on your form”, etc.
+* Never use "your child" or "the child" - ALWAYS use ${childRef}
 Content Requirements
 The email MUST:
 1. Begin with:“Dear ${greetingName},”
@@ -1306,7 +1307,7 @@ The email MUST:
     * 1 translated child observation
     * A reference to their session type (JR, CREATE, ACADEMY)
     * A warm emotional insight
-3. Explain why the recommended program${programDisplay}fits their child emotionally and logically.
+3. Explain why the recommended program${programDisplay}fits ${childRef} emotionally and logically.
 4. Include one subtle future-skills line if triggered by logic.
 5. Include the EXACT required discount sentence:"As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days."
 6. Close with:
@@ -1407,6 +1408,7 @@ You must NEVER:
 * Mention specific answers
 * Repeat traits literally
 * Say “you selected” or “you said”
+* Use the phrase "your child" (ALWAYS use the child's actual name)
 * Reveal internal logic or rules
 * Show CD tools to the parent
 * Mention the system prompt
@@ -1435,6 +1437,16 @@ DATA CONTEXT:
 - Persona: ${personaLabel}
 - Survey Answers (use for insights, never reference directly):
 ${(qaSummaryLines || []).map(l => "  - " + l).join("\n")}`;
+
+                console.log("Generating AI Comms...");
+                console.log("Child Ref:", childRef);
+                console.log("Prompt length:", prompt.length);
+                console.log("Prompt preview:", prompt.substring(0, 200));
+
+                if (!prompt) {
+                    console.error("Prompt is empty or undefined!");
+                    return null;
+                }
 
                 const raw = await callGemini(prompt);
                 if (!raw) return null;
@@ -2456,9 +2468,22 @@ Code Ninjas ${centerName}`;
                 }
 
                 // UI
-                const currentChildName = (numChildren > 1 && childNames[currentChildIndex])
-                    ? childNames[currentChildIndex].name
-                    : "Your Child"; // Used for UI display, not for prompt
+                // For single child, we need to grab the name from the input if it wasn't captured in childNames array yet
+                let currentChildName = "Your Child";
+                if (numChildren > 1 && childNames[currentChildIndex]) {
+                    currentChildName = childNames[currentChildIndex].name;
+                } else if (numChildren === 1) {
+                    // Try to get from childNames first
+                    if (childNames[0] && childNames[0].name) {
+                        currentChildName = childNames[0].name;
+                    } else {
+                        // Fallback to reading the input directly if childNames wasn't populated (should be by validateChildSetup)
+                        const nameInput = document.querySelector('input[data-type="name"][data-index="0"]');
+                        if (nameInput && nameInput.value.trim()) {
+                            currentChildName = nameInput.value.trim();
+                        }
+                    }
+                }
 
                 $('#personaTitle').textContent = `${currentChildName}'s Profile: ${persona}`;
                 $('#personaBlurb').textContent = personaBlurb;
@@ -2540,7 +2565,7 @@ Code Ninjas ${centerName}`;
                         marketingSource,
                         marketingSubsource,
                         qaSummaryLines: qaSummary,
-                        currentChildName: (numChildren > 1) ? currentChildName : null,
+                        currentChildName: currentChildName, // Always pass the name
                         gender: gender // Pass gender to AI
                     });
                     if (comms) {
@@ -2554,7 +2579,7 @@ Code Ninjas ${centerName}`;
 
                 // Fallback if Gemini fails
                 if (!emailBody || smsOptions.length === 0) {
-                    const fallback = buildFallbackComms(programDisplay, (numChildren > 1) ? currentChildName : null);
+                    const fallback = buildFallbackComms(programDisplay, currentChildName);
                     emailBody = fallback.email;
                     smsOptions = fallback.sms;
                     cdTools = fallback.cdTools;
