@@ -904,8 +904,8 @@ When explaining the fit, mention that this bundle gives them the best of both wo
 
                 // Construct pronoun hint based on gender
                 let pronounHint = "";
-                if (gender === 'Boy') pronounHint = `IMPORTANT: The child is a Boy. Use he/him/his pronouns when referring to ${childRef}.`;
-                else if (gender === 'Girl') pronounHint = `IMPORTANT: The child is a Girl. Use she/her/her pronouns when referring to ${childRef}.`;
+                if (gender === 'Boy') pronounHint = `IMPORTANT: The child is a Boy. Use he/him/his pronouns when referring to ${childRef} after the first mention. Do NOT overuse the name.`;
+                else if (gender === 'Girl') pronounHint = `IMPORTANT: The child is a Girl. Use she/her/her pronouns when referring to ${childRef} after the first mention. Do NOT overuse the name.`;
                 else pronounHint = `Use they/them pronouns or the child's name when referring to ${childRef}.`;
 
                 // BUNDLE / ACADEMY INSTRUCTIONS
@@ -1301,9 +1301,9 @@ Tone
 * Never salesy
 * Never mention questionnaire
 * Never mention “your answers”, “you selected”, “based on your form”, etc.
-* Never use "your child" or "the child" - ALWAYS use ${childRef}
+* Never use "your child" or "the child" - ALWAYS use ${childRef} or appropriate pronouns (he/she/they).
 Content Requirements
-REMINDER: Use "${childRef}" (the child's actual name) in every reference. Never write "your child".
+REMINDER: Use "${childRef}" (the child's actual name) in the first reference, then switch to pronouns (he/she/they) to avoid repetition. Never write "your child".
 The email MUST:
 1. Begin with:“Dear ${greetingName},”
 2. Start the first paragraph with:
@@ -1339,7 +1339,7 @@ Tone
 * Not overly excited
 * No emojis
 * No pressure
-REMINDER: Use "${childRef}" (the child's actual name), not "your child".
+REMINDER: Use "${childRef}" (the child's actual name) once, then use pronouns. Do not use "your child".
 Content Requirements
 * 1 translated observation
 * 1 reference to activity (“game-building”, “their session yesterday”)
