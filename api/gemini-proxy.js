@@ -1,12 +1,5 @@
-// Backend API Proxy for Gemini API (Supabase Version)
-// This endpoint securely retrieves the API key from Supabase and calls Gemini
-
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-);
+// Backend API Proxy for Gemini API (Environment Variable Version)
+// This endpoint reads the API key from environment variables and calls Gemini
 
 export default async function handler(req, res) {
     console.log("API Handler started");
@@ -28,51 +21,23 @@ export default async function handler(req, res) {
     }
 
     try {
-        console.log("Checking environment variables...");
-        if (!process.env.SUPABASE_URL) console.error("Missing SUPABASE_URL");
-        if (!process.env.SUPABASE_SERVICE_KEY) console.error("Missing SUPABASE_SERVICE_KEY");
+        // Get API key from environment variable
+        const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+        if (!GEMINI_API_KEY) {
+            console.error("Missing GEMINI_API_KEY environment variable");
+            return res.status(500).json({
+                success: false,
+                error: 'Missing GEMINI_API_KEY environment variable. Please set it in your .env file or Vercel dashboard.'
+            });
+        }
+
+        console.log("GEMINI_API_KEY found");
 
         // DEBUG: Log request details
         console.log("Request Headers:", JSON.stringify(req.headers));
         console.log("Request Body Type:", typeof req.body);
         console.log("Request Body:", JSON.stringify(req.body).substring(0, 500)); // Log first 500 chars
-
-        if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-            return res.status(500).json({
-                success: false,
-                error: 'Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_SERVICE_KEY environment variables.'
-            });
-        }
-
-        // Fetch API key from Supabase with timeout
-        console.log("Connecting to Supabase...");
-
-        const supabasePromise = supabase
-            .from('api_keys')
-            .select('api_key')
-            .eq('service_name', 'gemini')
-            .single();
-
-        // Add 5 second timeout for Supabase query
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Supabase query timeout')), 5000)
-        );
-
-        const { data, error } = await Promise.race([supabasePromise, timeoutPromise])
-            .catch(err => ({ data: null, error: err }));
-
-        if (error) {
-            console.error('Supabase error:', error);
-            return res.status(500).json({ success: false, error: 'Database error: ' + error.message });
-        }
-
-        if (!data) {
-            console.error('No data returned from Supabase for service_name=gemini');
-            return res.status(500).json({ success: false, error: 'API key not found in database' });
-        }
-
-        console.log("API Key retrieved successfully");
-        const GEMINI_API_KEY = data.api_key;
 
         const { prompt, models } = req.body;
 
@@ -81,10 +46,10 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, error: 'Invalid prompt' });
         }
 
+        // Use gemini-flash-lite-latest as the primary model
         const modelCandidates = models || [
-            "gemini-2.5-flash",
-            "gemini-2.0-flash",
-            "gemini-flash-latest"
+            "gemini-2.0-flash-lite",
+            "gemini-flash-lite-latest"
         ];
 
         // Try each model in sequence until one succeeds
