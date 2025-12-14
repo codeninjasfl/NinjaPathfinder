@@ -103,7 +103,8 @@
             <!-- PATH 1: JR (5–7) -->
             <div class="step" data-step-id="q2A" data-show-if="age=5-7">
                 <fieldset>
-                    <legend>Which of these best describe your child? <span class="hint">Choose up to 2</span></legend>
+                    <legend>Which of these best describe your child? <span class="hint">Choose 2 responses</span>
+                    </legend>
                     <div class="opts">
                         <label class="opt"><input type="checkbox" name="traits5" value="Curious"> Curious</label>
                         <label class="opt"><input type="checkbox" name="traits5" value="Creative"> Creative</label>
@@ -1667,9 +1668,17 @@ Code Ninjas ${centerName}`;
                     // NEW: Require at least one checkbox checked on any step that has checkboxes
                     const checkboxes = $$('input[type=checkbox]', active);
                     if (checkboxes.length) {
-                        const anyChecked = checkboxes.some(c => c.checked);
-                        if (!anyChecked) {
+                        const checkedCount = checkboxes.filter(c => c.checked).length;
+                        if (checkedCount === 0) {
                             disableNext = true;
+                        }
+
+                        // Strict check for q2A (Age 5-7 traits): Must choose exactly 2 responses
+                        // "User cannot choose 1 response, but also cannot choose anything more than 3. In this case, they have to choose 2."
+                        if (active.dataset.stepId === 'q2A') {
+                            if (checkedCount !== 2) {
+                                disableNext = true;
+                            }
                         }
                     }
                 }
