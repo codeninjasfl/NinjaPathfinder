@@ -32,7 +32,7 @@ cp .env.example .env
 Edit `.env` and add your Gemini API key:
 
 ```
-GEMINI_API_KEY=AIzaSyCyqSbjl5V5CgeBVuUePML09cySGGNHS5U
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 ### 4. Test Locally
