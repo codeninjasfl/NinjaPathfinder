@@ -196,7 +196,7 @@
                 </fieldset>
             </div>
 
-            <div class="step" data-step-id="q4B-1" data-show-if="school8=Bored,Struggles focus">
+            <div class="step" data-step-id="q4B-1" data-show-if="school8=Bored,Struggles focus | traits8=Distracted">
                 <fieldset>
                     <legend>What usually helps them re-engage?</legend>
                     <div class="opts grid-4">
@@ -1310,6 +1310,7 @@ The email MUST:
     * 1 translated child observation
     * A reference to their session type (JR, CREATE, ACADEMY)
     * A warm emotional insight
+    * CRITICAL: The very first sentence of the email body MUST start with the child's name (e.g., "It was great seeing [Child Name]..."). Do NOT start with "It was great seeing him" or "It was great seeing her".
 3. Explain why the recommended program${programDisplay}fits ${childRef} emotionally and logically.
 4. Include one subtle future-skills line if triggered by logic.
 5. Include the EXACT required discount sentence:"As a thank-you for taking the time to complete this questionnaire, you can enroll using this link: [ENROLLMENT_LINK]. Use code C9J5 at checkout to waive the enrollment fee if you enroll in the next few days."
@@ -1583,14 +1584,19 @@ Code Ninjas ${centerName}`;
                 });
             }
 
-            function conditionMatches(cond) {
-                const c = parseCondition(cond);
-                if (!c) return true;
-                const val = getValue(c.name);
-                if (Array.isArray(val)) {
-                    return val.some(v => c.values.includes(v));
-                }
-                return c.values.includes(val);
+            function conditionMatches(condStr) {
+                if (!condStr) return true;
+                // Support OR logic with '|'
+                const subConditions = condStr.split('|').map(s => s.trim());
+                return subConditions.some(sub => {
+                    const c = parseCondition(sub);
+                    if (!c) return true;
+                    const val = getValue(c.name);
+                    if (Array.isArray(val)) {
+                        return val.some(v => c.values.includes(v));
+                    }
+                    return c.values.includes(val);
+                });
             }
 
             function recomputeVisibleSteps() {
