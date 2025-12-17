@@ -263,7 +263,7 @@ curl -X POST http://localhost:3000/api/gemini-proxy \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "Say hello in a friendly way",
-    "models": ["gemini-2.5-flash"]
+    "models": ["gemini-3-flash-preview"]
   }'
 ```
 
@@ -273,7 +273,7 @@ Expected response:
 {
   "success": true,
   "text": "Hello! How can I help you today?",
-  "model": "gemini-2.5-flash"
+  "model": "gemini-3-flash-preview"
 }
 ```
 

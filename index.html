@@ -10,19 +10,28 @@
     <!-- --- PWA SETUP START --- -->
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="mobile-web-app-capable" content="yes">
     <!-- --- PWA SETUP END --- -->
 
     <link rel="stylesheet" href="./index.css">
+    <script src="./translations.js"></script>
 </head>
 
 <body>
     <div class="wrap">
         <header>
-            <div class="brand">
+            <div class="brand" style="position:relative;">
                 <img class="logo" src="https://www.codeninjas.com/hubfs/Group%201.svg" alt="Code Ninjas"
                     onerror="this.style.display='none'">
+                <select id="langSelect" aria-label="Language"
+                    style="position:absolute; right:0; top:0; padding:4px 8px; border-radius:12px; border:1px solid #cbd5e1; font-size:14px; background:#fff; cursor:pointer;">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="pt">🇧🇷 Português</option>
+                    <option value="zh">🇨🇳 中文</option>
+                </select>
             </div>
             <h1>Find the Right Path for Your Ninja</h1>
             <p>Answer a few quick questions to match your child with the perfect Code Ninjas program.</p>
@@ -658,6 +667,116 @@
             const confirmChildrenBtn = $('#confirmChildrenBtn');
             const childNamesArea = $('#child-names-area');
             const childNamesContainer = $('#child-names-inputs');
+            // --- TRANSLATION LOGIC ---
+            const langSelect = $('#langSelect');
+            let currentLang = 'en';
+
+            function normalize(str) {
+                return str.replace(/\s+/g, ' ').trim();
+            }
+
+            function t(text) {
+                if (currentLang === 'en' || !window.ALL_TRANSLATIONS) return text;
+                const dict = ALL_TRANSLATIONS[currentLang];
+                if (!dict) return text;
+                const norm = normalize(text);
+                return dict[norm] || text;
+            }
+
+            function translatePage() {
+                console.log('Translating page to:', currentLang);
+                console.log('ALL_TRANSLATIONS available:', !!window.ALL_TRANSLATIONS);
+
+                // Translate all translatable elements
+                const selector = 'h1, h2, h3, h4, p, legend, button, .prestart-label';
+                $$(selector).forEach(el => {
+                    if (el.closest('#langSelect')) return;
+                    if (el.querySelector('input, select, textarea')) return; // Skip if has form elements
+
+                    // Store original if not already stored
+                    if (!el.dataset.originalText) {
+                        el.dataset.originalText = el.textContent.trim();
+                    }
+
+                    const original = el.dataset.originalText;
+                    if (original) {
+                        el.textContent = t(original);
+                    }
+                });
+
+                // Translate hints and options (text inside labels with checkboxes)
+                $$('span.hint, div.hint').forEach(el => {
+                    if (!el.dataset.originalText) {
+                        el.dataset.originalText = el.textContent.trim();
+                    }
+                    const original = el.dataset.originalText;
+                    if (original) {
+                        el.textContent = t(original);
+                    }
+                });
+
+                // Translate label text nodes (keep checkboxes/radios intact)
+                $$('label.opt').forEach(label => {
+                    label.childNodes.forEach(node => {
+                        if (node.nodeType === 3) { // Text node
+                            const text = node.nodeValue.trim();
+                            if (text.length > 0) {
+                                if (!node._original) node._original = text;
+                                node.nodeValue = ' ' + t(node._original) + ' ';
+                            }
+                        }
+                    });
+                });
+
+                // Translate options
+                $$('select option').forEach(opt => {
+                    if (opt.closest('#langSelect')) return;
+                    if (!opt.dataset.originalText) {
+                        opt.dataset.originalText = opt.textContent.trim();
+                    }
+                    const original = opt.dataset.originalText;
+                    if (original) {
+                        opt.textContent = t(original);
+                    }
+                });
+
+                // Handle Placeholders
+                $$('input, textarea').forEach(el => {
+                    if (el.placeholder) {
+                        if (!el.dataset.originalPlaceholder) {
+                            el.dataset.originalPlaceholder = el.placeholder;
+                        }
+                        el.placeholder = t(el.dataset.originalPlaceholder);
+                    }
+                });
+
+                // Update dynamic wizard elements
+                if (!$('#wizard').classList.contains('hidden') && typeof childNames !== 'undefined' && childNames[currentChildIndex]) {
+                    const activeChild = childNames[currentChildIndex];
+                    if (numChildren > 1) {
+                        $('#childContextBanner').textContent = t("Questionnaire for") + ` ${activeChild.name}`;
+                        const genderLegend = $('#genderLegend');
+                        if (genderLegend) genderLegend.textContent = `${activeChild.name} ` + t("is a...");
+                    } else {
+                        const genderLegend = $('#genderLegend');
+                        if (genderLegend) genderLegend.textContent = t("My child is a...");
+                    }
+                }
+
+                // Update button text
+                const backBtn = $('#backBtn');
+                if (backBtn) backBtn.textContent = t("◀ Back");
+
+                console.log('Translation complete');
+            }
+
+            langSelect.addEventListener('change', function () {
+                currentLang = this.value;
+                console.log('Language changed to:', currentLang);
+                translatePage();
+            });
+
+            // -------------------------
 
             const inputsPre = {
                 parentFirst: $('#parentFirst'),
@@ -697,11 +816,11 @@
                     group.className = 'child-info-group';
 
                     const label = document.createElement('h4');
-                    label.textContent = `Child ${i + 1}`;
+                    label.textContent = t("Child") + ` ${i + 1}`;
                     group.appendChild(label);
 
                     const nameInp = document.createElement('input');
-                    nameInp.placeholder = `Name`;
+                    nameInp.placeholder = t("Name");
                     nameInp.className = 'step-input';
                     nameInp.dataset.type = 'name';
                     nameInp.dataset.index = i;
@@ -715,7 +834,7 @@
                     ageSelect.dataset.index = i;
                     ageSelect.style.margin = '0';
                     ageSelect.innerHTML = `
-        <option value="">Select Age</option>
+        <option value="">${t("Select Age")}</option>
         <option value="5-7">5-7</option>
         <option value="8-10">8-10</option>
         <option value="11-13">11-13</option>
@@ -773,8 +892,8 @@
             // Use full Vercel URL for GitHub Pages compatibility
             const BACKEND_API_URL = "https://pathfinder-nz0w16v5e-brennan-sheas-projects.vercel.app/api/gemini-proxy";
             const GEMINI_MODEL_CANDIDATES = [
-                "gemini-2.0-flash-lite",
-                "gemini-flash-lite-latest"
+                "gemini-3-flash-preview",
+                "gemini-2.0-flash-lite"
             ];
 
             // ---------- MONDAY.COM CONFIG ----------
@@ -959,6 +1078,8 @@ When explaining the fit, mention that this bundle gives them the ultimate experi
 
                 const prompt =
                     `YOU ARE AN ENROLLMENT ADVISOR AT CODE NINJAS.
+
+🚨 CRITICAL LANGUAGE INSTRUCTION: All generated content (Email, SMS, CD Tools) MUST be written in ENGLISH. Do not translate the generated content even if the input or child's name suggests a non-English background.
 
 ${pronounHint}
 
@@ -1529,13 +1650,13 @@ Code Ninjas ${centerName}`;
                 wizard.classList.add('hidden');
                 result.style.display = 'none';
                 loadingSection.classList.remove('hidden');
-                loadingTitle.textContent = 'Analyzing results…';
-                loadingSub.textContent = loadingPhrases[0];
+                loadingTitle.textContent = t('Analyzing results…');
+                loadingSub.textContent = t(loadingPhrases[0]);
                 let i = 0;
                 if (loadingIntervalId) clearInterval(loadingIntervalId);
                 loadingIntervalId = setInterval(() => {
                     i = (i + 1) % loadingPhrases.length;
-                    loadingSub.textContent = loadingPhrases[i];
+                    loadingSub.textContent = t(loadingPhrases[i]);
                 }, 2200);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -1691,9 +1812,9 @@ Code Ninjas ${centerName}`;
 
                 const currentName = (numChildren > 1 && childNames[currentChildIndex]) ? childNames[currentChildIndex].name : '';
                 if (idx === visibleSteps.length - 1) {
-                    nextBtn.textContent = currentName ? `See Results for ${currentName} ▶` : 'See Results ▶';
+                    nextBtn.textContent = currentName ? t("See Results for") + ` ${currentName} ▶` : t('See Results ▶');
                 } else {
-                    nextBtn.textContent = 'Next ▶';
+                    nextBtn.textContent = t('Next ▶');
                 }
 
                 nextBtn.disabled = disableNext;
@@ -2661,12 +2782,16 @@ ${smsOptions[1] || ''}`;
                 // Logic for Next Child button
                 if (numChildren > 1 && currentChildIndex < numChildren - 1) {
                     nextChildBtn.style.display = 'block';
-                    nextChildBtn.textContent = `Start Quiz for ${childNames[currentChildIndex + 1].name} ▶`;
+                    nextChildBtn.textContent = t("Start Quiz for") + ` ${childNames[currentChildIndex + 1].name} ▶`;
                     retakeBtn.style.display = 'none'; // Hide home button until done
                 } else {
                     nextChildBtn.style.display = 'none';
                     retakeBtn.style.display = 'block'; // Show home button
                 }
+
+                // Re-translate page to catch new dynamic content (Persona, Recs, etc. if we had them in dict)
+                // and static text in the result view
+                translatePage();
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -2686,7 +2811,6 @@ ${smsOptions[1] || ''}`;
         }
     </script>
     <!-- --- SERVICE WORKER REGISTRATION END --- -->
-    <script type="module" src="/index.tsx"></script>
 </body>
 
 </html>

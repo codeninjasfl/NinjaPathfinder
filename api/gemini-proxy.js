@@ -46,10 +46,10 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, error: 'Invalid prompt' });
         }
 
-        // Use gemini-flash-lite-latest as the primary model
+        // Use gemini-3-flash-preview as the primary model (Google AI Studio new release)
         const modelCandidates = models || [
-            "gemini-2.0-flash-lite",
-            "gemini-flash-lite-latest"
+            "gemini-3-flash-preview",
+            "gemini-2.0-flash-lite"
         ];
 
         // Try each model in sequence until one succeeds
