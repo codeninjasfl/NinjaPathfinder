@@ -688,7 +688,7 @@
                 console.log('ALL_TRANSLATIONS available:', !!window.ALL_TRANSLATIONS);
 
                 // Translate all translatable elements
-                const selector = 'h1, h2, h3, h4, p, legend, button, .prestart-label';
+                const selector = 'h1, h2, h3, h4, p, legend, button, strong, .prestart-label';
                 $$(selector).forEach(el => {
                     if (el.closest('#langSelect')) return;
                     if (el.querySelector('input, select, textarea')) return; // Skip if has form elements
@@ -2110,7 +2110,7 @@ Code Ninjas ${centerName}`;
 
                 if (key === 'JR') {
                     return {
-                        uiTitle: 'Recommended Program: Code Ninjas JR',
+                        uiTitle: t('Recommended Program') + ': Code Ninjas JR',
                         uiBlurb: 'Playful, story-driven sessions where young Ninjas (5–7) explore early coding, logic, and creativity with tons of encouragement.',
                         bullets: [
                             'Gentle, game-based introduction to core concepts',
@@ -2132,7 +2132,7 @@ Code Ninjas ${centerName}`;
 
                 if (key === 'ACADEMY') {
                     return {
-                        uiTitle: 'Recommended Program: CREATE 1+1 Bundle',
+                        uiTitle: t('Recommended Program') + ': CREATE 1+1 Bundle',
                         uiBlurb: 'A deeper track for motivated ninjas ready for real-world coding + AI or Engineering projects. Combines Code Ninjas CREATE (core coding) with an Academy of their choice.',
                         bullets: [
                             'Project-based learning in coding, AI, or robotics',
@@ -2204,7 +2204,7 @@ Code Ninjas ${centerName}`;
                         'Clubs/community add variety and momentum for hungry learners'
                     ];
                     return {
-                        uiTitle: 'Recommended Program:' + variantLine,
+                        uiTitle: t('Recommended Program') + ':' + variantLine,
                         uiBlurb: 'Your Ninja is ready for our CREATE Dojo—where they build real games, sharpen problem-solving, and level up through our belt system in a space that feels like home.',
                         bullets: [...baseThree, ...extraForTriple],
                         stats,
@@ -2214,7 +2214,7 @@ Code Ninjas ${centerName}`;
                 }
 
                 return {
-                    uiTitle: 'Recommended Program:' + variantLine,
+                    uiTitle: t('Recommended Program') + ':' + variantLine,
                     uiBlurb: 'Your Ninja is ready for our CREATE Dojo—where they build real games, sharpen problem-solving, and level up through our belt system in a space that feels like home.',
                     bullets: [
                         'Structured path from block coding into real languages',
@@ -2625,7 +2625,7 @@ Code Ninjas ${centerName}`;
                     }
                 }
 
-                $('#personaTitle').textContent = `${currentChildName}'s Profile: ${persona}`;
+                $('#personaTitle').textContent = `${currentChildName}'s ${t('Profile')}: ${persona}`;
                 $('#personaBlurb').textContent = personaBlurb;
 
                 // Bundle-aware program display - determine types first
@@ -2645,9 +2645,9 @@ Code Ninjas ${centerName}`;
                 // Update program title to include bundle type if applicable
                 let displayTitle = programUI.uiTitle;
                 if (apiProgramName === 'Code Ninjas Academy') {
-                    displayTitle = finalAcademyType === 'Robotics' ? 'Recommended Program: CREATE 1+1 Bundle (Robotics)' : 'Recommended Program: CREATE 1+1 Bundle (AI)';
+                    displayTitle = finalAcademyType === 'Robotics' ? t('Recommended Program') + ': CREATE 1+1 Bundle (Robotics)' : t('Recommended Program') + ': CREATE 1+1 Bundle (AI)';
                 } else if (apiProgramName === 'Code Ninjas CREATE' && (bundleType === '1+1_AI' || bundleType === '1+1_Robotics')) {
-                    displayTitle = bundleType === '1+1_Robotics' ? 'Recommended Program: CREATE 1+1 Bundle (Robotics)' : 'Recommended Program: CREATE 1+1 Bundle (AI)';
+                    displayTitle = bundleType === '1+1_Robotics' ? t('Recommended Program') + ': CREATE 1+1 Bundle (Robotics)' : t('Recommended Program') + ': CREATE 1+1 Bundle (AI)';
                 }
 
                 $('#recTitle').textContent = displayTitle;
@@ -2670,7 +2670,7 @@ Code Ninjas ${centerName}`;
                 }
 
                 // Center note - updated text and styling
-                $('#centerNote').textContent = 'Before you head out today, stop by the front desk so we can walk you through this path and help you enroll.';
+                $('#centerNote').textContent = t('Before you head out today, stop by the front desk so we can walk you through this path and help you enroll.');
                 $('#centerNote').style.fontWeight = 'bold';
                 $('#centerNote').classList.remove('hint'); // Remove hint styling
 
