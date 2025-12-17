@@ -1,3 +1,4 @@
+// Translations for Code Ninjas Path Finder - Last updated: Dec 17, 2024
 window.ALL_TRANSLATIONS = {
     "es": {
         "Find the Right Path for Your Ninja": "Encuentra el camino correcto para tu Ninja",
