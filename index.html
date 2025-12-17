@@ -618,15 +618,15 @@
 
         <!-- RESULT VIEW -->
         <section id="result" class="card" aria-live="polite">
-            <h2 id="personaTitle"></h2>
-            <p id="personaBlurb"></p>
-            <h2 id="recTitle"></h2>
-            <p id="recBlurb"></p>
-            <ul id="recPoints"></ul>
+            <h2 id="personaTitle" class="no-translate"></h2>
+            <p id="personaBlurb" class="no-translate"></p>
+            <h2 id="recTitle" class="no-translate"></h2>
+            <p id="recBlurb" class="no-translate"></p>
+            <ul id="recPoints" class="no-translate"></ul>
 
             <div id="funFact" class="hidden">
                 <strong>Fun Fact for Your Ninja!</strong>
-                <div id="funFactText"></div>
+                <div id="funFactText" class="no-translate"></div>
             </div>
 
             <h3 class="center" style="margin:24px 0 12px; color: var(--brand);">At-a-glance match</h3>
@@ -691,6 +691,7 @@
                 const selector = 'h1, h2, h3, h4, p, legend, button, strong, .prestart-label';
                 $$(selector).forEach(el => {
                     if (el.closest('#langSelect')) return;
+                    if (el.classList.contains('no-translate')) return; // Skip dynamic content
                     if (el.querySelector('input, select, textarea')) return; // Skip if has form elements
 
                     // Store original if not already stored
