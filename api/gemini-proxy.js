@@ -1,54 +1,88 @@
 // Backend API Proxy for Gemini API (Environment Variable Version)
 // This endpoint reads the API key from environment variables and calls Gemini
 
-export default async function handler(req, res) {
-    console.log("API Handler started");
+// Use Vercel Edge Runtime for native fetch support
+export const config = {
+    runtime: 'edge',
+};
 
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+export default async function handler(req) {
+    console.log("API Handler started");
+    console.log("Environment check - GEMINI_API_KEY exists:", !!process.env.GEMINI_API_KEY);
+
+    // CORS headers
+    const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+    };
 
     // Handle OPTIONS request for CORS preflight
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+        return new Response(null, {
+            status: 200,
+            headers: corsHeaders,
+        });
     }
 
     // Only allow POST requests
     if (req.method !== 'POST') {
-        return res.status(405).json({ success: false, error: 'Method not allowed' });
+        return new Response(
+            JSON.stringify({ success: false, error: 'Method not allowed' }),
+            {
+                status: 405,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+        );
     }
 
     try {
-        // Get API key from environment variable
-        const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+        // Get API key from environment variable (Primary)
+        let apiKey = process.env.GEMINI_API_KEY;
+        let usingFallback = false;
 
-        if (!GEMINI_API_KEY) {
-            console.error("Missing GEMINI_API_KEY environment variable");
-            return res.status(500).json({
-                success: false,
-                error: 'Missing GEMINI_API_KEY environment variable. Please set it in your .env file or Vercel dashboard.'
-            });
+        // Fallback Logic
+        if (!apiKey) {
+            console.warn("Primary GEMINI_API_KEY missing, trying fallback...");
+            apiKey = process.env.GEMINI_API_KEY_FALLBACK;
+            usingFallback = true;
         }
 
-        console.log("GEMINI_API_KEY found");
+        if (!apiKey) {
+            console.error("Both Primary and Fallback GEMINI_API_KEY are missing");
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    error: 'Server configuration error: API keys missing.'
+                }),
+                {
+                    status: 500,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                }
+            );
+        }
 
-        // DEBUG: Log request details
-        console.log("Request Headers:", JSON.stringify(req.headers));
-        console.log("Request Body Type:", typeof req.body);
-        console.log("Request Body:", JSON.stringify(req.body).substring(0, 500)); // Log first 500 chars
+        console.log(`Using ${usingFallback ? 'FALLBACK' : 'PRIMARY'} API Key`);
 
-        const { prompt, models } = req.body;
+        // Parse request body
+        const body = await req.json();
+        const { prompt, models } = body;
 
         // Validate request body
         if (!prompt || typeof prompt !== 'string') {
-            return res.status(400).json({ success: false, error: 'Invalid prompt' });
+            return new Response(
+                JSON.stringify({ success: false, error: 'Invalid prompt' }),
+                {
+                    status: 400,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                }
+            );
         }
 
         // Use gemini-3-flash-preview as the primary model (Google AI Studio new release)
         const modelCandidates = models || [
             "gemini-3-flash-preview",
+            "gemini-flash-lite-latest",
             "gemini-2.0-flash-lite"
         ];
 
@@ -57,7 +91,7 @@ export default async function handler(req, res) {
             try {
                 console.log(`Attempting model: ${model}`);
                 const geminiResponse = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,
+                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
                     {
                         method: "POST",
                         headers: {
@@ -87,11 +121,17 @@ export default async function handler(req, res) {
 
                 if (text) {
                     console.log("Success! Returning text.");
-                    return res.status(200).json({
-                        success: true,
-                        text: text,
-                        model: model // Include which model was used
-                    });
+                    return new Response(
+                        JSON.stringify({
+                            success: true,
+                            text: text,
+                            model: model // Include which model was used
+                        }),
+                        {
+                            status: 200,
+                            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                        }
+                    );
                 }
             } catch (modelError) {
                 console.warn(`Error with model ${model}:`, modelError.message);
@@ -101,16 +141,28 @@ export default async function handler(req, res) {
 
         // If all models failed
         console.error("All models failed");
-        return res.status(503).json({
-            success: false,
-            error: 'All Gemini models failed to respond'
-        });
+        return new Response(
+            JSON.stringify({
+                success: false,
+                error: 'All Gemini models failed to respond'
+            }),
+            {
+                status: 503,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+        );
 
     } catch (error) {
         console.error('Gemini proxy error (Catch Block):', error);
-        return res.status(500).json({
-            success: false,
-            error: 'Internal server error: ' + error.message
-        });
+        return new Response(
+            JSON.stringify({
+                success: false,
+                error: 'Internal server error: ' + error.message
+            }),
+            {
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+        );
     }
 }
