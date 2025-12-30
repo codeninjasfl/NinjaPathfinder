@@ -88,7 +88,7 @@ CREATE TABLE api_keys (
 
 -- Insert your Gemini API key
 INSERT INTO api_keys (service_name, api_key) 
-VALUES ('gemini', 'AIzaSyCyqSbjl5V5CgeBVuUePML09cySGGNHS5U');
+VALUES ('gemini', 'your_gemini_api_key_here');
 
 -- Create a function to get the API key (optional, for security)
 CREATE OR REPLACE FUNCTION get_api_key(service TEXT)
@@ -162,7 +162,7 @@ CREATE TABLE api_keys (
 );
 
 INSERT INTO api_keys (service_name, api_key) 
-VALUES ('gemini', 'AIzaSyCyqSbjl5V5CgeBVuUePML09cySGGNHS5U');
+VALUES ('gemini', 'your_gemini_api_key_here');
 ```
 
 #### 2. Update Backend Code
