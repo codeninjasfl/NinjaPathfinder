@@ -2536,8 +2536,8 @@ Code Ninjas ${centerName}`;
                 if (hearCode) {
                     switch (hearCode) {
                         case 'Friend': {
-                            marketingSource = 'Friend / Parent Referral';
                             const fName = textValue('friendName');
+                            marketingSource = fName ? `Referral: ${fName}` : 'Friend / Parent Referral';
                             marketingSubsource = [
                                 `Primary source: ${hearLabel}`,
                                 fName ? `Referred by: ${fName}` : ''
@@ -2545,9 +2545,10 @@ Code Ninjas ${centerName}`;
                             break;
                         }
                         case 'School': {
-                            marketingSource = 'School / Teacher';
-                            const schoolShare = checkboxLabels('schoolShare');
                             const sName = textValue('schoolNameInput');
+                            // Use school name if available, otherwise just generic category
+                            marketingSource = sName ? `School: ${sName}` : 'School / Teacher';
+                            const schoolShare = checkboxLabels('schoolShare');
                             const tName = textValue('teacherNameInput');
                             marketingSubsource = [
                                 `Primary source: ${hearLabel}`,
@@ -2558,8 +2559,8 @@ Code Ninjas ${centerName}`;
                             break;
                         }
                         case 'Social': {
-                            marketingSource = 'Social Media';
                             const socialPlatform = radioLabel('socialPlatform');
+                            marketingSource = socialPlatform ? `Social: ${socialPlatform}` : 'Social Media';
                             marketingSubsource = [
                                 `Primary source: ${hearLabel}`,
                                 socialPlatform ? `Platform: ${socialPlatform}` : ''
@@ -2583,8 +2584,8 @@ Code Ninjas ${centerName}`;
                             break;
                         }
                         case 'Event': {
-                            marketingSource = 'Event / Fair / Camp';
                             const evt = textValue('eventDetails');
+                            marketingSource = evt ? `Event: ${evt}` : 'Event / Fair / Camp';
                             marketingSubsource = [
                                 `Primary source: ${hearLabel}`,
                                 evt ? `Event/Loc: ${evt}` : ''
@@ -2597,8 +2598,8 @@ Code Ninjas ${centerName}`;
                             break;
                         }
                         case 'Other': {
-                            marketingSource = 'Other';
                             const oth = textValue('otherDetails');
+                            marketingSource = oth ? `Other: ${oth}` : 'Other';
                             marketingSubsource = [
                                 `Primary source: ${hearLabel}`,
                                 oth ? `Details: ${oth}` : ''
