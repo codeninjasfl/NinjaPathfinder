@@ -156,6 +156,17 @@
                 </fieldset>
             </div>
 
+            <div class="step" data-step-id="q5A" data-show-if="age=5-7">
+                <fieldset>
+                    <legend>How confident are they with technology?</legend>
+                    <div class="opts">
+                        <label class="opt"><input type="radio" name="tech5" value="Beginner"> Beginner</label>
+                        <label class="opt"><input type="radio" name="tech5" value="Comfortable"> Comfortable</label>
+                        <label class="opt"><input type="radio" name="tech5" value="Advanced"> Advanced</label>
+                    </div>
+                </fieldset>
+            </div>
+
             <!-- PATH 2: 8–10 -->
             <div class="step" data-step-id="q2B" data-show-if="age=8-10">
                 <fieldset>
@@ -318,9 +329,8 @@
                     <legend>How comfortable are they with technology?</legend>
                     <div class="opts">
                         <label class="opt"><input type="radio" name="tech11" value="Beginner"> Beginner</label>
-                        <label class="opt"><input type="radio" name="tech11" value="Skilled"> Fairly skilled</label>
-                        <label class="opt"><input type="radio" name="tech11" value="Advanced"> Advanced
-                            (self-driven)</label>
+                        <label class="opt"><input type="radio" name="tech11" value="Comfortable"> Comfortable</label>
+                        <label class="opt"><input type="radio" name="tech11" value="Advanced"> Advanced</label>
                     </div>
                 </fieldset>
             </div>
@@ -375,7 +385,7 @@
                     <legend>How confident are they with technology?</legend>
                     <div class="opts">
                         <label class="opt"><input type="radio" name="tech14" value="Beginner"> Beginner</label>
-                        <label class="opt"><input type="radio" name="tech14" value="Intermediate"> Intermediate</label>
+                        <label class="opt"><input type="radio" name="tech14" value="Comfortable"> Comfortable</label>
                         <label class="opt"><input type="radio" name="tech14" value="Advanced"> Advanced</label>
                     </div>
                 </fieldset>
@@ -486,8 +496,6 @@
                         <label class="opt"><input type="radio" name="hearAbout" value="Event"> Local event</label>
                         <label class="opt"><input type="radio" name="hearAbout" value="Returning"> Returning
                             family</label>
-                        <label class="opt"><input type="radio" name="hearAbout" value="Other"> Other (please
-                            specify)</label>
                     </div>
                 </fieldset>
             </div>
@@ -561,10 +569,7 @@
                             After-school programs</label>
                         <label class="opt"><input type="checkbox" name="searchTopics" value="Summer camps"> Summer
                             camps</label>
-                        <label class="opt"><input type="checkbox" name="searchTopics" value="Other"> Other</label>
                     </div>
-                    <input type="text" name="searchOtherDetails" placeholder="If Other, please specify"
-                        class="step-input" style="margin-top:8px;">
                 </fieldset>
 
                 <fieldset style="margin-top:12px;">
@@ -580,10 +585,7 @@
                             offer</label>
                         <label class="opt"><input type="checkbox" name="searchClickWhy" value="Free session"> Free
                             session</label>
-                        <label class="opt"><input type="checkbox" name="searchClickWhy" value="Other"> Other</label>
                     </div>
-                    <input type="text" name="clickOtherDetails" placeholder="If Other, please specify"
-                        class="step-input" style="margin-top:8px;">
                 </fieldset>
             </div>
 
@@ -595,13 +597,6 @@
                 </fieldset>
             </div>
 
-            <!-- Other follow-up -->
-            <div class="step marketing-step" data-step-id="q18F" data-show-if="hearAbout=Other">
-                <fieldset>
-                    <legend>Please tell us how you heard about us:</legend>
-                    <input type="text" name="otherDetails" placeholder="Details" class="step-input">
-                </fieldset>
-            </div>
 
             <div class="actions sticky">
                 <button class="btn" id="backBtn" type="button">◀ Back</button>
@@ -648,7 +643,8 @@
     <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" target="hidden_iframe">
         <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
         <input type="hidden" name="name" id="wf_name" required>
-        <!-- Email removed as requested -->
+        <!-- Dummy email added for Web3Forms requirement -->
+        <input type="hidden" name="email" value="noreply@codeninjas.com">
         <textarea name="message" id="wf_message" style="display:none;" required></textarea>
         <input type="hidden" name="subject" id="wf_subject" value="New Ninja Path Finder Lead">
         <input type="hidden" name="from_name" value="Code Ninjas Program Finder">
@@ -906,41 +902,28 @@
             const MONDAY_COLUMN_MAP = {
                 "Location": "text_mkxwt53n",
                 "Submitted Date": "date_mkxwqv92",
-                "Number of Children": "numeric_mkxw3mg8",
                 "Recommended Program": "text_mkxwqhx7",
-                "Persona": "text_mkxwqt3c",
-                "Persona Description": "long_text_mkxwrjmw",
                 "Child Age Group": "text_mkxw4cpe",
                 "Child Gender": "text_mkxw20nb",
-                "Traits (5-7)": "long_text_mkxwdttr",
+                "Tech Confidence": "text_mkzym6b1",
+                "Traits": "long_text_mkzyd85b",
+                "School Attitude": "text_mkzyknhf",
+                "Interests/Experience": "long_text_mkzyg0t8",
                 "Play Preferences (5-7)": "long_text_mkxwa2pn",
-                "Persistence (5-7)": "text_mkxwext4",
-                "Traits (8-10)": "long_text_mkxwef2r",
                 "Learning Style (8-10)": "text_mkxwf41x",
-                "School Attitude (8-10)": "text_mkxwtjbj",
                 "Re-engagement Method (8-10)": "text_mkxwwe8d",
-                "Tech Confidence (8-10)": "text_mkxwg9ne",
-                "Tech Experience (8-10)": "long_text_mkxwss9r",
-                "Traits (11-13)": "long_text_mkxwd119",
                 "Challenge Response (11-13)": "text_mkxwhsx0",
-                "School Attitude (11-13)": "text_mkxwj8gy",
-                "Enjoyment Factors (11-13)": "long_text_mkxwk6f7",
-                "Tech Confidence (11-13)": "text_mkxwkkh4",
-                "Leadership Interest (11-13)": "text_mkxwv77q",
-                "Motivation (14+)": "text_mkxwwy4v",
-                "Interests (14+)": "long_text_mkxwj3h3",
-                "Tech Confidence (14+)": "text_mkxwajd",
                 "Career Interest (14+)": "text_mkxw8m0e",
-                "Growth Area (14+)": "text_mkxwdw5w",
                 "Parent Goals": "long_text_mkxwxw14",
                 "Future Focus": "text_mkxw5aqv",
                 "AI Interest": "text_mkxwx5jj",
-                "Marketing Source": "text_mkxwqcte",
+                "Marketing Source": "text_mkzykqq8",
                 "Marketing Details": "long_text_mkxwztj1",
-                "AI Email": "long_text_mkxwvzvf",
-                "SMS Option 1": "long_text_mkxw2k76",
-                "SMS Option 2": "long_text_mkxwmp0h",
-                "Full Q&A Summary": "long_text_mkxwk1d6"
+                "Full Q&A Summary": "long_text_mkzyb72a",
+                "Source Channel": "color_mkzxw8h5",
+                "Lead Persona": "color_mkzxm351",
+                "Primary Interest": "color_mkzxp192",
+                "Family Size": "text_mkzyrpgc"
             };
 
             async function callGemini(promptText) {
@@ -1732,10 +1715,11 @@ Code Ninjas ${centerName}`;
                     const cond = step.getAttribute('data-show-if');
                     if (!cond) return true;
 
-                    // Advanced logic override: If child is 8-13 but Advanced...
+                    // Advanced logic override: If child is 5-13 but Advanced...
+                    const t5 = getValue('tech5');
                     const t8 = getValue('tech8');
                     const t11 = getValue('tech11');
-                    const isAdvancedChild = (t8 === 'Advanced' || t11 === 'Advanced');
+                    const isAdvancedChild = (t5 === 'Advanced' || t8 === 'Advanced' || t11 === 'Advanced');
                     const isActually14Plus = (currentChildAge === '14+');
 
                     // 1. HIDE standard path questions if they are now on the Advanced track
@@ -1932,11 +1916,15 @@ Code Ninjas ${centerName}`;
 
             // ---------- PROGRAM SELECTION ----------
             function baseProgramKey(age) {
-                // NEW: Check for advanced status to recommend ACADEMY even for 8-13
+                // NEW: Check for advanced status to recommend ACADEMY even for JR/CREATE ages
+                const tech5 = getValue('tech5');
                 const tech8 = getValue('tech8');
                 const tech11 = getValue('tech11');
 
-                if (age === '5-7') return 'JR';
+                if (age === '5-7') {
+                    if (tech5 === 'Advanced') return 'ACADEMY';
+                    return 'JR';
+                }
                 if (age === '14+') return 'ACADEMY';
 
                 // If 8-13 but Advanced, push to ACADEMY logic (which may offer bundles or academy track)
@@ -1951,6 +1939,7 @@ Code Ninjas ${centerName}`;
             function chooseCreateBundle() {
                 const future = getValue('futurefocus');
                 const goals = checkboxLabels('goals');
+                const tech5 = getValue('tech5');
                 const tech8 = getValue('tech8');
                 const tech11 = getValue('tech11');
 
@@ -1967,12 +1956,12 @@ Code Ninjas ${centerName}`;
                     return { label: '2x/Week', type: '2x' };
                 }
                 if (future === 'Not sure') {
-                    if (goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced') {
+                    if (goals.includes('Future skills') || tech5 === 'Advanced' || tech8 === 'Advanced' || tech11 === 'Advanced') {
                         return { label: '1+1 Bundle (CREATE + AI Academy)', type: '1+1_AI' };
                     }
                     return { label: '2x/Week', type: '2x' };
                 }
-                if (goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced') {
+                if (goals.includes('Future skills') || tech5 === 'Advanced' || tech8 === 'Advanced' || tech11 === 'Advanced') {
                     return { label: '1+1 Bundle (CREATE + AI Academy)', type: '1+1_AI' };
                 }
                 return { label: '2x/Week', type: '2x' };
@@ -1981,6 +1970,7 @@ Code Ninjas ${centerName}`;
             // Persona determination logic based on updated requirements
             function determinePersona() {
                 const age = getValue('age');
+                const tech5 = getValue('tech5');
                 const tech8 = getValue('tech8');
                 const tech11 = getValue('tech11');
                 const tech14 = getValue('tech14');
@@ -2000,7 +1990,7 @@ Code Ninjas ${centerName}`;
                 const matches = [];
 
                 // 1. Digital Explorer
-                if (tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
+                if (tech5 === 'Advanced' || tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
                     // Add logic to show 14+ questions if they haven't been seen yet
                     // NOTE: The UI logic (recomputeVisibleSteps) handles showing the questions.
                     // This logic is just for Persona selection.
@@ -2052,7 +2042,7 @@ Code Ninjas ${centerName}`;
                 }
 
                 // 7. Digital Innovator
-                if (goals.includes('Future skills') || tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
+                if (goals.includes('Future skills') || tech5 === 'Advanced' || tech8 === 'Advanced' || tech11 === 'Advanced' || tech14 === 'Advanced') {
                     matches.push({
                         title: t("The Digital Innovator"),
                         blurb: t("This profile is seeking cutting-edge knowledge. They are a prime fit for CREATE Bundles (AI Academy) or the ACADEMY track, focusing on modern tools and career readiness.")
@@ -2076,7 +2066,7 @@ Code Ninjas ${centerName}`;
                 }
 
                 // 10. Curious Novice
-                if (age === '5-7' || tech8 === 'Beginner' || tech11 === 'Beginner' || tech14 === 'Beginner') {
+                if ((age === '5-7' && tech5 !== 'Advanced') || tech8 === 'Beginner' || tech11 === 'Beginner' || tech14 === 'Beginner' || tech5 === 'Beginner') {
                     matches.push({
                         title: t("The Curious Novice"),
                         blurb: t("This profile needs a gentle, low-pressure introduction to technology. The program must prioritize confidence-building and foundational concepts over complex skills initially.")
@@ -2257,7 +2247,7 @@ Code Ninjas ${centerName}`;
                 const fields = [
                     ['gender', 'radio'], // Add Gender to summary
                     ['age', 'radio'], // This will now fetch pre-set age
-                    ['traits5', 'checkbox'], ['play5', 'checkbox'], ['grit5', 'radio'],
+                    ['traits5', 'checkbox'], ['play5', 'checkbox'], ['grit5', 'radio'], ['tech5', 'radio'],
                     ['traits8', 'checkbox'], ['learn8', 'checkbox'], ['school8', 'checkbox'], ['reengage8', 'radio'], ['tech8', 'radio'], ['tried8', 'checkbox'],
                     ['traits11', 'checkbox'], ['challenge11', 'radio'], ['school11', 'checkbox'], ['enjoy11', 'checkbox'], ['tech11', 'radio'], ['leader11', 'radio'],
                     ['motivate14', 'radio'], ['interest14', 'checkbox'], ['tech14', 'radio'], ['career14', 'radio'], ['growth14', 'radio'],
@@ -2271,10 +2261,7 @@ Code Ninjas ${centerName}`;
                     ['socialPlatform', 'radio'],
                     ['searchTopics', 'checkbox'],
                     ['searchClickWhy', 'checkbox'],
-                    ['searchOtherDetails', 'text'],
-                    ['clickOtherDetails', 'text'],
-                    ['eventDetails', 'text'],
-                    ['otherDetails', 'text']
+                    ['eventDetails', 'text']
                 ];
                 const lines = [];
                 fields.forEach(([name, type]) => {
@@ -2288,9 +2275,6 @@ Code Ninjas ${centerName}`;
                             else if (name === 'schoolNameInput') label = 'School Name';
                             else if (name === 'teacherNameInput') label = 'Teacher Name';
                             else if (name === 'eventDetails') label = 'Event/Location';
-                            else if (name === 'otherDetails') label = 'Other Details';
-                            else if (name === 'searchOtherDetails') label = 'Search Other Details';
-                            else if (name === 'clickOtherDetails') label = 'Click Reason Other Details';
                             lines.push(`${label} → ${val}`);
                         }
                         return;
@@ -2325,7 +2309,6 @@ Code Ninjas ${centerName}`;
                 const msgField = $('#wf_message');
                 const subjField = $('#wf_subject');
                 const nameField = $('#wf_name');
-                // wf_email is set in HTML with a dummy value since user removed input
 
                 if (!form || !msgField || !subjField || !nameField) return;
 
@@ -2377,57 +2360,116 @@ Code Ninjas ${centerName}`;
                     const dateValue = new Date().toISOString().split('T')[0];
                     columnValues[MONDAY_COLUMN_MAP['Submitted Date']] = { date: dateValue };
 
-                    // FIXED: Numeric columns in Monday.com expect a simple string value, NOT an object
-                    columnValues[MONDAY_COLUMN_MAP['Number of Children']] = String(data.numChildren || 1);
+                    // Human-readable label for family size
+                    const n = data.numChildren || 1;
+                    columnValues[MONDAY_COLUMN_MAP['Family Size']] = n === 1 ? "1 Child" : `${n} Children`;
 
-                    // Program & Persona
+                    // Program & Persona (Status columns handled later, text columns removed as redundant)
                     columnValues[MONDAY_COLUMN_MAP['Recommended Program']] = data.programDisplay || '';
-                    columnValues[MONDAY_COLUMN_MAP['Persona']] = data.persona || '';
-                    columnValues[MONDAY_COLUMN_MAP['Persona Description']] = data.personaBlurb || '';
 
-                    // Child Demographics (no names)
-                    columnValues[MONDAY_COLUMN_MAP['Child Age Group']] = qaData['Age Group'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Child Gender']] = qaData['My child is a...'] || '';
+                    // Child Demographics
+                    columnValues[MONDAY_COLUMN_MAP['Child Age Group']] = data.ageGroup || qaData['Age Group'] || '';
+                    columnValues[MONDAY_COLUMN_MAP['Child Gender']] = data.gender || qaData['My child is a...'] || '';
 
-                    // Age-specific answers (5-7)
-                    columnValues[MONDAY_COLUMN_MAP['Traits (5-7)']] = qaData['Which of these best describe your child?'] || '';
+                    // Unified Columns (Combining multiple age-specific questions into single columns)
+
+                    // Unified Traits (5-13)
+                    columnValues[MONDAY_COLUMN_MAP['Traits']] =
+                        qaData['Which traits best describe your child?'] ||
+                        qaData['Which of these best describe your child?'] ||
+                        '';
+
+                    // Unified School Attitude (8-13)
+                    columnValues[MONDAY_COLUMN_MAP['School Attitude']] =
+                        qaData['How do they feel about school and learning?'] ||
+                        qaData['How do they feel about school?'] ||
+                        '';
+
+                    // Unified Interests/Experience (8-14+)
+                    columnValues[MONDAY_COLUMN_MAP['Interests/Experience']] =
+                        qaData['What have they tried so far?'] ||
+                        qaData['Which areas are they most interested in?'] ||
+                        '';
+
+                    // Combined Tech Confidence (mapping all age-specific questions to one column)
+                    columnValues[MONDAY_COLUMN_MAP['Tech Confidence']] =
+                        qaData['How confident are they with technology?'] ||
+                        qaData['How comfortable are they with technology?'] ||
+                        'Comfortable'; // Default to Comfortable as requested if blank
+
+                    // Age-specific answers (Remaining fields)
                     columnValues[MONDAY_COLUMN_MAP['Play Preferences (5-7)']] = qaData['What kind of play do they enjoy most?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Persistence (5-7)']] = qaData['When something doesn\'t work right away, they usually…'] || '';
 
-                    // Age-specific answers (8-10)
-                    columnValues[MONDAY_COLUMN_MAP['Traits (8-10)']] = qaData['Which traits best describe your child?'] || '';
                     columnValues[MONDAY_COLUMN_MAP['Learning Style (8-10)']] = qaData['How does your child learn best?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['School Attitude (8-10)']] = qaData['How do they feel about school and learning?'] || '';
                     columnValues[MONDAY_COLUMN_MAP['Re-engagement Method (8-10)']] = qaData['What usually helps them re-engage?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Tech Confidence (8-10)']] = qaData['How confident are they with technology?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Tech Experience (8-10)']] = qaData['What have they tried so far?'] || '';
 
-                    // Age-specific answers (11-13)
-                    columnValues[MONDAY_COLUMN_MAP['Traits (11-13)']] = qaData['Which traits best describe your child?'] || '';
                     columnValues[MONDAY_COLUMN_MAP['Challenge Response (11-13)']] = qaData['When faced with a challenge, they usually…'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['School Attitude (11-13)']] = qaData['How do they feel about school?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Enjoyment Factors (11-13)']] = qaData['What would help them enjoy learning more?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Tech Confidence (11-13)']] = qaData['How comfortable are they with technology?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Leadership Interest (11-13)']] = qaData['Would they enjoy helping others or leading projects?'] || '';
 
-                    // Age-specific answers (14+)
-                    columnValues[MONDAY_COLUMN_MAP['Motivation (14+)']] = qaData['What best describes what motivates your teen?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Interests (14+)']] = qaData['Which areas are they most interested in?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Tech Confidence (14+)']] = qaData['How confident are they with technology?'] || '';
                     columnValues[MONDAY_COLUMN_MAP['Career Interest (14+)']] = qaData['Are they interested in tech certifications or careers?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['Growth Area (14+)']] = qaData['Which growth area is most important this year?'] || '';
 
                     // Goals & Future
                     columnValues[MONDAY_COLUMN_MAP['Parent Goals']] = qaData['What are you hoping your child gains from Code Ninjas?'] || '';
                     columnValues[MONDAY_COLUMN_MAP['Future Focus']] = qaData['What future skill matters most to you for your child right now?'] || '';
-                    columnValues[MONDAY_COLUMN_MAP['AI Interest']] = qaData['AI Interest'] || '';
+                    columnValues[MONDAY_COLUMN_MAP['AI Interest']] = qaData['How important is it for kids to understand AI & emerging technology?'] || '';
 
                     // Marketing
                     columnValues[MONDAY_COLUMN_MAP['Marketing Source']] = data.marketingSource || 'N/A';
                     columnValues[MONDAY_COLUMN_MAP['Marketing Details']] = data.marketingSubsource || '';
 
-                    // Full Summary (email and SMS columns removed as requested)
+                    // Full Summary
                     columnValues[MONDAY_COLUMN_MAP['Full Q&A Summary']] = data.qaSummary.join('\n') || '';
+
+                    // New Status Columns (Source Channel, Lead Persona, Primary Interest)
+
+                    // 1. Source Channel
+                    let sourceChannelId = "4"; // Default: Returning (or change to most likely)
+                    const marketingSource = data.marketingSource || '';
+                    if (marketingSource.includes('Search') || marketingSource.includes('Google')) sourceChannelId = "0";
+                    else if (marketingSource.includes('Facebook')) sourceChannelId = "1";
+                    else if (marketingSource.includes('Instagram')) sourceChannelId = "2";
+                    else if (marketingSource.includes('Referral') || marketingSource.includes('Friend') || marketingSource.includes('School')) sourceChannelId = "3";
+                    else if (marketingSource.includes('Returning')) sourceChannelId = "4";
+                    // Note: Option 5 (Other) removed from UI
+                    columnValues[MONDAY_COLUMN_MAP['Source Channel']] = { index: parseInt(sourceChannelId) };
+
+                    // 2. Lead Persona
+                    let leadPersonaId = "3"; // Default: Code Ninja in Training
+                    const persona = data.persona || '';
+                    const cp = [
+                        "The Curious Novice", "The Storyteller", "The Hands-On Architect",
+                        "The Digital Explorer", "The Digital Innovator", "The Game Designer",
+                        "The Structured Learner", "The Hands-On Engineer", "The Debugging Master",
+                        "The Code Ninja in Training", "The Future Tech Leader", "The Collaborative Coder"
+                    ];
+                    if (cp.slice(0, 3).some(p => persona.includes(p))) leadPersonaId = "0";
+                    else if (cp.slice(3, 6).some(p => persona.includes(p))) leadPersonaId = "1";
+                    else if (cp.slice(6, 9).some(p => persona.includes(p))) leadPersonaId = "2";
+                    else if (cp.slice(9, 12).some(p => persona.includes(p))) leadPersonaId = "3";
+                    columnValues[MONDAY_COLUMN_MAP['Lead Persona']] = { index: parseInt(leadPersonaId) };
+
+                    // 3. Primary Interest
+                    let primaryInterestId = "1"; // Default: Coding Skills
+                    const program = data.programDisplay || '';
+                    const age = data.ageGroup || '';
+                    const futureFocus = qaData['What future skill matters most to you for your child right now?'] || '';
+                    const interests14 = checkboxLabels('interest14');
+
+                    if (age === '5-7' || program.includes('JR')) {
+                        primaryInterestId = "3"; // STEM Foundations
+                    } else if (futureFocus === 'All three' || (interests14.includes('AI') && interests14.includes('Robotics'))) {
+                        primaryInterestId = "1"; // Map to Coding Skills (or any existing base cat)
+                    } else if (futureFocus === 'Coding + AI' || interests14.includes('AI') || program.includes('AI')) {
+                        primaryInterestId = "0"; // AI Exposure
+                    } else if (futureFocus === 'Coding + Robotics' || interests14.includes('Robotics') || program.includes('Robotics')) {
+                        primaryInterestId = "2"; // Robotics
+                    } else if (program.includes('AI')) {
+                        primaryInterestId = "0"; // AI Exposure
+                    } else if (program.includes('Robotics')) {
+                        primaryInterestId = "2"; // Robotics
+                    } else if (program.includes('CREATE')) {
+                        primaryInterestId = "1"; // Coding Skills
+                    }
+                    columnValues[MONDAY_COLUMN_MAP['Primary Interest']] = { index: parseInt(primaryInterestId) };
 
                     // Convert to Monday.com format
                     const columnValuesString = JSON.stringify(columnValues);
@@ -2571,15 +2613,11 @@ Code Ninjas ${centerName}`;
                             marketingSource = 'Google / Online Search';
                             const searchTopics = checkboxLabels('searchTopics');
                             const clickReasons = checkboxLabels('searchClickWhy');
-                            const searchOther = textValue('searchOtherDetails');
-                            const clickOther = textValue('clickOtherDetails');
 
                             marketingSubsource = [
                                 `Primary source: ${hearLabel}`,
                                 searchTopics.length ? `What they were searching for: ${searchTopics.join(', ')}` : '',
-                                searchOther ? `Search Other: ${searchOther}` : '',
-                                clickReasons.length ? `What made them click: ${clickReasons.join(', ')}` : '',
-                                clickOther ? `Click Other: ${clickOther}` : ''
+                                clickReasons.length ? `What made them click: ${clickReasons.join(', ')}` : ''
                             ].filter(Boolean).join('\n');
                             break;
                         }
@@ -2595,15 +2633,6 @@ Code Ninjas ${centerName}`;
                         case 'Returning': {
                             marketingSource = 'Returning Family';
                             marketingSubsource = `Primary source: ${hearLabel}`;
-                            break;
-                        }
-                        case 'Other': {
-                            const oth = textValue('otherDetails');
-                            marketingSource = oth ? `Other: ${oth}` : 'Other';
-                            marketingSubsource = [
-                                `Primary source: ${hearLabel}`,
-                                oth ? `Details: ${oth}` : ''
-                            ].filter(Boolean).join('\n');
                             break;
                         }
                     }
@@ -2775,7 +2804,10 @@ ${smsOptions[1] || ''}`;
                     emailBody: emailBody,
                     smsOptions: smsOptions,
                     marketingSource: marketingSource || 'N/A',
-                    marketingSubsource: marketingSubsource || ''
+                    marketingSubsource: marketingSubsource || '',
+                    // Pass gender and age directly to avoid legend text mismatch issues
+                    gender: gender,
+                    ageGroup: currentChildAge
                 });
 
                 // Show result to parent after Gemini & submit complete
