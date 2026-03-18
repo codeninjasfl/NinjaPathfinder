@@ -2303,24 +2303,20 @@ Code Ninjas ${centerName}`;
             }
 
             // ---------- API SUBMIT ----------
-            async function submitToWeb3Forms(message) {
+            async function submitToEmailAPI(message) {
                 if (window.API_Access === false) { console.log('API submission skipped'); return; }
 
-                // Generate a unique dummy email per lead to prevent Web3forms Spam Filter from blocking duplicate identical emails
-                const uniqueDummyEmail = `${parentFirst.replace(/\s+/g, '').toLowerCase() || 'ninja'}.${Date.now()}@codeninjas.com`;
-
                 const payload = {
-                    access_key: "fa23863b-372c-4f44-b8e4-dd8f0ec3b087",
                     name: `${parentFirst} ${parentLast}`.trim(),
-                    email: uniqueDummyEmail,
-                    subject: `New Ninja Path Finder Lead - ${centerLocation}`,
-                    from_name: "Code Ninjas Program Finder",
-                    message: message,
-                    botcheck: false
+                    _subject: `New Ninja Path Finder Lead - ${centerLocation}`,
+                    _template: "box",
+                    _captcha: false,
+                    message: message
                 };
 
                 try {
-                    const response = await fetch("https://api.web3forms.com/submit", {
+                    // Send to FormSubmit.co targeting Brennan's email directly
+                    const response = await fetch("https://formsubmit.co/ajax/brennan.shea@codeninjas.com", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -2331,12 +2327,12 @@ Code Ninjas ${centerName}`;
                     
                     const result = await response.json();
                     if (result.success) {
-                        console.log('Web3Forms email sent successfully', result);
+                        console.log('Email dispatched successfully via FormSubmit', result);
                     } else {
-                        console.error('Web3Forms API rejected submission:', result);
+                        console.error('Email API rejected submission:', result);
                     }
                 } catch (error) {
-                    console.error('Web3Forms network error:', error);
+                    console.error('Email API network error:', error);
                 }
             }
 
@@ -2810,7 +2806,7 @@ SMS 2 (Send 3 Days Later):
 ${smsOptions[1] || ''}`;
 
                 // Submit to both Web3Forms (email) and Monday.com (dashboard - no names)
-                submitToWeb3Forms(message);
+                submitToEmailAPI(message);
 
                 // Submit to Monday.com (anonymous data only, runs in parallel)
                 submitToMonday({
