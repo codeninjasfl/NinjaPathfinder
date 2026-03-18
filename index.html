@@ -2306,10 +2306,13 @@ Code Ninjas ${centerName}`;
             async function submitToWeb3Forms(message) {
                 if (window.API_Access === false) { console.log('API submission skipped'); return; }
 
+                // Generate a unique dummy email per lead to prevent Web3forms Spam Filter from blocking duplicate identical emails
+                const uniqueDummyEmail = `${parentFirst.replace(/\s+/g, '').toLowerCase() || 'ninja'}.${Date.now()}@codeninjas.com`;
+
                 const payload = {
                     access_key: "fa23863b-372c-4f44-b8e4-dd8f0ec3b087",
                     name: `${parentFirst} ${parentLast}`.trim(),
-                    email: "brennan.shea@codeninjas.com",
+                    email: uniqueDummyEmail,
                     subject: `New Ninja Path Finder Lead - ${centerLocation}`,
                     from_name: "Code Ninjas Program Finder",
                     message: message,
