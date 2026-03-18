@@ -10,7 +10,7 @@
         "dotenv": "^16.0.3"
     },
     "devDependencies": {
-        "vercel": "^33.0.0"
+        "vercel": "^50.33.1"
     },
     "engines": {
         "node": ">=18.0.0"
