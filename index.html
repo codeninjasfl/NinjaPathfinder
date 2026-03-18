@@ -642,10 +642,10 @@
     <iframe name="hidden_iframe" style="display:none;"></iframe>
     <form id="web3Form" class="hidden" action="https://api.web3forms.com/submit" method="POST" target="hidden_iframe">
         <input type="hidden" name="access_key" value="fa23863b-372c-4f44-b8e4-dd8f0ec3b087">
-        <input type="hidden" name="name" id="wf_name" required>
+        <input type="hidden" name="name" id="wf_name">
         <!-- Dummy email added for Web3Forms requirement -->
         <input type="hidden" name="email" value="noreply@codeninjas.com">
-        <textarea name="message" id="wf_message" style="display:none;" required></textarea>
+        <textarea name="message" id="wf_message" style="display:none;"></textarea>
         <input type="hidden" name="subject" id="wf_subject" value="New Ninja Path Finder Lead">
         <input type="hidden" name="from_name" value="Code Ninjas Program Finder">
     </form>
@@ -2303,23 +2303,38 @@ Code Ninjas ${centerName}`;
             }
 
             // ---------- API SUBMIT ----------
-            function submitToWeb3Forms(message) {
+            async function submitToWeb3Forms(message) {
                 if (window.API_Access === false) { console.log('API submission skipped'); return; }
 
-                const form = $('#web3Form');
-                const msgField = $('#wf_message');
-                const subjField = $('#wf_subject');
-                const nameField = $('#wf_name');
+                const payload = {
+                    access_key: "fa23863b-372c-4f44-b8e4-dd8f0ec3b087",
+                    name: `${parentFirst} ${parentLast}`.trim(),
+                    email: "noreply@codeninjas.com",
+                    subject: `New Ninja Path Finder Lead - ${centerLocation}`,
+                    from_name: "Code Ninjas Program Finder",
+                    message: message,
+                    botcheck: false
+                };
 
-                if (!form || !msgField || !subjField || !nameField) return;
-
-                subjField.value = `New Ninja Path Finder Lead - ${centerLocation}`;
-                nameField.value = `${parentFirst} ${parentLast}`.trim();
-                msgField.value = message;
-
-                // Submit via standard form POST to hidden iframe to bypass CORS on file://
-                form.submit();
-                console.log('Web3Forms submission triggered via hidden frame');
+                try {
+                    const response = await fetch("https://api.web3forms.com/submit", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log('Web3Forms email sent successfully', result);
+                    } else {
+                        console.error('Web3Forms API rejected submission:', result);
+                    }
+                } catch (error) {
+                    console.error('Web3Forms network error:', error);
+                }
             }
 
             // ---------- MONDAY.COM SUBMIT (No Names) ----------
