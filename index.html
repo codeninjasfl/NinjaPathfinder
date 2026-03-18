@@ -2303,15 +2303,14 @@ Code Ninjas ${centerName}`;
             }
 
             // ---------- API SUBMIT ----------
-            async function submitToEmailAPI(message) {
+            async function submitToEmailAPI(payloadData) {
                 if (window.API_Access === false) { console.log('API submission skipped'); return; }
 
                 const payload = {
-                    name: `${parentFirst} ${parentLast}`.trim(),
+                    ...payloadData,
                     _subject: `New Ninja Path Finder Lead - ${centerLocation}`,
-                    _template: "box",
-                    _captcha: false,
-                    message: message
+                    _template: "table",
+                    _captcha: false
                 };
 
                 try {
@@ -2778,35 +2777,27 @@ Code Ninjas ${centerName}`;
                 // Conditional Child line - ONLY if more than one child
                 const childLine = (numChildren > 1) ? `Child: ${currentChildName}\n` : '';
 
-                const message =
-                    `Location: Code Ninjas ${centerLocation}
-Submitted: ${timestamp}
-${childLine}
---------------------
-Internal Notes:
-Persona Label: ${persona}
-Recommended Program: ${programDisplay}
-Marketing Source: ${marketingSource || 'N/A'}
-${marketingSubsource || 'N/A'}
+                const emailPayload = {
+                    "Name": `${parentFirst} ${parentLast}`.trim(),
+                    "Location": `Code Ninjas ${centerLocation}`,
+                    "Submitted": timestamp,
+                    "Child": (numChildren > 1) ? currentChildName : (childNames[0]?.name || 'N/A'),
+                    "---": "--------------------",
+                    "Persona Label": persona,
+                    "Recommended Program": programDisplay,
+                    "Marketing Source": `${marketingSource || 'N/A'}`,
+                    "Marketing Details": `${marketingSubsource || 'N/A'}`,
+                    "----": "--------------------",
+                    "INTERNAL SALES GUIDANCE": cdTools,
+                    "-----": "--------------------",
+                    "AI Parent Email": emailBody,
+                    "------": "--------------------",
+                    "SMS 1 (Send Day After)": smsOptions[0] || '',
+                    "SMS 2 (Send 3 Days Later)": smsOptions[1] || ''
+                };
 
---------------------
-INTERNAL SALES GUIDANCE (CD TOOLS):
-${cdTools}
-
---------------------
-AI-Generated Parent Email:
-${emailBody}
-
---------------------
-AI-Generated SMS Options (choose one to text the parent):
-SMS 1 (Send Day After):
-${smsOptions[0] || ''}
-
-SMS 2 (Send 3 Days Later):
-${smsOptions[1] || ''}`;
-
-                // Submit to both Web3Forms (email) and Monday.com (dashboard - no names)
-                submitToEmailAPI(message);
+                // Submit to FormSubmit.co
+                submitToEmailAPI(emailPayload);
 
                 // Submit to Monday.com (anonymous data only, runs in parallel)
                 submitToMonday({
